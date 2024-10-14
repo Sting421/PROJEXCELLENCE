@@ -64,7 +64,7 @@
         }
 
         .form-control:focus {
-            border-color: var (--primary-light);
+            border-color: var(--primary-light);
             box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
         }
 
@@ -104,12 +104,12 @@
         }
 
         .white {
-            background-color: white
+            background-color: white;
         }
 
         .btn-light {
-        background-color: #f8f9fa !important; /* Ensure the light background */
-        color: #212529 !important; /* Ensure the text color is dark */
+            background-color: #f8f9fa !important; /* Ensure the light background */
+            color: #212529 !important; /* Ensure the text color is dark */
         }  
       
         .asteriskField {
@@ -122,22 +122,9 @@
 <div class="background-container">
     <div class="container-fluid d-flex flex-column justify-content-between" style="height: 100%;">
         <div class="row flex-grow-1">
-            <div class="col-lg-5 left-panel d-flex flex-column align-items-center justify-content-center rounded-start-4">
-                
-                <div class="px-4 py-5 text-center" style="position: relative; z-index: 1;">
-                    <h1 class="display-5 mb-4 fw-bold">Join Us Today!</h1>
-                    <p class="lead mb-5 ">Start your journey toward seamless project management. Create an account and take control of your team's success.<br/>Sign up to plan, collaborate, and achieve more together!</p>
-                    <form method="GET">
-                        <a href="{% url 'signup' %}" class="btn btn-light btn-lg px-5 py-3 rounded-3 shadow">
-                            Sign up
-                        </a>
-                    </form>
-                </div>
-            </div>
-            <div class="col-lg-7 d-flex align-items-center justify-content-center white rounded-end-4">
+            <div class="col-lg-7 d-flex align-items-center justify-content-center white rounded-start-4">
                 <div class="px-4 py-5 w-100" style="max-width: 500px;">
                     <img src="{% static '/res/slogo.svg' %}" alt="logo">
-                    <!-- <h1 class="display-5 mb-4 fw-bold text-center black">LOGIN</h1> -->
                     <form method="POST" action="{% url 'login' %}" class="mb-3">
                         {% csrf_token %}
                         {{ form|crispy }}
@@ -151,8 +138,20 @@
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                 {{ message }}
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
                         {% endfor %}
                     {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-5 left-panel d-flex flex-column align-items-center justify-content-center rounded-end-4">
+                <div class="px-4 py-5 text-center" style="position: relative; z-index: 1;">
+                    <h1 class="display-5 mb-4 fw-bold">Join Us Today!</h1>
+                    <p class="lead mb-5">Start your journey toward seamless project management. Create an account and take control of your team's success.<br/>Sign up to plan, collaborate, and achieve more together!</p>
+                    <form method="GET">
+                        <a href="{% url 'signup' %}" class="btn btn-light btn-lg px-5 py-3 rounded-3 shadow">
+                            Sign up
+                        </a>
+                    </form>
                 </div>
             </div>
         </div>
