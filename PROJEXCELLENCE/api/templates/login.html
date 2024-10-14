@@ -1,0 +1,161 @@
+{% extends "hero_base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}PROJEXCELLENCE- Sign In{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .background-container {
+            background-image: url("{% static 'res/background.png' %}");
+            padding: 0.5rem; /* Add padding for spacing */
+            height: 100vh; /* Ensure it covers the full height */
+            display: flex; /* Allow flexbox for vertical centering */
+            padding-left: 150px;
+            padding-right: 150px;
+            padding-top: 150px;
+            padding-bottom: 150px;
+        }
+
+        .left-panel {
+            color: white;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            background-color: #46DFB1; /* Solid background color */
+            align-items: center; /* Center vertically */
+            justify-content: center; /* Center horizontally */
+        }
+
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--primary-light) 0%, transparent 60%);
+            opacity: 0.4;
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .btn-primary {
+            background-color: #343a40;
+            border-color: #495057;
+            transition: all 0.3s cubic-bezier(0.35, -0.24, 0, 1.14);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-control {
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+            padding: 0.75rem 1rem;
+        }
+
+        .form-control:focus {
+            border-color: var (--primary-light);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+
+        .logo {
+            font-family: 'Paytone One', sans-serif;
+            font-weight: 400;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            position: absolute;
+            top: 3%;
+            left: 15%;
+            transform: translateX(-50%);
+            z-index: 2;
+            width: 100%;
+            max-width: 298px;
+            height: auto;
+            padding: 10px;
+            font-size: clamp(32px, 8vw, 64px);
+        }
+
+        @media (max-width: 991px) {
+            .logo {
+                position: static;
+                transform: none;
+                margin: 20px auto;
+            }
+        }
+
+        @media (max-width: 575px) {
+            .logo {
+                font-size: 40px;
+                max-width: 200px;
+            }
+        }
+
+        .white {
+            background-color: white
+        }
+
+        .btn-light {
+        background-color: #f8f9fa !important; /* Ensure the light background */
+        color: #212529 !important; /* Ensure the text color is dark */
+        }  
+      
+        .asteriskField {
+            display: none; 
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="background-container">
+    <div class="container-fluid d-flex flex-column justify-content-between" style="height: 100%;">
+        <div class="row flex-grow-1">
+            <div class="col-lg-5 left-panel d-flex flex-column align-items-center justify-content-center rounded-start-4">
+                
+                <div class="px-4 py-5 text-center" style="position: relative; z-index: 1;">
+                    <h1 class="display-5 mb-4 fw-bold">Join Us Today!</h1>
+                    <p class="lead mb-5 ">Start your journey toward seamless project management. Create an account and take control of your team's success.<br/>Sign up to plan, collaborate, and achieve more together!</p>
+                    <form method="GET">
+                        <a href="{% url 'signup' %}" class="btn btn-light btn-lg px-5 py-3 rounded-3 shadow">
+                            Sign up
+                        </a>
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-7 d-flex align-items-center justify-content-center white rounded-end-4">
+                <div class="px-4 py-5 w-100" style="max-width: 500px;">
+                    <img src="{% static '/res/slogo.svg' %}" alt="logo">
+                    <!-- <h1 class="display-5 mb-4 fw-bold text-center black">LOGIN</h1> -->
+                    <form method="POST" action="{% url 'login' %}" class="mb-3">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg px-5 py-3 rounded-3 shadow">Sign in</button>
+                        </div>
+                    </form>
+    
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
