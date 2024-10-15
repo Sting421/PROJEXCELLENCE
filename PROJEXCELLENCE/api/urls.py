@@ -10,4 +10,6 @@ urlpatterns = [
     path("login/", views.login_view, name="login"),
     path("logout/", LogoutView.as_view(next_page="login"), name="logout"),
     path("signup/", views.signup_view, name="signup"),
+    path("Error404/", views.Error404, name="Error404"),
+    path("myteam/", views.myteam, name="myteam"),
 ]

@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from django.contrib.messages import get_messages
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import (
     LoginForm,
@@ -10,6 +11,10 @@ from .forms import (
 
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
+def Error404(request):
+      return render(request, "page404.html")
+def myteam(request):
+      return render(request, "myteam.html")
 
 
 def login_view(request):
@@ -50,3 +55,20 @@ def signup_view(request):
         pass
 
     return render(request, "signup.html", {"form": form})
+
+# @login_required
+# def dashboard(request):
+#     user = request.user
+#     recent_goals = Goal.objects.filter(user=user).order_by("-created_at")[:5]
+#     recent_attendance = Attendance.objects.filter(user=user).order_by("-date")[:5]
+#     pending_leaves = Leave.objects.filter(user=user, status="PENDING")
+
+#     context = {
+#         "user": user,
+#         "recent_goals": recent_goals,
+#         "recent_attendance": recent_attendance,
+#         "pending_leaves": pending_leaves,
+#     }
+#     return render(request, "dashboard.html", context)
+
+
