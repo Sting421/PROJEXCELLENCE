@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
+from .models import Task
 
 User = get_user_model()
 
@@ -163,3 +164,11 @@ class SignupForm(forms.ModelForm):
 #         if commit:
 #             user.save()
 #         return user
+
+class TaskForm(forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ["task_name", "description","assigned_to","due_date","status"]
+        widgets = {
+            "due_date": forms.DateTimeInput(attrs={"type": "datetime-local"}),
+        }
