@@ -15,6 +15,9 @@ def Error404(request):
       return render(request, "page404.html")
 def myteam(request):
       return render(request, "myteam.html")
+@login_required
+def dashboard(request):
+      return render(request, "dashboard.html")
 
 
 def login_view(request):

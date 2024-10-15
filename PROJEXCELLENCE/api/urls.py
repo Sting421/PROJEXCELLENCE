@@ -12,4 +12,5 @@ urlpatterns = [
     path("signup/", views.signup_view, name="signup"),
     path("Error404/", views.Error404, name="Error404"),
     path("myteam/", views.myteam, name="myteam"),
+    path("dashboard/", views.dashboard, name="dashboard"),
 ]

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Dashboard{% endblock title %}Dashboard
+{% block extra_css %}
+    <style>
+        .main-content {
+            padding: 20px;
+        }
+        .btn-primary {
+            background-color: #818cf8;
+            border-color: #818cf8;
+        }
+        .btn-primary:hover {
+            background-color: #6366f1;
+            border-color: #6366f1;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .applicant-img {
+            width: 80px;
+            height: 80px;
+            background-color: #e5e7eb;
+            border-radius: 50%;
+            margin: 0 auto;
+        }
+        .table th {
+            font-weight: normal;
+            color: #6b7280;
+        }
+        .status-active {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        .status-expired {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        .action-icon {
+            color: #6b7280;
+            margin-right: 10px;
+        }
+        .profile-image {
+            width: 50px;  
+            height: 50px;
+            object-fit: cover; 
+            border-radius: 50%;  
+        }
+        .asteriskField {
+            display: none; 
+        }
+
+    </style>
+{% endblock extra_css %}
+
+{% block content %}
+            <!-- Main content -->
+                <div class="vh-100">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
+                        
+                        <div class="d-flex align-items-center">
+                            <input type="text" class="form-control me-2" placeholder="Search">
+                            <i class="fas fa-share-alt fs-4 me-3"></i>
+                            {% if user.profile_path %}
+                                <a href="{% url 'profile' %}" style="cursor: pointer;  width: 50px;  height: 50px;" ><img src="{{ user.profile_path.url }}" alt="Profile Picture" class="profile-image"></a>
+                            {% else %}
+                                <!-- Default image if no profile picture is uploaded -->
+                               
+                            {% endif %}
+                        </div>
+                    </div>
+    
+                    <h3 class="mb-4">Recent Applicants</h3>
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-5">
+                        <div class="col">
+                            <div class="card h-100 text-center">
+                                <div class="card-body">
+                                    <div class="applicant-img mb-3"></div>
+                                    <h5 class="card-title">test</h5>
+                                    <p class="card-text text-muted">test</p>
+                                    <button class="btn btn-outline-primary">test</button>
+                                </div>
+                            </div>
+                        </div>
+            
+    
+                
+                </div>
+{% endblock  %}
