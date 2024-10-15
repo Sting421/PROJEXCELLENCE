@@ -13,4 +13,11 @@ urlpatterns = [
     path("Error404/", views.Error404, name="Error404"),
     path("myteam/", views.myteam, name="myteam"),
     path("dashboard/", views.dashboard, name="dashboard"),
+
+    path("addtask/", views.addtask, name="addtask"),
+    path("myteams/", views.myteams, name="myteams"),
+    path("resourceLib/", views.resourceLib, name="resourceLib"),
+
+
+    path("profile/", views.profile, name="profile"),
 ]

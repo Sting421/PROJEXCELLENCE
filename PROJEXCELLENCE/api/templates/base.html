@@ -166,11 +166,25 @@
   </head>
   <body>
     <header>
-    <div class="header">
-        <img src="{% static '/res/slogo.svg' %}" alt="logo" width="200px">
-      Welcome, {{ request.user.first_name|capfirst }}
-      <div class="header-right"></div>
-    </div>
+      <div class="header">
+          <img src="{% static '/res/slogo.svg' %}" alt="logo" width="200px">
+        <div class="header-right"></div>
+          <div class="profile">
+            <a class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}" href="{% url 'profile' %}">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+              </svg> 
+              {{ request.user.first_name|capfirst }} {{ request.user.last_name|capfirst }}
+            </a>
+            <a class="nav-link" href="{% url 'logout' %}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+              <i class="fas fa-sign-out-alt me-2"></i>
+            </a>
+            <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: none;">
+              {% csrf_token %}
+            </form>
+          </div>
+      </div>
     </header>   
     <nav class="navbar navbar-expand-md navbar-light bg-light d-md-none">
       <div class="container-fluid">
@@ -203,13 +217,37 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'logout' %}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                <i class="fas fa-sign-out-alt me-2"></i> Logout
+              <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
+                <img src="{% static '/res/projectIcon.svg' %}" alt="logo" width="20px">  Project
               </a>
-              <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: none;">
-                {% csrf_token %}
-              </form>
             </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.resolver_match.url_name == 'addtask' %}active{% endif %}" href="{% url 'addtask' %}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list-task" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M2 2.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5V3a.5.5 0 0 0-.5-.5zM3 3H2v1h1z"/>
+                  <path d="M5 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5M5.5 7a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1zm0 4a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1z"/>
+                  <path fill-rule="evenodd" d="M1.5 7a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5zM2 7h1v1H2zm0 3.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm1 .5H2v1h1z"/>
+                </svg> task
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
+                <img src="{% static '/res/timelineIcon.svg' %}" alt="logo" width="20px">  TimeLine
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.resolver_match.url_name == 'myteam' %}active{% endif %}" href="{% url 'myteam' %}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people-fill" viewBox="0 0 16 16">
+                  <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>
+                </svg></i> Team
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.resolver_match.url_name == 'resourceLib' %}active{% endif %}" href="{% url 'resourceLib' %}">
+                <img src="{% static '/res/resourceIcon.svg' %}" alt="logo" width="20px"> Resource Library
+              </a>
+            </li>
+          
           </ul>
         </nav>
 
