@@ -49,6 +49,12 @@
         color: #2d3748;
         margin-bottom: 5px;
     }
+    .task-title {
+        font-size: 1.6rem;
+        color: #2d3748;
+        margin-bottom: 5px;
+    }
+   
     .task-item.completed .task-description {
         text-decoration: line-through;
         color: #718096;
@@ -107,6 +113,7 @@
                 <div class="d-flex align-items-center">
                     <input type="checkbox" class="task-checkbox" {% if task.completed %}checked{% endif %}>
                     <div>
+                        <div class="task-title">{{ task.task_name }}</div>
                         <div class="task-description">{{ task.description }}</div>
                         <div class="task-due-date">Due: {{ task.due_date|date:"F j, Y g:iA" }}</div>
                     </div>

@@ -128,13 +128,13 @@ def tasks(request):
             task.assigned_to = request.user
             task.save()
             messages.success(request, 'Task added successfully.')
-            return redirect('tasks')  # Redirect to the task list
+            return redirect('task')  # Redirect to the task list
     else:
         form = TaskForm()
     
     # Separate tasks into active and completed/expired based on status
     active_tasks = tasks.filter(status__in=['ACTIVE', 'IN_PROGRESS'])
-    completed_expired_tasks = tasks.filter(status__in=['pending', 'EXPIRED'])
+    completed_expired_tasks = tasks.filter(status__in=['PENDING', 'EXPIRED'])
 
     return render(request, 'task.html', {
         'active_tasks': active_tasks,
@@ -172,7 +172,7 @@ def add_task(request):
             task.assigned_to = request.user  # Assign the task to the logged-in user
             task.save()
             messages.success(request, "Task added successfully.")
-            return redirect("tasks")
+            return redirect("task")
     else:
         form = TaskForm()
     return render(request, "task_add.html", {"form": form})
@@ -183,7 +183,7 @@ def delete_task(request, pk):
     if request.method == 'POST':
         task.delete()
         messages.success(request, 'Task deleted successfully.')
-        return redirect('tasks')
+        return redirect('task')
     return render(request, 'delete_task.html', {'task': task})
 
 @login_required
@@ -196,7 +196,7 @@ def edit_task(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, 'Task updated successfully.')
-            return redirect('tasks')  # Redirect back to the tasks page
+            return redirect('task')  # Redirect back to the tasks page
     else:
         form = TaskForm(instance=task)  # Load form with existing task data
 
