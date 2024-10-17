@@ -172,3 +172,4 @@ class TaskForm(forms.ModelForm):
         widgets = {
             "due_date": forms.DateTimeInput(attrs={"type": "datetime-local"}),
         }
+        
