@@ -168,8 +168,12 @@ class SignupForm(forms.ModelForm):
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ["task_name", "description","assigned_to","due_date","status"]
+        fields = ["task_name", "description", "assigned_to", "due_date", "status"]
         widgets = {
             "due_date": forms.DateTimeInput(attrs={"type": "datetime-local"}),
         }
-        
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+       
+        self.fields['assigned_to'].queryset = User.objects.filter(is_active=True)

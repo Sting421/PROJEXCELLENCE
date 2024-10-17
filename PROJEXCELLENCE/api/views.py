@@ -169,7 +169,6 @@ def add_task(request):
         form = TaskForm(request.POST)
         if form.is_valid():
             task = form.save(commit=False)
-            task.assigned_to = request.user  # Assign the task to the logged-in user
             task.save()
             messages.success(request, "Task added successfully.")
             return redirect("task")
