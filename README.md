@@ -1,7 +1,7 @@
 # PROJEXCELLENCE
 
 <h1 align="center">
-  <img src="./PROJEXCELLENCE/static/res/slogo.svg" alt="Project Logo" width="200" /><br />
+  <img src="./PROJEXCELLENCE/static/res/logoWBg.svg" alt="Project Logo" width="200" /><br />
   <span style="font-size: 2em; font-weight: bold;">PROJECT MANAGEMENT SYSTEM</span>
 </h1>
 
