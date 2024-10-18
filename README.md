@@ -1,7 +1,7 @@
 # PROJEXCELLENCE
 
 <h1 align="center">
-  <img src="./PROJEXCELLENCE/static/res/logoWBg.svg" alt="Project Logo" width="200" /><br />
+  <img src="./PROJEXCELLENCE/static/res/logoWBg.jpg" alt="Project Logo" width="200" /><br />
   <span style="font-size: 2em; font-weight: bold;">PROJECT MANAGEMENT SYSTEM</span>
 </h1>
 
@@ -14,11 +14,12 @@
 
 ## Team Members
 
-- **zincaid (Lanz Roy Sumalpong)** -Project Manager / Designer / Front-end
+- **zincaid (Lanz Roy Sumalpong)** -Project Manager / Designer / Front-end / Tester
 - **Sting421 (Aldrin John Vitorillo)** -Full-stack Developer
-- **Raveneko (Mary Apple Ramos)** -Designer & Front-end Tester
+- **Raveneko (Mary Apple Ramos)** -Designer & Front-end / Tester
 
 
+## How to clone
 
 1. **Clone the repository**  
    ```bash
