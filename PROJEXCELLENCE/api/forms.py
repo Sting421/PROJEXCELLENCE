@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
-from .models import Task
+from .models import Task, Project
 
 User = get_user_model()
 
@@ -177,3 +177,13 @@ class TaskForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
        
         self.fields['assigned_to'].queryset = User.objects.filter(is_active=True)
+
+class ProjectForm(forms.ModelForm):
+    class Meta:
+        model = Project
+        fields = ['project_name', 'description']  
+        widgets = {
+            'project_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Project Name'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Project Description', 'rows': 5}),
+        }
+ 

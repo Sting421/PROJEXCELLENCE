@@ -54,7 +54,7 @@ class User(AbstractUser):
         message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.",
     )
     phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True)
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="EMPLOYEE")
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="MEMBER")
     date_of_hire = models.DateField(blank=True, null=True)
     profile_path = models.ImageField(null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="PENDING")
@@ -119,6 +119,8 @@ class User(AbstractUser):
 class Project(models.Model):
     project_name = models.CharField(max_length=50)
     description = models.TextField()
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    date_created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.project_name

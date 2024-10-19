@@ -1,6 +1,6 @@
 import django_filters
 from django.forms.widgets import DateInput
-from .models import User, Task
+from .models import User, Task, Project
 
 class TaskFilter(django_filters.FilterSet):
     due_date_range = django_filters.DateFromToRangeFilter(
@@ -11,3 +11,20 @@ class TaskFilter(django_filters.FilterSet):
     class Meta:
         model = Task
         fields = ["due_date_range"]
+
+class ProjectFilter(django_filters.FilterSet):
+    date_created_range = django_filters.DateFromToRangeFilter(
+        field_name="date_created",
+        widget=django_filters.widgets.RangeWidget(attrs={"type": "date"}),
+        label="Creation Date (Range)"
+    )
+    project_name = django_filters.CharFilter(
+        field_name="project_name", lookup_expr="icontains", label="Project Name"
+    )
+    description = django_filters.CharFilter(
+        field_name="description", lookup_expr="icontains", label="Description"
+    )
+
+    class Meta:
+        model = Project
+        fields = ["project_name", "description", "date_created_range"]

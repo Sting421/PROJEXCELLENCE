@@ -6,14 +6,15 @@ from django.contrib.messages import get_messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
-from .filters import TaskFilter
+from .filters import TaskFilter, ProjectFilter
 
-from .models import Task
+from .models import Task ,Project
 from django.contrib import messages
 from .forms import (
     LoginForm,
     SignupForm,
     TaskForm,
+    ProjectForm,
   
 )
 
@@ -52,17 +53,12 @@ def profile(request):
 
 #addtask
 @login_required
-def addtask(request):
-      return render(request, "addtask.html")
-@login_required
 def myteams(request):
       return render(request, "myteams.html")
 @login_required
 def resourceLib(request):
       return render(request, "resourceLib.html")
-@login_required
-def projects(request):
-      return render(request, "projectDashboard.html")
+
 
 
 def login_view(request):
@@ -176,7 +172,7 @@ def add_task(request):
             return redirect("task")
     else:
         form = TaskForm()
-    return render(request, "task_add.html", {"form": form})
+    return render(request, "add_task.html", {"form": form})
 
 @login_required
 def delete_task(request, pk):
@@ -207,93 +203,87 @@ def edit_task(request, pk):
 # ------------------------------------------- End of task -------------------------------------
 
 
-# ------------------------------------------- projects -------------------------------------
+#------------------------------------------- projects -------------------------------------
 
-# @login_required
-# def tasks(request):
-#     # Get all tasks assigned to the logged-in user and order by 'assigned_to'
-#     tasks = Task.objects.filter(assigned_to=request.user).order_by('assigned_to')
+@login_required
+def projects(request):
+    # Get all projects created by the logged-in user and order by 'project_name'
+    projects = Project.objects.filter(created_by=request.user).order_by('project_name')
 
-#     if request.method == 'POST':
-#         form = TaskForm(request.POST)
-#         if form.is_valid():
-#             task = form.save(commit=False)
-#             task.assigned_to = request.user
-#             task.save()
-#             messages.success(request, 'Task added successfully.')
-#             return redirect('task')  # Redirect to the task list
-#     else:
-#         form = TaskForm()
+    if request.method == 'POST':
+        form = ProjectForm(request.POST)
+        if form.is_valid():
+            project = form.save(commit=False)
+            project.created_by = request.user
+            project.save()
+            messages.success(request, 'Project added successfully.')
+            return redirect('project')
+
+    else:
+        form = ProjectForm()
     
-#     # Separate tasks into active and completed/expired based on status
-#     active_tasks = tasks.filter(status__in=['ACTIVE', 'IN_PROGRESS'])
-#     completed_expired_tasks = tasks.filter(status__in=['PENDING', 'EXPIRED'])
+    return render(request, 'project.html', {
+        'projects': projects,
+        'form': form
+    })
 
-#     return render(request, 'task.html', {
-#         'active_tasks': active_tasks,
-#         'completed_expired_tasks': completed_expired_tasks,
-#         'form': form
-#     })
+@login_required
+def project_list(request):
+    # Fetch all projects created by the current user, ordered by date created
+    projects = Project.objects.filter(created_by=request.user).order_by("-date_created")
+    project_filter = ProjectFilter(request.GET, queryset=projects)
 
-# @login_required
-# def task_list(request):
-#     # Fetch all tasks assigned to the current user, ordered by due date
-#     tasks = Task.objects.filter(assigned_to=request.user).order_by("-due_date")
-#     task_filter = TaskFilter(request.GET, queryset=tasks)
+    paginator = Paginator(project_filter.qs, 10)  # Paginate the projects, 10 per page
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
 
-#     paginator = Paginator(task_filter.qs, 10)  # Paginate the tasks, 10 per page
-#     page_number = request.GET.get("page")
-#     page_obj = paginator.get_page(page_number)
+    # Create a form instance for each project for editing purposes
+    edit_project_forms = {project.id: ProjectForm(instance=project) for project in projects}
 
-#     # Create a form instance for each task for editing purposes
-#     edit_task_forms = {task.id: TaskForm(instance=task) for task in tasks}
+    context = {
+        "page_obj": page_obj,
+        "edit_project_forms": edit_project_forms,
+        "add_project_form": ProjectForm(),  # Form to add a new project
+        "filter": project_filter,
+    }
+    return render(request, "project.html", context)
 
-#     context = {
-#         "page_obj": page_obj,
-#         "edit_task_forms": edit_task_forms,
-#         "add_task_form": TaskForm(),  # Form to add a new task
-#         "filter": task_filter,
-#     }
-#     return render(request, "task.html", context)# from task_list
+@login_required
+def add_project(request):
+    if request.method == "POST":
+        form = ProjectForm(request.POST)
+        if form.is_valid():
+            project = form.save(commit=False)
+            project.created_by = request.user
+            project.save()
+            messages.success(request, "Project added successfully.")
+            return redirect("project")
+    else:
+        form = ProjectForm()
+    return render(request, "add_project.html", {"form": form})
 
-# @login_required
-# def add_task(request):
-#     if request.method == "POST":
-#         form = TaskForm(request.POST)
-#         if form.is_valid():
-#             task = form.save(commit=False)
-#             task.save()
-#             messages.success(request, "Task added successfully.")
-#             return redirect("task")
-#     else:
-#         form = TaskForm()
-#     return render(request, "task_add.html", {"form": form})
+@login_required
+def delete_project(request, pk):
+    project = get_object_or_404(Project, pk=pk, created_by=request.user)
+    if request.method == 'POST':
+        project.delete()
+        messages.success(request, 'Project deleted successfully.')
+        return redirect('project')
+    return render(request, 'delete_project.html', {'project': project})
 
-# @login_required
-# def delete_task(request, pk):
-#     task = get_object_or_404(Task, pk=pk, assigned_to=request.user)
-#     if request.method == 'POST':
-#         task.delete()
-#         messages.success(request, 'Task deleted successfully.')
-#         return redirect('task')
-#     return render(request, 'delete_task.html', {'task': task})
-
-# @login_required
-# def edit_task(request, pk):
-#     # Fetch the task to be edited and ensure it belongs to the logged-in user
-#     task = get_object_or_404(Task, pk=pk, assigned_to=request.user)
+@login_required
+def edit_project(request, pk):
+    # Fetch the project to be edited and ensure it belongs to the logged-in user
+    project = get_object_or_404(Project, pk=pk, created_by=request.user)
     
-#     if request.method == 'POST':
-#         form = TaskForm(request.POST, instance=task)  # Load form with task data
-#         if form.is_valid():
-#             form.save()
-#             messages.success(request, 'Task updated successfully.')
-#             return redirect('task')  # Redirect back to the tasks page
-#     else:
-#         form = TaskForm(instance=task)  # Load form with existing task data
+    if request.method == 'POST':
+        form = ProjectForm(request.POST, instance=project)  # Load form with project data
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Project updated successfully.')
+            return redirect('project')  # Redirect back to the projects page
+    else:
+        form = ProjectForm(instance=project)  # Load form with existing project data
 
-#     return render(request, 'task.html', {'form': form, 'task': task})
-
-
-# # ------------------------------------------- End of projects -------------------------------------
-
+    return render(request, 'project_edit.html', {'form': form, 'project': project})
+#------------------------------------------- projects -------------------------------------
