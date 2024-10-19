@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from .filters import TaskFilter, ProjectFilter
+from django.contrib.auth.models import User
 
 from .models import Task ,Project
 from django.contrib import messages
@@ -142,24 +143,23 @@ def tasks(request):
 
 @login_required
 def task_list(request):
-    # Fetch all tasks assigned to the current user, ordered by due date
     tasks = Task.objects.filter(assigned_to=request.user).order_by("-due_date")
     task_filter = TaskFilter(request.GET, queryset=tasks)
 
-    paginator = Paginator(task_filter.qs, 10)  # Paginate the tasks, 10 per page
+    paginator = Paginator(task_filter.qs, 10)  
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
-    # Create a form instance for each task for editing purposes
+
     edit_task_forms = {task.id: TaskForm(instance=task) for task in tasks}
 
     context = {
         "page_obj": page_obj,
         "edit_task_forms": edit_task_forms,
-        "add_task_form": TaskForm(),  # Form to add a new task
+        "add_task_form": TaskForm(),  
         "filter": task_filter,
     }
-    return render(request, "task.html", context)# from task_list
+    return render(request, "task.html", context)
 
 @login_required
 def add_task(request):
@@ -185,17 +185,17 @@ def delete_task(request, pk):
 
 @login_required
 def edit_task(request, pk):
-    # Fetch the task to be edited and ensure it belongs to the logged-in user
+    
     task = get_object_or_404(Task, pk=pk, assigned_to=request.user)
     
     if request.method == 'POST':
-        form = TaskForm(request.POST, instance=task)  # Load form with task data
+        form = TaskForm(request.POST, instance=task) 
         if form.is_valid():
             form.save()
             messages.success(request, 'Task updated successfully.')
-            return redirect('task')  # Redirect back to the tasks page
+            return redirect('task')  
     else:
-        form = TaskForm(instance=task)  # Load form with existing task data
+        form = TaskForm(instance=task)  
 
     return render(request, 'task.html', {'form': form, 'task': task})
 
@@ -233,7 +233,7 @@ def project_list(request):
     projects = Project.objects.filter(created_by=request.user).order_by("-date_created")
     project_filter = ProjectFilter(request.GET, queryset=projects)
 
-    paginator = Paginator(project_filter.qs, 10)  # Paginate the projects, 10 per page
+    paginator = Paginator(project_filter.qs, 5)  # Paginate the projects, 5 per page
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
@@ -286,4 +286,41 @@ def edit_project(request, pk):
         form = ProjectForm(instance=project)  # Load form with existing project data
 
     return render(request, 'project_edit.html', {'form': form, 'project': project})
-#------------------------------------------- projects -------------------------------------
+#------------------------------------------- end projects -------------------------------------
+
+
+def user_list_view(request):
+    users = User.objects.all()  # Query all users
+    return render(request, 'myteam.html', {'users': users})
+
+def dashboard_view(request):
+    tasks = Task.objects.filter(assigned_to=request.user)  
+    paginator = Paginator(tasks, 2) 
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    
+    return render(request, 'dashboard.html', {'page_obj': page_obj})
+# def dashboard_view(request):
+#     # Task pagination
+#     tasks = Task.objects.filter(assigned_to=request.user)
+#     task_paginator = Paginator(tasks, 3)  # Paginate tasks
+#     task_page_number = request.GET.get('task_page')  # Unique GET parameter for tasks
+#     task_page_obj = task_paginator.get_page(task_page_number)
+
+#     # Project filtering and pagination
+#     projects = Project.objects.filter(created_by=request.user).order_by("-date_created")
+#     project_filter = ProjectFilter(request.GET, queryset=projects)
+#     project_paginator = Paginator(project_filter.qs, 5)  # Paginate projects
+#     project_page_number = request.GET.get('project_page')  # Unique GET parameter for projects
+#     project_page_obj = project_paginator.get_page(project_page_number)
+
+#     # Pass both paginated objects to the template
+#     context = {
+#         'task_page_obj': task_page_obj,
+#         'project_page_obj': project_page_obj,
+#         'project_filter': project_filter,  # Pass the filter too if needed
+#     }
+
+#     return render(request, 'dashboard.html', context)
+

@@ -3,89 +3,248 @@
 {% block title %}Dashboard{% endblock title %}Dashboard
 {% block extra_css %}
 
+{% load crispy_forms_tags %}
+{% load custom_filters %}
+
     <style>
-        .main-content {
-            padding: 20px;
+        .dashboard{
+            margin-left: 4%;
         }
-        .btn-primary {
-            background-color: #818cf8;
-            border-color: #000959;
-        }
-        .btn-primary:hover {
-            background-color: #6366f1;
-            border-color: #6366f1;
-        }
-        .card {
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .applicant-img {
-            width: 80px;
-            height: 80px;
-            background-color: #e5e7eb;
-            border-radius: 50%;
-            margin: 0 auto;
-        }
-        .table th {
-            font-weight: normal;
-            color: #6b7280;
-        }
-        .status-active {
-            background-color: #d1fae5;
-            color: #065f46;
-        }
-        .status-expired {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-        .action-icon {
-            color: #6b7280;
-            margin-right: 10px;
-        }
-        .profile-image {
-            width: 50px;  
-            height: 50px;
-            object-fit: cover; 
-            border-radius: 50%;  
-        }
-        .asteriskField {
-            display: none; 
-        }
+        .Welcome-card {
+        background-color: rgba(70, 223, 177, 0.5);
+        color: #213A58;
+        border-radius: 8px;
+        padding: 16px;
+        min-height: 100px;
+        padding: 20;
+        box-shadow: 0 10px 14px rgba(0, 0, 0, 0.1);
+        max-width: 90%;
+        height: 120%;
+        margin-bottom: 16px;  /* Add some space between cards if you have more than one */
+    }
+
+    .name {
+        padding: 20px;
+        font-size: 25px;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    /* Task area */
+    #tasks-list {
+        flex: 1;
+        overflow-y: auto;
+        margin-bottom: 20px;
+      
+    }
+    .task-item {
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+       
+    }
+    .task-item:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        transform: translateY(-2px);
+    }
+    .task-item.completed {
+        background-color: #f0fff4;
+        border-color: #68d391;
+    }
+    .task-description {
+        font-size: 1.1rem;
+        color: #2d3748;
+        margin-bottom: 5px;
+    }
+    .task-title {
+        font-size: 1.6rem;
+        color: #2d3748;
+        margin-bottom: 5px;
+    }
+   
+    
+    .task-due-date {
+        font-size: 0.9rem;
+        color: #718096;
+    }
+    .task-actions {
+        float: right;
+    }
+    .task-actions i {
+        cursor: pointer;
+        margin-top: 10px;
+        margin-left: 10px;
+        color: #718096;
+        transition: color 0.2s ease;
+        font-size: 1.3em; /* Increased icon size */
+    }
+    .task-actions i:hover {
+        color: #2b6cb0;
+    }
+    .asteriskField {
+        display: none !important;
+    }
+    /* project Area */
+    #projects-list {
+        margin-top: 10px;
+        overflow-y: auto;
+        margin-bottom: 40px;
+        height: 10%;
+    }
+    .project-item {
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 20px;
+        padding-bottom: 40px;
+        margin-bottom: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .project-item:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        transform: translateY(-2px);
+    }
+    
+    .project-description {
+        font-size: 1.1rem;
+        color: #2d3748;
+        margin-bottom: 5px;
+    }
+    .project-title {
+        font-size: 1.6rem;
+        color: #2d3748;
+        margin-bottom: 5px;
+    }
+    .add-project {
+        color: #4a5568;
+        cursor: pointer;
+        padding: 15px;
+        border: 2px dashed #e2e8f0;
+        border-radius: 8px;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+    .add-project:hover {
+        color: #2b6cb0;
+        background-color: #ebf8ff;
+        border-color: #63b3ed;
+    }
+    .project-actions {
+        float: right;
+    }
+    .project-actions i {
+        cursor: pointer;
+        margin-top: 10px;
+        margin-left: 10px;
+        color: #718096;
+        transition: color 0.2s ease;
+        font-size: 1.3em;
+    }
+    .project-actions i:hover {
+        color: #2b6cb0;
+    }
+    .asteriskField {
+        display: none !important;
+    }
+    .View-Members {
+        background-color: #213A58;
+        color: white;
+        float: right;
+    }
+    .View-Members:hover {
+        background-color: #ffffff; /* Darker background on hover */
+        border-radius: 10px;
+        border-width: 2px;
+        border-color: #63a0e0;
+        transform: translateY(-2px); /* Slight lift effect on hover */
+    }
+    #projects-list {
+        margin-top: 20px;
+        overflow-y: auto;
+        flex-grow: 1; /* Allow the list to grow and fill the available space */
+    }
+    .Header_page{
+        float: right;
+        margin-right: 10%;
+        color:#213A58;
+        margin-bottom: 10px;
+    }
+    .custom-page-link {
+        background-color: #213A58; /* Change background color */
+        color: white; /* Change text color */
+    }
+  
+  
 
     </style>
 {% endblock extra_css %}
 
 {% block content %}
-            <!-- Main content -->
-                <div class="vh-100">
-                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
-                        
-                        <div class="d-flex align-items-center">
-                            <input type="text" class="form-control me-2" placeholder="Search">
-                            <i class="fas fa-share-alt fs-4 me-3"></i>
-                            {% if user.profile_path %}
-                                <a href="{% url 'profile' %}" style="cursor: pointer;  width: 50px;  height: 50px;" ><img src="{{ user.profile_path.url }}" alt="Profile Picture" class="profile-image"></a>
-                            {% else %}
-                                <!-- Default image if no profile picture is uploaded -->
-                               
-                            {% endif %}
+        <!-- Main content -->
+    <div class="dashboard">
+        <div class="Welcome-card">
+            {% if request.user.project_set.exists %}
+                {% with project=request.user.project_set.first %}
+                    <p class="name">Welcome back,  {{ project.created_by.first_name|capfirst }} {{ project.created_by.last_name|capfirst }}</p>
+                {% endwith %}
+            {% endif %}
+        </div>
+        <div class="recent-task">
+            <table>
+                <th> <h2>Recent Task</h2></th>
+                <th><a href="{% url 'task' %}">View All Task</a></th>
+            </table>
+            <div id="tasks-list">
+                {% for task in page_obj %}
+                <div class="task-item {% if task.completed %}completed{% endif %}">
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <div class="task-title">{{ task.task_name }}</div>
+                            <div class="task-description">{{ task.description }}</div>
+                            <div class="task-due-date">Due: {{ task.due_date|date:"F j, Y g:iA" }}</div>
                         </div>
                     </div>
-    
-                    <h3 class="mb-4">Recent Applicants</h3>
-                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-5">
-                        <div class="col">
-                            <div class="card h-100 text-center">
-                                <div class="card-body">
-                                    <div class="applicant-img mb-3"></div>
-                                    <h5 class="card-title">test</h5>
-                                    <p class="card-text text-muted">test</p>
-                                    <button class="btn btn-outline-primary">test</button>
-                                </div>
-                            </div>
-                        </div>
-            
-    
-                
                 </div>
+                
+                {% empty %}
+                    <div class="task-item">
+                        <h4 class="text-center">You have no tasks to accomplish.<br/><small>Set up tasks to have a productive day ahead.</small></h4>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="ongoing-projects">
+            <table>
+                <th> <h2>Ongoing Projects</h2></th>
+                <th><a href="{% url 'project' %}">View All Project</a></th>
+            </table>
+            <div id="projects-list">
+                {% for project in page_obj %}
+                <div class="project-item">
+                    <div class="project-actions ml-10">
+                        <a href="{% url 'myteam' %}" class="btn View-Members mt-3">View Team</a>
+                    </div>
+                    <div>
+                        <div class="project-title">{{ project.project_name }}</div>
+                        <div class="project-description">{{ project.description }}</div>
+                        <div class="project-due-date">Created on: {{ project.date_created|date:"F j, Y g:iA" }}</div>
+                    </div>   
+                </div>
+                {% empty %}
+                    <div class="project-item">
+                        <h4 class="text-center">No projects found.<br/><small>Create a project to get started.</small></h4>
+                    </div>
+                {% endfor %}
+            </div>
+
+        </div>
+    </div>
+           
 {% endblock  %}
