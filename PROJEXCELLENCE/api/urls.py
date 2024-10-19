@@ -25,6 +25,8 @@ urlpatterns = [
     path("myteams/", views.myteams, name="myteams"),
     path("resourceLib/", views.resourceLib, name="resourceLib"),
 
+    path("projects/", views.projects, name="projects"),
+
 
     path("profile/", views.profile, name="profile"),
 ]

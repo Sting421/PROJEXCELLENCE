@@ -186,7 +186,7 @@ class Task(models.Model):
 class Team(models.Model):
     team_name = models.CharField(max_length=50)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    users = models.ManyToManyField(User)
 
     def __str__(self):
         return self.team_name
