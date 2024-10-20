@@ -9,13 +9,14 @@ from django.core.paginator import Paginator
 from .filters import TaskFilter, ProjectFilter
 from django.contrib.auth.models import User
 
-from .models import Task ,Project
+from .models import Task ,Project, Team
 from django.contrib import messages
 from .forms import (
     LoginForm,
     SignupForm,
     TaskForm,
     ProjectForm,
+    TeamForm,
   
 )
 
@@ -55,7 +56,7 @@ def profile(request):
 #addtask
 @login_required
 def myteams(request):
-      return render(request, "myteams.html")
+      return render(request, "myteam.html")
 @login_required
 def resourceLib(request):
       return render(request, "resourceLib.html")
@@ -292,7 +293,7 @@ def edit_project(request, pk):
 def user_list_view(request):
     users = User.objects.all()  # Query all users
     return render(request, 'myteam.html', {'users': users})
-
+@login_required
 def dashboard_view(request):
     tasks = Task.objects.filter(assigned_to=request.user)  
     paginator = Paginator(tasks, 2) 
@@ -323,4 +324,49 @@ def dashboard_view(request):
 #     }
 
 #     return render(request, 'dashboard.html', context)
+
+#team
+
+from django.shortcuts import render
+from django.core.paginator import Paginator
+from .models import Team
+from .filters import TeamFilter  # Assuming you have a TeamFilter similar to ProjectFilter
+from .forms import TeamForm  # Assuming you have a TeamForm for creating or editing teams
+
+def team_list(request):
+    # Fetch all teams created by the current user, ordered by date created
+    teams = Team.objects.filter(users=request.user).order_by("-id")  # Adjust if you have a date_created field
+
+    # Apply filtering to the teams
+    team_filter = TeamFilter(request.GET, queryset=teams)
+
+    # Paginate the filtered teams, 5 per page
+    paginator = Paginator(team_filter.qs, 5)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    # Create a form instance for each team for editing purposes
+    edit_team_forms = {team.id: TeamForm(instance=team) for team in page_obj}  # Only create forms for current page
+
+    context = {
+        "page_obj": page_obj,
+        "edit_team_forms": edit_team_forms,
+        "add_team_form": TeamForm(),  # Form to add a new team
+        "filter": team_filter,
+    }
+    
+    return render(request, "myteam.html", context)
+
+
+
+def add_team(request):
+    if request.method == 'POST':
+        form = TeamForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('myteam')  # Redirect to the list of teams
+        
+    else:  
+        form = TeamForm()
+    return render(request, 'myteam.html', {'add_team_form': form})
 

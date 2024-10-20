@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% load static %}
+{% load crispy_forms_tags %}
 {% block title %}My Team{% endblock title %}Dashboard
 {% block extra_css %}
+
 <style>
     .card {
         background-color: #E0E7EF;
@@ -64,6 +66,22 @@
         user-select: none;
      
     }
+
+    /* team style */
+    .add-team {
+        color: #4a5568;
+        cursor: pointer;
+        padding: 15px;
+        border: 2px dashed #e2e8f0;
+        border-radius: 8px;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+    .add-team:hover {
+        color: #2b6cb0;
+        background-color: #ebf8ff;
+        border-color: #63b3ed;
+    }
     
 </style>
 {% endblock extra_css %}
@@ -72,6 +90,11 @@
 <div class="page">
     <div class="Team">
         <h1> Team</h1><br>
+        
+        <div type="button" class="add-team" data-bs-toggle="modal" data-bs-target="#addTeamModal">
+            <i class="fas fa-plus mr-2"></i> Add Team
+        </div>
+        
         <h4>Project Manager</h4>
         <div class="card">
             <div class="info">
@@ -104,17 +127,28 @@
 
     <div class="Members">
         <ul class="nav nav-tabs">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Project Team</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#2">Creative Team</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#1">Technology Team</a>\
-            </li>
-            
-          </ul>
+            {% for team in page_obj %}
+                <li class="nav-item">
+                    <a class="nav-link {% if forloop.first %}active{% endif %}" 
+                       aria-current="page" 
+                       href="#team-{{ team.id }}">
+                       {{ team.team_name }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+        <div class="tab-content">
+            {% for team in page_obj %}
+                <div class="tab-pane {% if forloop.first %}active{% endif %}" id="team-{{ team.id }}">
+                    {{ team.team_name }}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+   
+    
+    
        
         <div class="card-members">
             <div class="info">
@@ -129,12 +163,32 @@
                                     <h2 class="name"> {{ project.created_by.first_name|capfirst }} {{ project.created_by.last_name|capfirst }}</h2>
                                 {% endwith %}
                             {% endif %}
-                            <h2 class="title"> {{ request.user.role|capfirst }}</>
+                            <h2 class="title"> {{ request.user.role|capfirst }}</h2>
                         </td>
                     </tr>
                 </table>
             </div>
         </div>
+        <!-- add team -->
+        <div class="modal fade" id="addTeamModal" tabindex="-1" aria-labelledby="addTeamModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addTeamModalLabel">Add Team</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" action="{% url 'add_team' %}">
+                            {% csrf_token %}
+                            {{ add_team_form|crispy }}
+                            <button type="submit" class="btn btn-primary mt-3">Add Team</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
     </div>
 </div>
 {% endblock %}

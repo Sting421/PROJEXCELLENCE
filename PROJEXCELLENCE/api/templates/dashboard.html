@@ -7,10 +7,10 @@
 {% load custom_filters %}
 
     <style>
-        .dashboard{
+    .dashboard{
             margin-left: 4%;
-        }
-        .Welcome-card {
+    }
+    .Welcome-card {
         background-color: rgba(70, 223, 177, 0.5);
         color: #213A58;
         border-radius: 8px;
@@ -28,6 +28,7 @@
         font-size: 25px;
         font-weight: bold;
         margin: 0;
+        user-select: none;
     }
 
     /* Task area */
@@ -35,6 +36,7 @@
         flex: 1;
         overflow-y: auto;
         margin-bottom: 20px;
+        user-select: none;
       
     }
     .task-item {
@@ -180,9 +182,14 @@
         background-color: #213A58; /* Change background color */
         color: white; /* Change text color */
     }
-  
-  
-
+    .rt-header{
+        display: flex;
+        
+    }
+    .view-btn{
+        float: right;
+    }
+   
     </style>
 {% endblock extra_css %}
 
@@ -190,17 +197,13 @@
         <!-- Main content -->
     <div class="dashboard">
         <div class="Welcome-card">
-            {% if request.user.project_set.exists %}
-                {% with project=request.user.project_set.first %}
-                    <p class="name">Welcome back,  {{ project.created_by.first_name|capfirst }} {{ project.created_by.last_name|capfirst }}</p>
-                {% endwith %}
-            {% endif %}
+            <p class="name">Welcome back,  {{ request.user.first_name|capfirst }} {{ request.user.last_name|capfirst }}</p>
         </div>
         <div class="recent-task">
-            <table>
-                <th> <h2>Recent Task</h2></th>
-                <th><a href="{% url 'task' %}">View All Task</a></th>
-            </table>
+                <div class="rt-header">
+                    <h2>Recent Task</h2>
+                    <a class="view-btn" href="{% url 'task' %}">View All Task</a></th>
+                </div>
             <div id="tasks-list">
                 {% for task in page_obj %}
                 <div class="task-item {% if task.completed %}completed{% endif %}">
@@ -212,7 +215,6 @@
                         </div>
                     </div>
                 </div>
-                
                 {% empty %}
                     <div class="task-item">
                         <h4 class="text-center">You have no tasks to accomplish.<br/><small>Set up tasks to have a productive day ahead.</small></h4>

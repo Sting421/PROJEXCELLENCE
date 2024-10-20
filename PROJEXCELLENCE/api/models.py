@@ -125,6 +125,15 @@ class Project(models.Model):
     def __str__(self):
         return self.project_name
 
+    
+class Team(models.Model):
+    team_name = models.CharField(max_length=50)
+    users = models.ManyToManyField(User)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.team_name
+
 
 class ProjectManager(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -184,14 +193,6 @@ class Task(models.Model):
     def __str__(self):
         return self.task_name
 
-
-class Team(models.Model):
-    team_name = models.CharField(max_length=50)
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    users = models.ManyToManyField(User)
-
-    def __str__(self):
-        return self.team_name
 
 
 class Member(models.Model):

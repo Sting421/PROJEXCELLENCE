@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
-from .models import Task, Project
+from .models import Task, Project, Team
 
 User = get_user_model()
 
@@ -186,4 +186,23 @@ class ProjectForm(forms.ModelForm):
             'project_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Project Name'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Project Description', 'rows': 5}),
         }
+ 
+class TeamForm(forms.ModelForm):
+    class Meta:
+        model = Team
+        fields = ['team_name', 'users', 'project']
+        
+  
+    team_name = forms.CharField(
+        label="Team Name",
+        max_length=50,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    
+    users = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(),
+        widget=forms.CheckboxSelectMultiple, 
+        label="Select Team Members"
+    )
+    
  
