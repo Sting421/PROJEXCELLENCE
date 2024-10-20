@@ -6,7 +6,7 @@ from django.contrib.messages import get_messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
-from .filters import TaskFilter, ProjectFilter
+from .filters import TaskFilter, ProjectFilter, TeamFilter
 from django.contrib.auth.models import User
 
 from .models import Task ,Project, Team
@@ -17,6 +17,7 @@ from .forms import (
     TaskForm,
     ProjectForm,
     TeamForm,
+    EditProfile,
   
 )
 
@@ -96,23 +97,6 @@ def signup_view(request):
         form = SignupForm()
 
     return render(request, "signup.html", {"form": form})
-
-# @login_required
-# def dashboard(request):
-#     user = request.user
-#     recent_goals = Goal.objects.filter(user=user).order_by("-created_at")[:5]
-#     recent_attendance = Attendance.objects.filter(user=user).order_by("-date")[:5]
-#     pending_leaves = Leave.objects.filter(user=user, status="PENDING")
-
-#     context = {
-#         "user": user,
-#         "recent_goals": recent_goals,
-#         "recent_attendance": recent_attendance,
-#         "pending_leaves": pending_leaves,
-#     }
-#     return render(request, "dashboard.html", context)
-
-
 
 # ------------------------------------------- task -------------------------------------
 
@@ -302,36 +286,8 @@ def dashboard_view(request):
 
     
     return render(request, 'dashboard.html', {'page_obj': page_obj})
-# def dashboard_view(request):
-#     # Task pagination
-#     tasks = Task.objects.filter(assigned_to=request.user)
-#     task_paginator = Paginator(tasks, 3)  # Paginate tasks
-#     task_page_number = request.GET.get('task_page')  # Unique GET parameter for tasks
-#     task_page_obj = task_paginator.get_page(task_page_number)
-
-#     # Project filtering and pagination
-#     projects = Project.objects.filter(created_by=request.user).order_by("-date_created")
-#     project_filter = ProjectFilter(request.GET, queryset=projects)
-#     project_paginator = Paginator(project_filter.qs, 5)  # Paginate projects
-#     project_page_number = request.GET.get('project_page')  # Unique GET parameter for projects
-#     project_page_obj = project_paginator.get_page(project_page_number)
-
-#     # Pass both paginated objects to the template
-#     context = {
-#         'task_page_obj': task_page_obj,
-#         'project_page_obj': project_page_obj,
-#         'project_filter': project_filter,  # Pass the filter too if needed
-#     }
-
-#     return render(request, 'dashboard.html', context)
 
 #team
-
-from django.shortcuts import render
-from django.core.paginator import Paginator
-from .models import Team
-from .filters import TeamFilter  # Assuming you have a TeamFilter similar to ProjectFilter
-from .forms import TeamForm  # Assuming you have a TeamForm for creating or editing teams
 
 def team_list(request):
     # Fetch all teams created by the current user, ordered by date created
@@ -368,5 +324,19 @@ def add_team(request):
         
     else:  
         form = TeamForm()
+    return render(request, 'myteam.html', {'add_team_form': form})
+
+#profile
+
+
+def edit_profile(request):
+    if request.method == 'POST':
+        form = EditProfile(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')  # Redirect to the list of teams
+        
+    else:  
+        form = EditProfile()
     return render(request, 'myteam.html', {'add_team_form': form})
 

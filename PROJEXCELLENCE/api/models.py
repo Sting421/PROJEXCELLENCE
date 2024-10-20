@@ -45,7 +45,7 @@ class User(AbstractUser):
     ]
 
     # Use email instead of username
-    username = None  # Remove the username field entirely
+    username = None 
     email = models.EmailField(_("email address"), unique=True)
 
     # Additional fields

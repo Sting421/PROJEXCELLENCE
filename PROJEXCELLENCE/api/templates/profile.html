@@ -92,6 +92,12 @@
       cursor: pointer;
       border-radius: 5px;
   }
+  .avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        margin-right: 16px;
+    }
 </style>
 {% endblock extra_css %}
 
@@ -101,6 +107,7 @@
     <h1>User Profile</h1>
     <div class="profile-header">
         <div class="profile-avatar"></div>
+        <!-- <img src="{% static '/res/logoPlaceHolder.png' %}" alt="avatar-profile" class="avatar"> -->
         <button class="upload-photo">Upload new photo</button>
     </div>
     <div class="info-section">
