@@ -2,97 +2,163 @@
 {% load static %}
 {% block title %}Profile{% endblock title %}Dashboard
 {% block extra_css %}
-<style>
- 
-  .container {
-      display: flex;
-      height: 100%;
-  }
+    <style>
+        .container {
+            display: flex;
+            height: 100%;
+        }
 
-  .main-content {
-      flex-grow: 1;
-      padding: 16px;
-      margin-left: 17%;
-  }
-  
-  .logo {
-      font-weight: bold;
-      font-size: 18px;
-  }
-  .user-menu {
-      display: flex;
-      align-items: center;
-  }
-  .user-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background-color: #4CAF50;
-      margin-right: 10px;
-  }
-  .profile-header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 20px;
-  }
-  .profile-avatar {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      background-color: #46DFB1;
-      margin-right: 20px;
-  }
-  .upload-photo {
-      background-color: #f0f0f0;
-      border: none;
-      padding: 10px 15px;
-      cursor: pointer;
-      border-radius: 5px;
-  }
-  .info-section {
-      background-color: #fff;
-      border: 1px solid #e0e0e0;
-      border-radius: 5px;
-      padding: 20px;
-      margin-bottom: 20px;
-  }
-  .info-header {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-  }
-  .edit-button {
-      background: none;
-      border: none;
-      color: #000000;
-      cursor: pointer;
-  }
-  .info-content {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-  }
-  .info-item {
-      background-color: #f9f9f9;
-      padding: 10px;
-      border-radius: 5px;
-  }
-  .location-input {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #e0e0e0;
-      border-radius: 5px;
-  }
-  .save-button {
-      background-color: #46DFB1;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      cursor: pointer;
-      border-radius: 5px;
-  }
-</style>
+        .main-content {
+            flex-grow: 1;
+            padding: 16px;
+            margin-left: 17%;
+        }
+        
+        .logo {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #4CAF50;
+            margin-right: 10px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-header2 {
+            display: inline-block;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: #46DFB1;
+            margin: 20px 40px 20px 40px;
+        }
+
+        .upload-photo {
+            color: #314863;
+            cursor: pointer;
+            border: 1px #d5d8dc solid;
+            border-radius: 10px;
+            width: 200px;
+            height: 40px;
+            font-weight: 650;
+        }
+
+        .upload-text{
+            font-size: 13px;
+            color: #8a8a8a;
+            margin-top: 5px;
+        }
+
+        .info-section {
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .info-loc-section {
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #c0c6ce ;
+        }
+
+        .info-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .edit-button {
+            background: none;
+            color: #000000;
+            cursor: pointer;
+            border: 1px #d5d8dc solid;
+            border-radius: 10px;
+            width: 80px;
+            height: 35px;
+        }
+
+        .cancel-button {
+            background: none;
+            border: none;
+            color: #000000;
+            cursor: pointer;
+        }
+
+        .info-content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        .info-item {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .location-input {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 2px solid #29415e;
+            border-radius: 10px;
+        }
+
+        .save-button {
+            background-color: #29415e;
+            font-weight: 500;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            margin-right: 16px;
+        }
+        
+        h1{
+            color: #314863;
+            font-weight: 700;
+        }
+        
+        h2{
+            color: #314863;
+        }
+
+        strong{
+            color: #8a8a8a;
+        }
+
+    </style>
 {% endblock extra_css %}
 
 {% block content %}
@@ -101,7 +167,11 @@
     <h1>User Profile</h1>
     <div class="profile-header">
         <div class="profile-avatar"></div>
-        <button class="upload-photo">Upload new photo</button>
+        <!-- <img src="{% static '/res/logoPlaceHolder.png' %}" alt="avatar-profile" class="avatar"> -->
+        <div class="profile-header2">
+            <button class="upload-photo">Upload new photo</button>
+            <p class="upload-text">At leaest 800x800 px recommended.<br>JPG or PNG is allowed.</p>
+        </div>
     </div>
     <div class="info-section">
         <div class="info-header">
@@ -123,12 +193,12 @@
             </div>
         </div>
     </div>
-    <div class="info-section">
+    <div class="info-loc-section">
         <div class="info-header">
             <h2>Location</h2>
-            <button class="edit-button">Cancel</button>
+            <button class="cancel-button">Cancel</button>
         </div>
-        <input type="text" class="location-input" placeholder="Enter your location">
+        <input type="text" class="location-input" placeholder="⚲ Enter your location">
         <button class="save-button">Save Changes</button>
     </div>
     <div class="info-section">

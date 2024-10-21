@@ -165,6 +165,12 @@ class SignupForm(forms.ModelForm):
 #             user.save()
 #         return user
 
+class EditProfile(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["first_name", "last_name", "email", "phone_number", "status"]
+       
+
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
