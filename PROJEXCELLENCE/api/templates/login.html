@@ -163,6 +163,26 @@
         .asteriskField {
             display: none; 
         }
+
+        .fade-out {
+            opacity: 0;
+            transform: scale(0.95); 
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+       
+        .fade-in {
+            opacity: 0;
+            transform: scale(1);
+            animation: fadeInAnimation 0.8s forwards ease;
+        }
+
+        @keyframes fadeInAnimation {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
     </style>
 {% endblock %}
 
@@ -170,6 +190,8 @@
 <div class="background-container">
     <div class="container-fluid">
         <div class="row">
+
+            <!-- LogIn Form -->
             <div class="col-lg-7">
                 <img src="{% static '/res/slogo.svg' %}" alt="logo" class="logo">
                 <div class="form-container">
@@ -192,6 +214,8 @@
                     {% endif %}
                 </div>
             </div>
+
+            <!-- SignUp Form -->
             <div class="col-lg-5 left-panel">
                 <div class="sign-up-container">
                     <h1 class="signuptext">Join Us Today!</h1>
@@ -205,4 +229,23 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const signupButton = document.querySelector(".btn-signup");
+
+        if (signupButton) {
+            signupButton.addEventListener("click", function (e) {
+                e.preventDefault();
+                document.querySelector(".container-fluid").classList.add("fade-out");
+
+                setTimeout(function () {
+                    window.location.href = signupButton.getAttribute("href");
+                }, 800); 
+            });
+        }
+
+        document.querySelector(".container-fluid").classList.add("fade-in");
+    });
+</script>
 {% endblock %}
