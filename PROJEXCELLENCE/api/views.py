@@ -63,7 +63,6 @@ def resourceLib(request):
       return render(request, "resourceLib.html")
 
 
-
 def login_view(request):
     if request.method == "POST":
         form = LoginForm(request.POST)
@@ -74,14 +73,13 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 return redirect("dashboard")
-            else:
-                messages.error(request, "Invalid email or password.")
+           
     else:
         form = LoginForm()
 
-    storage = get_messages(request)
-    for _ in storage:
-        pass
+    # storage = get_messages(request)
+    # for _ in storage:
+    #     pass
     return render(request, "login.html", {"form": form})
 
 
@@ -111,7 +109,7 @@ def tasks(request):
             task = form.save(commit=False)
             task.assigned_to = request.user
             task.save()
-            messages.success(request, 'Task added successfully.')
+            # messages.success(request, 'Task added successfully.')
             return redirect('task')  # Redirect to the task list
     else:
         form = TaskForm()
@@ -153,7 +151,7 @@ def add_task(request):
         if form.is_valid():
             task = form.save(commit=False)
             task.save()
-            messages.success(request, "Task added successfully.")
+            # messages.success(request, "Task added successfully.")
             return redirect("task")
     else:
         form = TaskForm()
@@ -164,7 +162,7 @@ def delete_task(request, pk):
     task = get_object_or_404(Task, pk=pk, assigned_to=request.user)
     if request.method == 'POST':
         task.delete()
-        messages.success(request, 'Task deleted successfully.')
+        # messages.success(request, 'Task deleted successfully.')
         return redirect('task')
     return render(request, 'delete_task.html', {'task': task})
 
@@ -177,7 +175,7 @@ def edit_task(request, pk):
         form = TaskForm(request.POST, instance=task) 
         if form.is_valid():
             form.save()
-            messages.success(request, 'Task updated successfully.')
+            # messages.success(request, 'Task updated successfully.')
             return redirect('task')  
     else:
         form = TaskForm(instance=task)  
@@ -201,7 +199,7 @@ def projects(request):
             project = form.save(commit=False)
             project.created_by = request.user
             project.save()
-            messages.success(request, 'Project added successfully.')
+            # messages.success(request, 'Project added successfully.')
             return redirect('project')
 
     else:
@@ -241,7 +239,7 @@ def add_project(request):
             project = form.save(commit=False)
             project.created_by = request.user
             project.save()
-            messages.success(request, "Project added successfully.")
+            # messages.success(request, "Project added successfully.")
             return redirect("project")
     else:
         form = ProjectForm()
@@ -252,7 +250,7 @@ def delete_project(request, pk):
     project = get_object_or_404(Project, pk=pk, created_by=request.user)
     if request.method == 'POST':
         project.delete()
-        messages.success(request, 'Project deleted successfully.')
+        # messages.success(request, 'Project deleted successfully.')
         return redirect('project')
     return render(request, 'delete_project.html', {'project': project})
 
@@ -265,7 +263,7 @@ def edit_project(request, pk):
         form = ProjectForm(request.POST, instance=project)  # Load form with project data
         if form.is_valid():
             form.save()
-            messages.success(request, 'Project updated successfully.')
+            # messages.success(request, 'Project updated successfully.')
             return redirect('project')  # Redirect back to the projects page
     else:
         form = ProjectForm(instance=project)  # Load form with existing project data
