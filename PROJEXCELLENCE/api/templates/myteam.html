@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
+{% load custom_filters %}
 {% block title %}My Team{% endblock title %}Dashboard
 {% block extra_css %}
+
 
 <style>
     .card {
@@ -80,6 +82,12 @@
         background-color: #ebf8ff;
         border-color: #63b3ed;
     }
+    .project-name{
+        color: #213A58;
+    }
+    .active{
+        color: rgb(52, 0, 241);
+    }
     
 </style>
 {% endblock extra_css %}
@@ -87,7 +95,7 @@
 {% block content %}
 <div class="page">
     <div class="Team">
-        <h1> Team</h1><br>
+        <h1> <div class="project-name">{{ project.project_name|capfirst }} </div>Team</h1><br>
         
         <div type="button" class="add-team" data-bs-toggle="modal" data-bs-target="#addTeamModal">
             <i class="fas fa-plus mr-2"></i> Add Team
@@ -134,10 +142,34 @@
                 </li>
             {% endfor %}
         </ul>
+        {% for team in page_obj %}
+    
         <div class="tab-content">
-            {% for team in page_obj %}
+            {{ team.team_name }}
+            {% for membership in team_memberships|default_if_none:team.id %}
                 <div class="tab-pane {% if forloop.first %}active{% endif %}" id="team-{{ team.id }}">
-                    {{ team.team_name }}
+                    <div class="card-members">
+                        <div class="info">
+                            <table>
+                                    <tr>
+                                        <td>
+                                            <img src="{% static 'res/logoPlaceHolder.png' %}" alt="profile pic" class="avatar">
+                                        </td>
+                                        <td>
+                                            <h2 class="name">{{user.first_name|capfirst}}</h2>
+                                            <h2>{{ membership.user.first_name|capfirst }} {{ membership.user.last_name|capfirst }}</h2>
+                                            <h2 class="title">{{ membership.role|capfirst }}</h2>    
+                                        </td>
+                                    </tr>
+                                  
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="2">No members in this team.</td>
+                                    </tr>
+                                    {% endfor %}
+                            </table>
+                        </div>
+                    </div>
                 </div>
             {% endfor %}
         </div>
@@ -154,7 +186,7 @@
                         </td>
                         <td>
                             <h2 class="name">{{ membership.user.first_name|capfirst }} {{ membership.user.last_name|capfirst }}</h2>
-                            <h2 class="title">{{ membership.role|capfirst }}</h2> <!-- Using the role from TeamMembership -->
+                            <h2 class="title">{{ membership.role|capfirst }}</h2> <!-- Using the role from TeamMembership -->    
                         </td>
                     </tr>
                 {% empty %}

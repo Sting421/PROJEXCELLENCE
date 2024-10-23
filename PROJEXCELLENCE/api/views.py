@@ -272,7 +272,6 @@ def edit_project(request, pk):
     return render(request, 'project_edit.html', {'form': form, 'project': project})
 #------------------------------------------- end projects -------------------------------------
 
-
 def user_list_view(request):
     users = User.objects.all()  # Query all users
     return render(request, 'myteam.html', {'users': users})
@@ -287,6 +286,7 @@ def dashboard_view(request):
     return render(request, 'dashboard.html', {'page_obj': page_obj})
 
 #team
+@login_required
 
 def team_list(request, project_id):
     project = get_object_or_404(Project, id=project_id)
@@ -312,12 +312,16 @@ def team_list(request, project_id):
 
     edit_team_forms = {team.id: TeamForm(instance=team) for team in page_obj}
 
+    # Fetching team memberships for each team on the current page
+    team_memberships = {team.id: team.teammembership_set.all() for team in page_obj}
+
     context = {
         "page_obj": page_obj,
         "edit_team_forms": edit_team_forms,
         "add_team_form": add_team_form,  
         "filter": team_filter,
-        "project": project, 
+        "project": project,
+        "team_memberships": team_memberships,  # Ensure this line is included
     }
 
     return render(request, "myteam.html", context)
@@ -332,4 +336,3 @@ def edit_profile(request):
     else:  
         form = EditProfile()
     return render(request, 'myteam.html', {'add_team_form': form})
-
