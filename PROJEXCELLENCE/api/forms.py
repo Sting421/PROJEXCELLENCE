@@ -193,10 +193,32 @@ class ProjectForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Project Description', 'rows': 5}),
         }
  
+# class TeamForm(forms.ModelForm):
+#     class Meta:
+#         model = Team
+#         fields = ['team_name', 'users', 'project']
+        
+  
+#     team_name = forms.CharField(
+#         label="Team Name",
+#         max_length=50,
+#         widget=forms.TextInput(attrs={'class': 'form-control'})
+#     )
+    
+#     users = forms.ModelMultipleChoiceField(
+#         queryset=User.objects.all(),
+#         widget=forms.CheckboxSelectMultiple, 
+#         label="Select Team Members"
+#     )
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+       
+#         self.fields['project'].queryset = Project.objects.filter(id)
+
 class TeamForm(forms.ModelForm):
     class Meta:
         model = Team
-        fields = ['team_name', 'users', 'project']
+        fields = ['team_name', 'users']
         
   
     team_name = forms.CharField(
@@ -210,5 +232,4 @@ class TeamForm(forms.ModelForm):
         widget=forms.CheckboxSelectMultiple, 
         label="Select Team Members"
     )
-    
  

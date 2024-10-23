@@ -6,6 +6,8 @@ from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from PIL import Image
+from django.contrib.auth.models import User
+
 
 
 class UserManager(BaseUserManager):
@@ -124,15 +126,34 @@ class Project(models.Model):
 
     def __str__(self):
         return self.project_name
-
     
+
 class Team(models.Model):
-    team_name = models.CharField(max_length=50)
-    users = models.ManyToManyField(User)
+    team_name = models.CharField(max_length=50, unique=True)
+    users = models.ManyToManyField(User, through='TeamMembership')  # Using a through model
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.team_name
+    
+
+class Team(models.Model):
+    team_name = models.CharField(max_length=50)
+    users = models.ManyToManyField(User, through='TeamMembership')  # Define the through model
+    project = models.ForeignKey('Project', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.team_name
+
+class TeamMembership(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    role = models.CharField(max_length=50)  # Store user role within the team
+    joined_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} in {self.team.team_name} as {self.role}"
+
 
 
 class ProjectManager(models.Model):

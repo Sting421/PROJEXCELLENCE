@@ -9,6 +9,7 @@
     <style>
     .dashboard{
             margin-left: 4%;
+           
     }
     .Welcome-card {
         background-color: rgba(70, 223, 177, 0.5);
@@ -36,7 +37,7 @@
         flex: 1;
         overflow-y: auto;
         margin-bottom: 20px;
-        user-select: none;
+        
       
     }
     .task-item {
@@ -232,7 +233,7 @@
                 {% for project in page_obj %}
                 <div class="project-item">
                     <div class="project-actions ml-10">
-                        <a href="{% url 'myteam' %}" class="btn View-Members mt-3">View Team</a>
+                        <a href="{% url 'myteam' project.id %}" class="btn View-Members mt-3">View Team</a>
                     </div>
                     <div>
                         <div class="project-title">{{ project.project_name }}</div>
@@ -240,6 +241,7 @@
                         <div class="project-due-date">Created on: {{ project.date_created|date:"F j, Y g:iA" }}</div>
                     </div>   
                 </div>
+                
                 {% empty %}
                     <div class="project-item">
                         <h4 class="text-center">No projects found.<br/><small>Create a project to get started.</small></h4>

@@ -9,10 +9,13 @@
             background-image: url("{% static 'res/bg.svg' %}");
             background-size: cover;
             background-repeat: no-repeat;
+            user-select: none;
+            
         }
          .background-container {
             display: flex; 
             padding: 80px 150px 123px 150px;
+           
         }
         
         .container-fluid {
@@ -23,6 +26,7 @@
             -webkit-box-shadow: 5px 5px 15px 5px #000000; 
             box-shadow: 5px 5px 20px 0px #242424;
             border-radius: 15px;
+            margin-top: 4%;
         }
 
         .row {
@@ -154,13 +158,34 @@
         .asteriskField {
             display: none;
         }
-  
+        
+        .fade-out {
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+
+        .fade-in {
+            opacity: 0;
+            transform: scale(1);
+            animation: fadeInAnimation 0.8s forwards ease;
+        }
+
+        @keyframes fadeInAnimation {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
     </style>
 {% endblock %}
 {% block content %}
 <div class="background-container">
     <div class="container-fluid">
         <div class="row">
+
+            <!-- Sign In Form -->
             <div class="col-lg-5"> 
                 <div class="sign-in-container">
                     <h1 class="signintext">Welcome Back!</h1>
@@ -171,6 +196,8 @@
                     </form>
                 </div>
             </div>
+
+            <!-- Register Form -->
             <div class="col-lg-7">
                 <div class="form">
                     <img src="{% static 'res/slogo.svg' %}" alt="logo" class="logo">
@@ -195,4 +222,35 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const signupButton = document.querySelector(".btn-signup");
+        const signinButton = document.querySelector(".btn-signin");
+
+        if (signupButton) {
+            signupButton.addEventListener("click", function (e) {
+                e.preventDefault(); 
+                document.querySelector(".container-fluid").classList.add("fade-out");
+
+                setTimeout(function () {
+                    window.location.href = signupButton.getAttribute("href");
+                }, 800); 
+            });
+        }
+
+        if (signinButton) {
+            signinButton.addEventListener("click", function (e) {
+                e.preventDefault();
+                document.querySelector(".container-fluid").classList.add("fade-out");
+
+                setTimeout(function () {
+                    window.location.href = signinButton.getAttribute("href");
+                }, 800); 
+            });
+        }
+
+        document.querySelector(".container-fluid").classList.add("fade-in");
+    });
+</script>
 {% endblock %}

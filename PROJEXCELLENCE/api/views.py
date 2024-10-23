@@ -8,8 +8,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from .filters import TaskFilter, ProjectFilter, TeamFilter
 from django.contrib.auth.models import User
+from django.urls import reverse
 
-from .models import Task ,Project, Team
+from .models import Task ,Project, Team, TeamMembership
 from django.contrib import messages
 from .forms import (
     LoginForm,
@@ -287,45 +288,39 @@ def dashboard_view(request):
 
 #team
 
-def team_list(request):
-    # Fetch all teams created by the current user, ordered by date created
-    teams = Team.objects.filter(users=request.user).order_by("-id")  # Adjust if you have a date_created field
-
-    # Apply filtering to the teams
+def team_list(request, project_id):
+    project = get_object_or_404(Project, id=project_id)
+    teams = Team.objects.filter(project=project).order_by("-id")
     team_filter = TeamFilter(request.GET, queryset=teams)
-
-    # Paginate the filtered teams, 5 per page
     paginator = Paginator(team_filter.qs, 5)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
-    # Create a form instance for each team for editing purposes
-    edit_team_forms = {team.id: TeamForm(instance=team) for team in page_obj}  # Only create forms for current page
+    if request.method == 'POST':
+        add_team_form = TeamForm(request.POST)
+        if add_team_form.is_valid():
+            team = add_team_form.save(commit=False)
+            team.project = project  
+            team.save()
+            
+            # Handle adding users with a default role
+            for user in add_team_form.cleaned_data['users']:
+                TeamMembership.objects.create(user=user, team=team, role='member')  # Default role
+            return redirect('team_list', project_id=project.id)
+    else:
+        add_team_form = TeamForm()
+
+    edit_team_forms = {team.id: TeamForm(instance=team) for team in page_obj}
 
     context = {
         "page_obj": page_obj,
         "edit_team_forms": edit_team_forms,
-        "add_team_form": TeamForm(),  # Form to add a new team
+        "add_team_form": add_team_form,  
         "filter": team_filter,
+        "project": project, 
     }
-    
+
     return render(request, "myteam.html", context)
-
-
-
-def add_team(request):
-    if request.method == 'POST':
-        form = TeamForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('myteam')  # Redirect to the list of teams
-        
-    else:  
-        form = TeamForm()
-    return render(request, 'myteam.html', {'add_team_form': form})
-
-#profile
-
 
 def edit_profile(request):
     if request.method == 'POST':
