@@ -20,8 +20,9 @@ urlpatterns = [
     path("task/<int:pk>/edit/", views.edit_task, name="edit_task"),
     path("task/<int:pk>/delete/", views.delete_task, name="delete_task"),
 
-  
     path("resourceLib/", views.resourceLib, name="resourceLib"),
+    #Timeline
+     path("timeline/", views.timeline, name="timeline"),
 
     #projects
     path("project/", views.project_list, name="project"),
@@ -32,8 +33,6 @@ urlpatterns = [
     path("project/add/", views.add_project, name="add_project"),
     path("project/<int:pk>/edit/", views.edit_project, name="edit_project"),
     path("project/<int:pk>/delete/", views.delete_project, name="delete_project"),
-
-
 
     path("profile/", views.profile, name="profile"),
 ]

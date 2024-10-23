@@ -156,8 +156,8 @@
                                             <img src="{% static 'res/logoPlaceHolder.png' %}" alt="profile pic" class="avatar">
                                         </td>
                                         <td>
-                                            <h2 class="name">{{user.first_name|capfirst}}</h2>
-                                            <h2>{{ membership.user.first_name|capfirst }} {{ membership.user.last_name|capfirst }}</h2>
+                                            <!-- <h2 class="name">{{user.first_name|capfirst}}</h2> -->
+                                            <h2>{{ membership.users.first_name|capfirst }} {{ membership.user.last_name|capfirst }}</h2>
                                             <h2 class="title">{{ membership.role|capfirst }}</h2>    
                                         </td>
                                     </tr>

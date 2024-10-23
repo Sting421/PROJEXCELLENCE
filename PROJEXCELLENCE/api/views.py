@@ -34,6 +34,9 @@ def dashboard(request):
 @login_required
 def profile(request):
     return render(request, "profile.html")
+@login_required
+def timeline(request):
+    return render(request, "timeline.html")
 
 
 # #update profile
@@ -213,7 +216,6 @@ def projects(request):
 
 @login_required
 def project_list(request):
-    # Fetch all projects created by the current user, ordered by date created
     projects = Project.objects.filter(created_by=request.user).order_by("-date_created")
     project_filter = ProjectFilter(request.GET, queryset=projects)
 
@@ -221,13 +223,12 @@ def project_list(request):
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
-    # Create a form instance for each project for editing purposes
     edit_project_forms = {project.id: ProjectForm(instance=project) for project in projects}
 
     context = {
         "page_obj": page_obj,
         "edit_project_forms": edit_project_forms,
-        "add_project_form": ProjectForm(),  # Form to add a new project
+        "add_project_form": ProjectForm(), 
         "filter": project_filter,
     }
     return render(request, "project.html", context)
@@ -251,45 +252,47 @@ def delete_project(request, pk):
     project = get_object_or_404(Project, pk=pk, created_by=request.user)
     if request.method == 'POST':
         project.delete()
-        # messages.success(request, 'Project deleted successfully.')
         return redirect('project')
     return render(request, 'delete_project.html', {'project': project})
 
 @login_required
 def edit_project(request, pk):
-    # Fetch the project to be edited and ensure it belongs to the logged-in user
     project = get_object_or_404(Project, pk=pk, created_by=request.user)
     
     if request.method == 'POST':
-        form = ProjectForm(request.POST, instance=project)  # Load form with project data
+        form = ProjectForm(request.POST, instance=project)  
         if form.is_valid():
             form.save()
-            # messages.success(request, 'Project updated successfully.')
-            return redirect('project')  # Redirect back to the projects page
+           
+            return redirect('project') 
     else:
-        form = ProjectForm(instance=project)  # Load form with existing project data
+        form = ProjectForm(instance=project)  #
 
     return render(request, 'project_edit.html', {'form': form, 'project': project})
 #------------------------------------------- end projects -------------------------------------
 
-def user_list_view(request):
-    users = User.objects.all()  # Query all users
-    return render(request, 'myteam.html', {'users': users})
+
 @login_required
 def dashboard_view(request):
-    tasks = Task.objects.filter(assigned_to=request.user)  
+    projects = Project.objects.filter()  # Assuming user is part of a project
+    tasks = Task.objects.filter(assigned_to=request.user)
+    
     paginator = Paginator(tasks, 2) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
+    context = {
+        "page_obj": page_obj,
+        "projects": projects,  # Changed to projects (plural)
+    }
     
-    return render(request, 'dashboard.html', {'page_obj': page_obj})
+    return render(request, 'dashboard.html', context)
 
 #team
 @login_required
-
 def team_list(request, project_id):
     project = get_object_or_404(Project, id=project_id)
+    #teams = Team.objects.filter(project=project).filter(id=10).order_by("-id") #for static testing
     teams = Team.objects.filter(project=project).order_by("-id")
     team_filter = TeamFilter(request.GET, queryset=teams)
     paginator = Paginator(team_filter.qs, 5)
@@ -321,7 +324,7 @@ def team_list(request, project_id):
         "add_team_form": add_team_form,  
         "filter": team_filter,
         "project": project,
-        "team_memberships": team_memberships,  # Ensure this line is included
+        "team_memberships": team_memberships,  # Add this line to include memberships
     }
 
     return render(request, "myteam.html", context)
@@ -336,3 +339,4 @@ def edit_profile(request):
     else:  
         form = EditProfile()
     return render(request, 'myteam.html', {'add_team_form': form})
+

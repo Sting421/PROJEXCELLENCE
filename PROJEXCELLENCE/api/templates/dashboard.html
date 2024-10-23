@@ -226,14 +226,14 @@
         </div>
         <div class="ongoing-projects">
             <table>
-                <th> <h2>Ongoing Projects</h2></th>
-                <th><a href="{% url 'project' %}">View All Project</a></th>
+                <th><h2>Ongoing Projects</h2></th>
+                <th><a href="{% url 'project' %}">View All Projects</a></th>
             </table>
             <div id="projects-list">
-                {% for project in page_obj %}
+                {% for project in projects %}
                 <div class="project-item">
                     <div class="project-actions ml-10">
-                        <a href="{% url 'myteam' project.id %}" class="btn View-Members mt-3">View Team</a>
+                        <a href="{% url 'team_list' project.id %}" class="btn View-Members mt-3">View Team</a>
                     </div>
                     <div>
                         <div class="project-title">{{ project.project_name }}</div>
@@ -248,7 +248,6 @@
                     </div>
                 {% endfor %}
             </div>
-
         </div>
     </div>
            
