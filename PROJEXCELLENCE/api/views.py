@@ -9,6 +9,7 @@ from django.core.paginator import Paginator
 from .filters import TaskFilter, ProjectFilter, TeamFilter
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.db import models
 
 from .models import Task ,Project, Team, TeamMembership
 from django.contrib import messages
@@ -216,7 +217,7 @@ def projects(request):
 
 @login_required
 def project_list(request):
-    projects = Project.objects.filter(created_by=request.user).order_by("-date_created")
+    projects = Project.objects.filter(models.Q(created_by=request.user) | models.Q(teammembership__user=request.user)).distinct()
     project_filter = ProjectFilter(request.GET, queryset=projects)
 
     paginator = Paginator(project_filter.qs, 5)  # Paginate the projects, 5 per page
@@ -230,6 +231,7 @@ def project_list(request):
         "edit_project_forms": edit_project_forms,
         "add_project_form": ProjectForm(), 
         "filter": project_filter,
+        "projects":projects,
     }
     return render(request, "project.html", context)
 
@@ -274,16 +276,16 @@ def edit_project(request, pk):
 
 @login_required
 def dashboard_view(request):
-    projects = Project.objects.filter()  # Assuming user is part of a project
+    projects = Project.objects.filter(models.Q(created_by=request.user) | models.Q(teammembership__user=request.user)).distinct()
     tasks = Task.objects.filter(assigned_to=request.user)
     
-    paginator = Paginator(tasks, 2) 
+   
+    paginator = Paginator(tasks, 2)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-
     context = {
         "page_obj": page_obj,
-        "projects": projects,  # Changed to projects (plural)
+        "projects": projects,
     }
     
     return render(request, 'dashboard.html', context)
@@ -308,7 +310,7 @@ def team_list(request, project_id):
             
             # Handle adding users with a default role
             for user in add_team_form.cleaned_data['users']:
-                TeamMembership.objects.create(user=user, team=team, role='member')  # Default role
+                TeamMembership.objects.create(user=user, team=team,project_id =project ,  role='member')  # Default role
             return redirect('team_list', project_id=project.id)
     else:
         add_team_form = TeamForm()

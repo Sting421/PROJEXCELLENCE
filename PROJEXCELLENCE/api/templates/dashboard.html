@@ -239,14 +239,15 @@
                         <div class="project-title">{{ project.project_name }}</div>
                         <div class="project-description">{{ project.description }}</div>
                         <div class="project-due-date">Created on: {{ project.date_created|date:"F j, Y g:iA" }}</div>
+                        <div class="project-due-date">Created By: {{ project.created_by.first_name}} {{ project.created_by.last_name}}</div>
                     </div>   
                 </div>
-                
-                {% empty %}
-                    <div class="project-item">
-                        <h4 class="text-center">No projects found.<br/><small>Create a project to get started.</small></h4>
-                    </div>
+                 {% empty %}
+                <div class="project-item">
+                    <h4 class="text-center">No projects found.<br/><small>Create a project to get started.</small></h4>
+                </div>
                 {% endfor %}
+            
             </div>
         </div>
     </div>

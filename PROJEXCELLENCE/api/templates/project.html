@@ -188,10 +188,13 @@
             {% for project in page_obj %}
             <div class="project-item">
                 <div class="project-actions">
-                    <i class="fas fa-edit" data-bs-toggle="modal" data-bs-target="#editProjectModal{{ project.id }}"></i>
-                    <i class="fas fa-trash" data-bs-toggle="modal" data-bs-target="#deleteProjectModal{{ project.id }}"></i>
+                    {% if project.created_by.id == request.user.id %}
+                        <i class="fas fa-edit" data-bs-toggle="modal" data-bs-target="#editProjectModal{{ project.id }}"></i>
+                        <i class="fas fa-trash" data-bs-toggle="modal" data-bs-target="#deleteProjectModal{{ project.id }}"></i>
+                    {%endif%}
                     <br>
                     <a href="{% url 'team_list' project.id %}" class="btn View-Members mt-3">View Team</a>
+                   
                 </div>
                 <div>
                     <div class="project-title">{{ project.project_name }}</div>
