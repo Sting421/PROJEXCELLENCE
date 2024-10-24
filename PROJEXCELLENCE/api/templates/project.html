@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 {% load custom_filters %}
+{% load static %}
 
 {% block title %}Projects{% endblock %}
 
@@ -17,12 +18,16 @@
         margin-top: 4px;
         width: 100%;      /* Full width */
         padding: 20px; 
+        min-height: 700px;
     }
-    #projects-list {
+        #projects-list {
         margin-top: 10px;
-        overflow-y: auto;
+        overflow-x: auto;  /* Keep horizontal overflow */
         margin-bottom: 40px;
-        height: 10%;
+        height: auto;      /* Adjust height to auto */
+        display: flex;     /* Enable flex display */
+        flex-direction: row;  /* Align items in a row */
+        flex-wrap: wrap;   /* Allow items to wrap into a new row */
     }
 
     .project-item {
@@ -30,15 +35,20 @@
         border: 1px solid #e0e0e0;
         border-radius: 8px;
         padding: 20px;
-        margin-bottom: 15px;
         cursor: pointer;
         transition: all 0.3s ease;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        max-width: calc(20% - 15px); /* Allow exactly 5 items in a row */
+        min-width: 250px; /* Optional: set a minimum width */
+        flex-grow: 1; /* Ensures that items can grow */
+        max-height: 200px;
+        margin-left: 25px;
     }
+
     .project-item:hover {
-        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        box-shadow: 0 4px 8px rgba(158, 224, 250, 0.15);
         transform: translateY(-2px);
-        background-color: #adb3bd;
+        background-color: #46dfb142;
     }
     
     .project-top{
@@ -58,9 +68,18 @@
         color: #2d3748;
         margin-bottom: 5px;
     }
+    .project-profile{
+        width: 30px;
+        height:30px;
+    }
 
     .project-created-date{
         color: #718096;
+        font-size: 10px;
+    }
+    .project-created-by{
+        color: #718096;
+        font-size: 12px;
     }
     
     .add-project {
@@ -127,6 +146,14 @@
         font-weight: 700;
         color: #314863;
     }
+    .dropdown-item.delete {
+        color: #e74c3c;
+        border-color: #e74c3c;
+      
+    }
+    .lower-btn{
+        margin-top: 10px;
+    }
   
     </style>
 {% endblock extra_css %}
@@ -186,22 +213,63 @@
         
         <div id="projects-list">
             {% for project in page_obj %}
+          
             <div class="project-item">
                 <div class="project-actions">
-                    {% if project.created_by.id == request.user.id %}
-                        <i class="fas fa-edit" data-bs-toggle="modal" data-bs-target="#editProjectModal{{ project.id }}"></i>
-                        <i class="fas fa-trash" data-bs-toggle="modal" data-bs-target="#deleteProjectModal{{ project.id }}"></i>
-                    {%endif%}
+                   
+                    <div class="dropdown">
+                        <!-- Dropdown toggle -->
+                        <button class="btn" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                          <i class="bi bi-three-dots" title="Settings"></i>
+                        </button>
+                        <!-- Dropdown menu -->
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            {% if project.created_by.id == request.user.id %}
+                            <li>
+                                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addMemberModalModal{{ project.id }}">
+                                  Add Member
+                                </a>
+                              </li>
+                          <!-- Edit Project Modal Trigger -->
+                          <li>
+                            <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editProjectModal{{ project.id }}">
+                              Edit Project
+                            </a>
+                          </li>
+                          <li>
+                            {%endif%}
+                            <a class="dropdown-item" href="{% url 'team_list' project.id %}">View Team</a>
+                          </li>
+                          <!-- Delete Project Modal Trigger -->
+                          <li>
+                            {% if project.created_by.id == request.user.id %}
+                            <a class="dropdown-item delete" data-bs-toggle="modal" data-bs-target="#deleteProjectModal{{ project.id }}">
+                              Delete Project
+                            </a>
+                            {%endif%}
+                          </li>
+                         
+                        </ul>
+                      </div>
+                   
                     <br>
-                    <a href="{% url 'team_list' project.id %}" class="btn View-Members mt-3">View Team</a>
+                   
                    
                 </div>
                 <div>
-                    <div class="project-title">{{ project.project_name }}</div>
+                  
+                    <div class="project-title">  <img src="{% static 'res/logoPlaceHolder.png' %}" alt="profile pic" class="project-profile">{{ project.project_name }}</div>
                     <div class="project-description">{{ project.description }}</div>
-                    <div class="project-created-date">Created on: {{ project.date_created|date:"F j, Y g:iA" }}</div>
+                    <div class="project-created-date">Created on: {{ project.date_created|date:"F j, Y" }}</div>
+                    <div class="project-created-by">Created by: {{ project.created_by.last_name}}</div>
                 </div>   
+                <div class="lower-btn">
+                    <i class="bi bi-list-task" title="To Do list"></i>
+                    <i class="bi bi-chat-square-text" style="margin-left: 10px; " title="Chat Box"></i>
+                    <i class="bi bi-collection " style="margin-left: 10px;"  title="Resources"></i>
+                </div>
             </div>
+         
            
             <!-- Edit Project Modal -->
             <div class="modal fade" id="editProjectModal{{ project.id }}" tabindex="-1" aria-labelledby="editProjectModalLabel{{ project.id }}" aria-hidden="true">
@@ -209,6 +277,25 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="editProjectModalLabel{{ project.id }}">Edit Project</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="post" action="{% url 'edit_project' project.id %}">
+                                {% csrf_token %}
+                                {{ edit_project_forms|dict_get:project.id|crispy }}
+                                <button type="submit" class="btn btn-primary mt-3">Save changes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Project add Member -->
+            <div class="modal fade" id="addMemberModal{{ project.id }}" tabindex="-1" aria-labelledby="addMemberModalModalLabel{{ project.id }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addMemberModalModalLabel{{ project.id }}">Add Member(Maintenance)</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
@@ -236,11 +323,13 @@
                         <div class="modal-footer">
                             <form method="post" action="{% url 'delete_project' project.id %}">
                                 {% csrf_token %}
+                                <input type="hidden" name="project_id" value="{{ project.id }}">
                                 <button type="submit" class="btn btn-danger">Delete</button>
                             </form>
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         </div>
                     </div>
+                    
                 </div>
             </div>
             {% empty %}

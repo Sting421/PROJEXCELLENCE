@@ -10,6 +10,7 @@ from .filters import TaskFilter, ProjectFilter, TeamFilter
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.db import models
+from django.http import Http404
 
 from .models import Task ,Project, Team, TeamMembership
 from django.contrib import messages
@@ -220,7 +221,7 @@ def project_list(request):
     projects = Project.objects.filter(models.Q(created_by=request.user) | models.Q(teammembership__user=request.user)).distinct()
     project_filter = ProjectFilter(request.GET, queryset=projects)
 
-    paginator = Paginator(project_filter.qs, 5)  # Paginate the projects, 5 per page
+    paginator = Paginator(project_filter.qs, 8)  # Paginate the projects, 5 per page
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
@@ -251,26 +252,32 @@ def add_project(request):
 
 @login_required
 def delete_project(request, pk):
-    project = get_object_or_404(Project, pk=pk, created_by=request.user)
-    if request.method == 'POST':
-        project.delete()
-        return redirect('project')
-    return render(request, 'delete_project.html', {'project': project})
+    try:
+        project = get_object_or_404(Project, pk=pk, created_by=request.user)
+        if request.method == 'POST':
+            project.delete()
+            return redirect('project')
+        return render(request, 'delete_project.html', {'project': project})
+    except Http404:
+            return redirect('Error404')
 
 @login_required
 def edit_project(request, pk):
-    project = get_object_or_404(Project, pk=pk, created_by=request.user)
-    
-    if request.method == 'POST':
-        form = ProjectForm(request.POST, instance=project)  
-        if form.is_valid():
-            form.save()
-           
-            return redirect('project') 
-    else:
-        form = ProjectForm(instance=project)  #
+    try:
+        project = get_object_or_404(Project, pk=pk, created_by=request.user)
+        
+        if request.method == 'POST':
+            form = ProjectForm(request.POST, instance=project)  
+            if form.is_valid():
+                form.save()
+            
+                return redirect('project') 
+        else:
+            form = ProjectForm(instance=project)  #
 
-    return render(request, 'project_edit.html', {'form': form, 'project': project})
+        return render(request, 'project_edit.html', {'form': form, 'project': project})
+    except Http404:
+        return redirect('Error404')
 #------------------------------------------- end projects -------------------------------------
 
 
