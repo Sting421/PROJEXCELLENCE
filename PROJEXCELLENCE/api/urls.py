@@ -15,8 +15,9 @@ urlpatterns = [
     path("dashboard/", views.dashboard_view, name="dashboard"),
 
     #task
-    path("task/", views.task_list, name="task"),
-    path("task/add/", views.add_task, name="add_task"),
+    #ath("task/", views.task_list, name="task"),
+    path("task/<str:status>/", views.task_list, name="task"),
+    path("tasks/add/", views.add_task, name="add_task"),
     path("task/<int:pk>/edit/", views.edit_task, name="edit_task"),
     path("task/<int:pk>/delete/", views.delete_task, name="delete_task"),
 

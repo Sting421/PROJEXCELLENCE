@@ -123,11 +123,64 @@
         border-radius: 0.25rem;
     }
     .badge {
-    padding: 5px 10px;
-    border-radius: 4px;
-    color: #fff;
-    font-weight: bold;
-}
+        padding: 5px 10px;
+        border-radius: 4px;
+        color: #fff;
+        font-weight: bold;
+    }
+    /* header breadcrumb */
+    :focus {
+        outline: 0;
+        border-color: #2260ff;
+        box-shadow: 0 0 0 4px #b5c9fc;
+    }
+
+    .mydict div {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 0.5rem;
+        justify-content: center;
+    }
+
+    .mydict input[type="radio"] {
+        clip: rect(0 0 0 0);
+        clip-path: inset(100%);
+        height: 1px;
+        overflow: hidden;
+        position: absolute;
+        white-space: nowrap;
+        width: 1px;
+    }
+
+    .mydict input[type="radio"]:checked + span {
+        box-shadow: 0 0 0 0.0625em #00eeff;
+        background-color: #ffffff;
+        z-index: 1;
+        color: #000000;
+    }
+
+    label span {
+        display: block;
+        cursor: pointer;
+        background-color: #fff;
+        padding: 0.375em .75em;
+        position: relative;
+        margin-left: .0625em;
+        box-shadow: 0 0 0 0.0625em #b5bfd9;
+        letter-spacing: .05em;
+        color: #3e4963;
+        text-align: center;
+        transition: background-color .5s ease;
+    }
+
+    label:first-child span {
+        border-radius: .375em 0 0 .375em;   
+    }
+
+    label:last-child span {
+        border-radius: 0 .375em .375em 0;
+    }
+
 
     
     
@@ -135,6 +188,34 @@
 {% endblock extra_css %}
 
 {% block content %}
+    <div class="mydict">
+        <div>
+            <!-- Upcoming -->
+            <label for="On-going">
+                <input type="radio" name="status" id="On-going" onchange="redirectToDashboard('On-going')">
+                <span>On-going</span>
+            </label>
+
+            <!-- Past Due -->
+            <label for="Pending">
+                <input type="radio" name="status" id="Pending" onchange="redirectToDashboard('Pending')">
+                <span>Pending</span>
+            </label>
+
+            <!-- Completed -->
+            <label for="Done">
+                <input type="radio" name="status" id="Done" onchange="redirectToDashboard('Done')">
+                <span>Done</span>
+            </label>
+        </div>
+    </div>
+    <script>
+        function redirectToDashboard(status) {
+            window.location.href = `/task/${status}/`;
+        }
+    </script>
+
+
 <div class="page-container">
     <div class="content-wrapper container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -146,7 +227,7 @@
         
         <div id="tasks-list">
             {% for task in page_obj %}
-                {% if task.status != "Done" %}
+                
             <div class="task-item {% if task.completed %}completed{% endif %}">
                 <div class="d-flex align-items-center">
                     <input type="checkbox" class="task-checkbox" {% if task.completed %}checked{% endif %}>
@@ -206,7 +287,7 @@
                     </div>
                 </div>
             </div>
-            {%endif%}
+            
             {% empty %}
                 <div class="task-item">
                     <h4 class="text-center">You have no tasks to accomplish.<br/><small>Set up tasks to have a productive day ahead.</small></h4>
@@ -227,7 +308,7 @@
                     <div class="modal-body">
                         <form method="post" action="{% url 'add_task' %}">
                             {% csrf_token %}
-                            {{ add_task_form|crispy }}
+                            {{ add_task_form|crispy }}  
                             <button type="submit" class="btn btn-primary mt-3">Add Task</button>
                         </form>
                     </div>

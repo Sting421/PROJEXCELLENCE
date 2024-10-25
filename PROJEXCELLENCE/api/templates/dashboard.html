@@ -204,7 +204,8 @@
         <div class="recent-task">
                 <div class="rt-header">
                     <h2>Recent Task</h2>
-                    <a class="view-btn" href="{% url 'task' %}">View All Task</a></th>
+                    <a class="view-btn" href="{% url 'task' 'Pending' %}">View All Task</a></th>
+                   
                 </div>
             <div id="tasks-list">
                 {% for task in page_obj %}
