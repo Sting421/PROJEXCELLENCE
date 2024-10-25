@@ -3,4 +3,3 @@ django-crispy-forms
 Pillow
 django-filter
 ruff
-bootstrap-icons

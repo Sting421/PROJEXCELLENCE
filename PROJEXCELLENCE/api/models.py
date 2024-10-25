@@ -182,10 +182,16 @@ class File(models.Model):
 
 
 class Task(models.Model):
+    STATUS_CHOICES = [
+        ("On-going", "On-going"),
+        ("Pending", "Pending"),
+        ("Done", "Done"),
+    ]
+    project_id = models.ForeignKey(Project, on_delete=models.CASCADE)
     task_name = models.CharField(max_length=50)
     description = models.TextField()
     assigned_to = models.ForeignKey(User, on_delete=models.CASCADE)
-    status = models.CharField(max_length=50)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="Pending")
     due_date = models.DateTimeField()
     completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

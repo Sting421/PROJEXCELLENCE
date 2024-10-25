@@ -174,7 +174,7 @@ class EditProfile(forms.ModelForm):
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ["task_name", "description", "assigned_to", "due_date", "status"]
+        fields = ["project_id","task_name", "description", "assigned_to", "due_date", "status"]
         widgets = {
             "due_date": forms.DateTimeInput(attrs={"type": "datetime-local"}),
         }
