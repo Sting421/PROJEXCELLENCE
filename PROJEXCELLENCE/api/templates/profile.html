@@ -62,12 +62,16 @@
             width: 200px;
             height: 40px;
             font-weight: 650;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .upload-text{
             font-size: 13px;
             color: #8a8a8a;
             margin-top: 5px;
+            text-align: center;
         }
 
         .info-section {
@@ -76,6 +80,7 @@
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 20px;
+            width: 100%;
         }
 
         .info-loc-section {
@@ -93,7 +98,8 @@
             margin-bottom: 10px;
         }
 
-        .edit-button {
+        .edit-button,
+        .cancel-button {
             background: none;
             color: #000000;
             cursor: pointer;
@@ -101,13 +107,6 @@
             border-radius: 10px;
             width: 80px;
             height: 35px;
-        }
-
-        .cancel-button {
-            background: none;
-            border: none;
-            color: #000000;
-            cursor: pointer;
         }
 
         .info-content {
@@ -164,24 +163,29 @@
 {% endblock extra_css %}
 
 {% block content %}
-  <div class="main-content">
+<div class="main-content">
     
     <h1>User Profile</h1>
+
+    <!-- Upload Photo -->
     <div class="profile-header">
         {% if request.user.profile_path.url != null  %}
-        <img class="avatar" src="{{ request.user.profile_path.url }}" >
+            <img class="profile-avatar" src="{{ request.user.profile_path.url }}" >
         {% else %}
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
-          <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
-          <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
-        </svg> 
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+            <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+            </svg> 
         {%endif%}
-        <div class="profile-header2">
-            <div class="upload-photo" data-bs-toggle="modal" data-bs-target="#uploadProfileModal">
-                <i class="fas fa-plus mr-2"></i> Upload Photo
-            <p class="upload-text">At leaest 800x800 px recommended.<br>JPG or PNG is allowed.</p>
-        </div>
+            <div class="profile-header2">
+                <div class="upload-photo" data-bs-toggle="modal" data-bs-target="#uploadProfileModal">
+                    <i class="fas fa-plus mr-2"></i> Upload Photo
+                </div>
+                <p class="upload-text">At leaest 800x800 px recommended.<br>JPG or PNG is allowed.</p>
+            </div>
     </div>
+    
+    <!-- Personal Information -->
     <div class="info-section">
         <div class="info-header">
             <h2>Personal Information</h2>
@@ -190,19 +194,21 @@
         <div class="info-content">
             <div class="info-item">
                 <strong>Full Name</strong>
-                <div> {{ request.user.first_name|capfirst }} {{ request.user.last_name|capfirst }}</div>
+                <div>{{ request.user.first_name|capfirst }} {{ request.user.last_name|capfirst }}</div>
             </div>
             <div class="info-item">
                 <strong>Email</strong>
-                <div> {{ request.user.email|capfirst }}</div>
+                <div>{{ request.user.email }}</div>
             </div>
             <div class="info-item">
                 <strong>Phone</strong>
-                <div>{{ request.user.phone|capfirst }}</div>
+                <div>{{ request.user.phone }}</div>
             </div>
         </div>
     </div>
-    <div class="info-loc-section">
+
+    <!-- Location -->
+    <div class="info-section">
         <div class="info-header">
             <h2>Location</h2>
             <button class="cancel-button">Cancel</button>
@@ -210,6 +216,8 @@
         <input type="text" class="location-input" placeholder="⚲ Enter your location">
         <button class="save-button">Save Changes</button>
     </div>
+
+    <!-- Bio -->
     <div class="info-section">
         <div class="info-header">
             <h2>Bio</h2>
@@ -221,24 +229,24 @@
     </div>
 </div>
 
- <!-- upload photo  -->
- <div class="modal fade" id="uploadProfileModal" tabindex="-1" aria-labelledby="uploadProfileModal" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="uploadProfileModal">Upload Profile</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form method="post" action="{% url 'upload_profile' %}" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ form | crispy}}
-                    <button type="submit" class="btn btn-primary mt-3">Upload</button>
-                </form>
+    <!-- upload photo  -->
+    <div class="modal fade" id="uploadProfileModal" tabindex="-1" aria-labelledby="uploadProfileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadProfileModalLabel">Upload Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="{% url 'upload_profile' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <button type="submit" class="btn btn-primary mt-3">Upload</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 
 {% endblock  %}
