@@ -49,16 +49,15 @@ def upload_profile(request):
         form = UserProfileForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             user = form.save()
-            # Update session to prevent logout on password change
             update_session_auth_hash(request, user)
             messages.success(request, "Your profile was successfully updated.")
             return redirect("profile")
     else:
         form = UserProfileForm(instance=request.user)
 
-    storage = get_messages(request)
-    for _ in storage:
-        pass
+    # storage = get_messages(request)
+    # for _ in storage:
+    #     pass
     return render(request, "profile.html", {"form": form})
 
 #addtask

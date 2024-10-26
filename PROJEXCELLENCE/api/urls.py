@@ -40,5 +40,5 @@ urlpatterns = [
     #----------------   Profile   ----------------
     path("profile/", views.profile, name="profile"),
     path("profile/edit", views.edit_profile, name="edit_profile"),
-    path("profile/uploadProfile", views.upload_profile, name ="upload_profile")
+    path("profiles/uploadProfile", views.upload_profile, name ="upload_profile")
 ] 
