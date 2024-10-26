@@ -104,7 +104,7 @@
         border: 1px solid orange; 
         border-radius: 0.25rem;
     }
-    .badge.On-going {
+    .badge.on-going {
         display: inline-block;
         padding: 0.35em 0.65em;
         font-size: 0.875rem;
@@ -158,6 +158,9 @@
         z-index: 1;
         color: #000000;
     }
+    .filter-bar:hover{
+        background-color: #6affda;
+    }
 
     label span {
         display: block;
@@ -180,10 +183,11 @@
     label:last-child span {
         border-radius: 0 .375em .375em 0;
     }
+    .icon-small {
+        font-size: 10px; /* Adjust size as needed */
+     
+    }
 
-
-    
-    
     </style>
 {% endblock extra_css %}
 
@@ -193,19 +197,19 @@
             <!-- Upcoming -->
             <label for="On-going">
                 <input type="radio" name="status" id="On-going" onchange="redirectToDashboard('On-going')">
-                <span>On-going</span>
+                <span class="filter-bar">On-going</span>
             </label>
 
             <!-- Past Due -->
             <label for="Pending">
                 <input type="radio" name="status" id="Pending" onchange="redirectToDashboard('Pending')">
-                <span>Pending</span>
+                <span class="filter-bar"></i>Pending</span>
             </label>
 
             <!-- Completed -->
             <label for="Done">
                 <input type="radio" name="status" id="Done" onchange="redirectToDashboard('Done')">
-                <span>Done</span>
+                <span class="filter-bar">Done</span>
             </label>
         </div>
     </div>
@@ -236,7 +240,7 @@
                         <div class="task-description">{{ task.description }}</div>
                         <div class="task-due-date">Due: {{ task.due_date|date:"F j, Y g:iA" }}</div>
                         <span class="badge {{ task.status|lower }}">
-                            {{ task.status }}
+                            <i class="bi bi-circle-fill icon-small" style="width: 0.1px;"></i> {{ task.status }}
                         </span>
                     </div>
                     <div class="task-actions ml-auto">

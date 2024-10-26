@@ -12,6 +12,7 @@ from django.urls import reverse
 from django.db import models
 from django.http import Http404
 
+
 from .models import Task ,Project, Team, TeamMembership
 from django.contrib import messages
 from .forms import (
@@ -20,7 +21,7 @@ from .forms import (
     TaskForm,
     ProjectForm,
     TeamForm,
-    EditProfile,
+    UserProfileForm,
   
 )
 
@@ -41,24 +42,24 @@ def timeline(request):
     return render(request, "timeline.html")
 
 
-# #update profile
-# @login_required
-# def profile(request):
-#     if request.method == "POST":
-#         form = UserProfileForm(request.POST, request.FILES, instance=request.user)
-#         if form.is_valid():
-#             user = form.save()
-#             # Update session to prevent logout on password change
-#             update_session_auth_hash(request, user)
-#             messages.success(request, "Your profile was successfully updated.")
-#             return redirect("profile")
-#     else:
-#         form = UserProfileForm(instance=request.user)
+#update profile
+@login_required
+def upload_profile(request):
+    if request.method == "POST":
+        form = UserProfileForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            user = form.save()
+            # Update session to prevent logout on password change
+            update_session_auth_hash(request, user)
+            messages.success(request, "Your profile was successfully updated.")
+            return redirect("profile")
+    else:
+        form = UserProfileForm(instance=request.user)
 
-#     storage = get_messages(request)
-#     for _ in storage:
-#         pass
-#     return render(request, "profile.html", {"form": form})
+    storage = get_messages(request)
+    for _ in storage:
+        pass
+    return render(request, "profile.html", {"form": form})
 
 #addtask
 @login_required
@@ -222,8 +223,6 @@ def edit_task(request, pk):
     return render(request, 'task.html', {'form': form, 'task': task})
 
 
-
-
 # ------------------------------------------- End of task -------------------------------------
 
 
@@ -324,10 +323,15 @@ def dashboard_view(request):
    
     paginator = Paginator(tasks, 2)
     page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_obj_task = paginator.get_page(page_number)
+
+    paginator = Paginator(projects, 2)
+    page_number = request.GET.get('page')
+    page_obj_projects = paginator.get_page(page_number)
     context = {
-        "page_obj": page_obj,
-        "projects": projects,
+       
+        "projects": page_obj_projects,
+        "tasks":page_obj_task,
     }
     
     return render(request, 'dashboard.html', context)
@@ -336,7 +340,6 @@ def dashboard_view(request):
 @login_required
 def team_list(request, project_id):
     project = get_object_or_404(Project, id=project_id)
-    #teams = Team.objects.filter(project=project).filter(id=10).order_by("-id") #for static testing
     teams = Team.objects.filter(project=project).order_by("-id")
     team_filter = TeamFilter(request.GET, queryset=teams)
     paginator = Paginator(team_filter.qs, 5)
@@ -349,10 +352,13 @@ def team_list(request, project_id):
             team = add_team_form.save(commit=False)
             team.project = project  
             team.save()
-            
+
             # Handle adding users with a default role
             for user in add_team_form.cleaned_data['users']:
-                TeamMembership.objects.create(user=user, team=team,project_id =project ,  role='member')  # Default role
+                # Check if user is already a member of the team
+                if not TeamMembership.objects.filter(user=user, team=team).exists():
+                    TeamMembership.objects.create(user=user, team=team, project=project, role='member')  # Default role
+            messages.success(request, "Team created successfully!")
             return redirect('team_list', project_id=project.id)
     else:
         add_team_form = TeamForm()
@@ -365,22 +371,22 @@ def team_list(request, project_id):
     context = {
         "page_obj": page_obj,
         "edit_team_forms": edit_team_forms,
-        "add_team_form": add_team_form,  
+        "add_team_form": add_team_form,
         "filter": team_filter,
         "project": project,
-        "team_memberships": team_memberships,  # Add this line to include memberships
+        "team_memberships": team_memberships,  # Include memberships
     }
 
     return render(request, "myteam.html", context)
-
+@login_required
 def edit_profile(request):
     if request.method == 'POST':
-        form = EditProfile(request.POST)
+        form = UserProfileForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
-            return redirect('profile')  # Redirect to the list of teams
-        
-    else:  
-        form = EditProfile()
-    return render(request, 'myteam.html', {'add_team_form': form})
+            return redirect('profile')  # Ensure 'profile' is defined in urls.py
+
+    else:
+        form = UserProfileForm(instance=request.user)
+    return render(request, 'profile.html', {'profile_form': form})
 

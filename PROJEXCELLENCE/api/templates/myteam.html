@@ -142,62 +142,46 @@
                 </li>
             {% endfor %}
         </ul>
-        {% for team in page_obj %}
+        
     
         <div class="tab-content">
-            {{ team.team_name }}
-            {% for membership in team_memberships|default_if_none:team.id %}
-                <div class="tab-pane {% if forloop.first %}active{% endif %}" id="team-{{ team.id }}">
+            <h2>{{ team.team_name }}</h2>
+            {% for membership in team_memberships %}
+                <div class="tab-pane {% if forloop.first %}active{% endif %}" id="team-{{ team_id }}">
                     <div class="card-members">
                         <div class="info">
                             <table>
-                                    <tr>
-                                        <td>
-                                            <img src="{% static 'res/logoPlaceHolder.png' %}" alt="profile pic" class="avatar">
-                                        </td>
-                                        <td>
-                                            <!-- <h2 class="name">{{user.first_name|capfirst}}</h2> -->
-                                            <h2>{{ membership.users.first_name|capfirst }} {{ membership.user.last_name|capfirst }}</h2>
-                                            <h2 class="title">{{ membership.role|capfirst }}</h2>    
-                                        </td>
-                                    </tr>
-                                  
-                                {% empty %}
-                                    <tr>
-                                        <td colspan="2">No members in this team.</td>
-                                    </tr>
-                                    {% endfor %}
+                                <tr>
+                                    <td>
+                                        <img src="{% static 'res/logoPlaceHolder.png' %}" alt="profile pic" class="avatar">
+                                    </td>
+                                    <td>
+                                        <h2>{{ membership.user.first_name|capfirst }} {{ membership.user.last_name|capfirst }}</h2>
+                                        <h2 class="title">{{ membership.role|capfirst }}</h2>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="tab-pane" id="team-{{ team.id }}">
+                    <div class="card-members">
+                        <div class="info">
+                            <table>
+                                <tr>
+                                    <td colspan="2">No members in this team.</td>
+                                </tr>
                             </table>
                         </div>
                     </div>
                 </div>
             {% endfor %}
         </div>
-    </div>
+        
     
    
-    <div class="card-members">
-        <div class="info">
-            <table>
-                {% for membership in team.teammembership_set.all %}
-                    <tr>
-                        <td>
-                            <img src="{% static 'res/logoPlaceHolder.png' %}" alt="profile pic" class="avatar">
-                        </td>
-                        <td>
-                            <h2 class="name">{{ membership.user.first_name|capfirst }} {{ membership.user.last_name|capfirst }}</h2>
-                            <h2 class="title">{{ membership.role|capfirst }}</h2> <!-- Using the role from TeamMembership -->    
-                        </td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="2">No members in this team.</td>
-                    </tr>
-                {% endfor %}
-            </table>
-        </div>
-    </div>
-    
+   
     
       <!-- add team -->
         <div class="modal fade" id="addTeamModal" tabindex="-1" aria-labelledby="addTeamModalLabel" aria-hidden="true">

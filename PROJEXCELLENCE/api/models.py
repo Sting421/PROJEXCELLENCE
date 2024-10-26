@@ -54,7 +54,7 @@ class User(AbstractUser):
     phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="EMPLOYEE")
     date_of_hire = models.DateField(blank=True, null=True)
-    profile_path = models.ImageField(null=True, blank=True)
+    profile_path = models.ImageField(null=True, blank=True,upload_to='profile/' )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="PENDING")
     # Override the groups field
     groups = models.ManyToManyField(
@@ -125,10 +125,15 @@ class Team(models.Model):
         return self.team_name
 
 class TeamMembership(models.Model):
+    STATUS_CHOICES = [
+        ("PM", "Project Manager"),
+        ("HEAD", "Head"),
+        ("MEMBER", "Member"),
+    ]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     project_id = models.ForeignKey(Project, on_delete=models.CASCADE)
-    role = models.CharField(max_length=50)
+    role = models.CharField(max_length=50,  choices=STATUS_CHOICES, default="Member")
     joined_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
