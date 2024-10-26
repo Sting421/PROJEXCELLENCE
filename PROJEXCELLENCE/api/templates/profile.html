@@ -35,7 +35,7 @@
         }
 
         .profile-header {
-            display: flex;
+          
             align-items: center;
             margin-bottom: 20px;
         }
@@ -176,10 +176,9 @@
           <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
         </svg> 
         {%endif%}
-        <div class="profile-header2">
-            <div class="upload-photo" data-bs-toggle="modal" data-bs-target="#uploadProfileModal">
-                <i class="fas fa-plus mr-2"></i> Upload Photo
-            <p class="upload-text">At leaest 800x800 px recommended.<br>JPG or PNG is allowed.</p>
+        <div class="upload-photo" data-bs-toggle="modal" data-bs-target="#uploadProfileModal">
+            <i class="fas fa-plus mr-2"></i> Upload Photo
+            <p class="upload-text">At least 800x800 px recommended.<br>JPG or PNG is allowed.</p>
         </div>
     </div>
     <div class="info-section">
@@ -198,7 +197,7 @@
             </div>
             <div class="info-item">
                 <strong>Phone</strong>
-                <div>{{ request.user.phone|capfirst }}</div>
+                <div>{{ request.user.phone_number|capfirst }}</div>
             </div>
         </div>
     </div>
@@ -222,23 +221,22 @@
 </div>
 
  <!-- upload photo  -->
- <div class="modal fade" id="uploadProfileModal" tabindex="-1" aria-labelledby="uploadProfileModal" aria-hidden="true">
+ <div class="modal fade" id="uploadProfileModal" tabindex="-1" aria-labelledby="uploadProfileModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="uploadProfileModal">Upload Profile</h5>
+                <h5 class="modal-title" id="uploadProfileModalLabel">Upload Profile</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form method="post" action="{% url 'upload_profile' %}" enctype="multipart/form-data">
                     {% csrf_token %}
-                    {{ form | crispy}}
+                    {{ form|crispy }}
                     <button type="submit" class="btn btn-primary mt-3">Upload</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
-
 
 {% endblock  %}
