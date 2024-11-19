@@ -22,7 +22,7 @@ from .forms import (
     ProjectForm,
     TeamForm,
     UserProfileForm,
-  
+    AddMemberForm,
 )
 
 def index(request):
@@ -336,10 +336,16 @@ def dashboard_view(request):
     return render(request, 'dashboard.html', context)
 
 #team
-@login_required
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.core.paginator import Paginator
+from .models import Project, Team, TeamMembership
+from .forms import TeamForm
+from .filters import TeamFilter
+
 def team_list(request, project_id):
     project = get_object_or_404(Project, id=project_id)
-    teams = Team.objects.filter(project=project).order_by("-id")
+    teams = Team.objects.filter(project=project).order_by("-id").prefetch_related('teammembership_set')
     team_filter = TeamFilter(request.GET, queryset=teams)
     paginator = Paginator(team_filter.qs, 5)
     page_number = request.GET.get("page")
@@ -347,25 +353,44 @@ def team_list(request, project_id):
 
     if request.method == 'POST':
         add_team_form = TeamForm(request.POST)
+        add_member_form = AddMemberForm(request.POST, team=team)
+
         if add_team_form.is_valid():
             team = add_team_form.save(commit=False)
             team.project = project  
             team.save()
 
             # Handle adding users with a default role
-            for user in add_team_form.cleaned_data['users']:
-                # Check if user is already a member of the team
+            users = add_team_form.cleaned_data.get('users', [])
+            role = add_team_form.cleaned_data.get('role', [])
+            default_role = role  # Define your default role here
+            for user in users:
                 if not TeamMembership.objects.filter(user=user, team=team).exists():
-                    TeamMembership.objects.create(user=user, team=team, project=project, role='member')  # Default role
+                    TeamMembership.objects.create(user=user, team=team, project=project, role=default_role)
+
             messages.success(request, "Team created successfully!")
+            return redirect('team_list', project_id=project.id)
+        
+        if 'add_member' in request.POST and add_member_form.is_valid():
+            team_id = request.POST.get('team_id')  # Capture the team ID from the form
+            team = get_object_or_404(Team, id=team_id, project=project)
+            user = add_member_form.cleaned_data.get('user')
+            role = add_member_form.cleaned_data.get('role', 'Member')  # Default role
+
+            # Check if the user is already a member of the team
+            if not TeamMembership.objects.filter(user=user, team=team).exists():
+                TeamMembership.objects.create(user=user, team=team, project=project, role=role)
+                messages.success(request, f"Member {user.username} added to the team!")
+            else:
+                messages.warning(request, f"{user.username} is already a member of this team.")
+
             return redirect('team_list', project_id=project.id)
     else:
         add_team_form = TeamForm()
 
     edit_team_forms = {team.id: TeamForm(instance=team) for team in page_obj}
 
-    # Fetching team memberships for each team on the current page
-    team_memberships = {team.id: team.teammembership_set.all() for team in page_obj}
+    team_memberships = [(team, team.teammembership_set.all()) for team in page_obj]
 
     context = {
         "page_obj": page_obj,
@@ -373,10 +398,11 @@ def team_list(request, project_id):
         "add_team_form": add_team_form,
         "filter": team_filter,
         "project": project,
-        "team_memberships": team_memberships,  # Include memberships
+        "team_memberships": team_memberships,
+        "team_count": teams.count(),
     }
-
     return render(request, "myteam.html", context)
+
 @login_required
 def edit_profile(request):
     if request.method == 'POST':

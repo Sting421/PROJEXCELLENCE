@@ -217,9 +217,8 @@
         
         <div id="projects-list">
             {% for project in page_obj %}
-          
-            <div class="project-item">
-                <div class="project-actions">
+            <div class="project-item" >
+                <div class="project-actions" >
                    
                     <div class="dropdown">
                         <!-- Dropdown toggle -->
@@ -256,15 +255,12 @@
                          
                         </ul>
                       </div>
-                   
                     <br>
-                   
-                   
                 </div>
                 <div>
                   
                     <div class="project-title">  <img src="{% static 'res/logoPlaceHolder.png' %}" alt="profile pic" class="project-profile">{{ project.project_name }}</div>
-                    <div class="project-description">{{ project.description }}</div>
+                    <div class="project-description">{{ project.description|slice:":15" }}{% if project.description|length > 15 %}...{% endif %}</div>
                     <div class="project-created-date">Created on: {{ project.date_created|date:"F j, Y" }}</div>
                     <div class="project-created-by">Created by: {{ project.created_by.last_name}}</div>
                 </div>   
@@ -274,6 +270,7 @@
                     <i class="bi bi-collection " style="margin-left: 10px;"  title="Resources"></i>
                 </div>
             </div>
+      
          
            
             <!-- Edit Project Modal -->

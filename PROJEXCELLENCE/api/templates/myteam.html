@@ -4,8 +4,6 @@
 {% load custom_filters %}
 {% block title %}My Team{% endblock title %}Dashboard
 {% block extra_css %}
-
-
 <style>
     .card {
         background-color: #E0E7EF;
@@ -16,7 +14,7 @@
         padding: 20;
         box-shadow: 0 10px 14px rgba(0, 0, 0, 0.1);
         max-width: 30%;
-        margin-bottom: 16px;  /* Add some space between cards if you have more than one */
+        margin-bottom: 16px;  
     }
     .card-members{
         background-color: #616569;
@@ -27,7 +25,7 @@
         padding: 20;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         max-width: 30%;
-        margin-bottom: 16px;  /* Add some space between cards if you have more than one */
+        margin-bottom: 16px;
     }
     .card-members .title{
         color: #D9D9D9;
@@ -39,8 +37,7 @@
         margin-right: 16px;
     }
     .info {
-      
-        display: flex;  /* Use flexbox for layout */
+        display: flex;
         align-items: center;
     }
     .name {
@@ -50,7 +47,6 @@
     }
     .title {
         font-size: 14px;
-      
         margin: 4px 0 0;
     }
     .page{
@@ -64,10 +60,8 @@
         margin-top: 6%;
         margin-bottom: 2%;
         user-select: none;
-     
     }
 
-    /* team style */
     .add-team {
         color: #4a5568;
         cursor: pointer;
@@ -82,16 +76,29 @@
         background-color: #ebf8ff;
         border-color: #63b3ed;
     }
+
+    .add-member {
+        color: #4a5568;
+        cursor: pointer;
+        padding: 15px;
+        border: 2px dashed #e2e8f0;
+        border-radius: 8px;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+    .add-member:hover {
+        color: #2b6cb0;
+        background-color: #ebf8ff;
+        border-color: #63b3ed;
+    }
     .project-name{
         color: #213A58;
     }
     .active{
         color: rgb(52, 0, 241);
     }
-    
 </style>
 {% endblock extra_css %}
-
 {% block content %}
 <div class="page">
     <div class="Team">
@@ -100,7 +107,10 @@
         <div type="button" class="add-team" data-bs-toggle="modal" data-bs-target="#addTeamModal">
             <i class="fas fa-plus mr-2"></i> Add Team
         </div>
-        
+        <div type="button" class="add-member" data-bs-toggle="modal" data-bs-target="#addMemberModal">
+            <i class="fas fa-plus mr-2"></i> Add Member
+        </div>
+
         <h4>Project Manager</h4>
         <div class="card">
             <div class="info">
@@ -110,16 +120,9 @@
                             <img src="{% static '/res/logoPlaceHolder.png' %}" alt="avatar-profile" class="avatar">
                         </td>
                         <td>
-                            {% if request.user.project_set.exists %}
-                                {% with project=request.user.project_set.first %}
-                                    <h2 class="name"> {{ project.created_by.first_name|capfirst }} {{ project.created_by.last_name|capfirst }}</h2>
-                                {% endwith %}
-                            {% endif %}
-                            <h2 class="title"> {{ request.user.role|capfirst }}</h2>
-                                
+                            <h2 class="name"> {{ project.created_by.first_name|capfirst }} {{ project.created_by.last_name|capfirst }}</h2>
                         </td>
                         <td class="message">
-                            
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-left-text-fill" viewBox="0 0 16 16">
                                 <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4.414a1 1 0 0 0-.707.293L.854 15.146A.5.5 0 0 1 0 14.793zm3.5 1a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1zm0 2.5a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1zm0 2.5a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1z"/>
                             </svg> 
@@ -129,81 +132,96 @@
             </div>
         </div>
     </div>
-
     <div class="Members">
         <ul class="nav nav-tabs">
-            {% for team in page_obj %}
-                <li class="nav-item">
-                    <a class="nav-link {% if forloop.first %}active{% endif %}" 
-                       aria-current="page" 
-                       href="#team-{{ team.id }}">
-                       {{ team.team_name }}
-                    </a>
-                </li>
-            {% endfor %}
+            {% with first_team_id=page_obj.0.id %}
+                {% for team in page_obj %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if team.id == first_team_id %}active{% endif %}" 
+                           aria-current="page" 
+                           data-bs-toggle="tab"
+                           href="#team-{{ team.id }}">
+                           {{ team.team_name }} 
+                        </a>
+                    </li>
+                {% endfor %}
+            {% endwith %}
         </ul>
         
-    
         <div class="tab-content">
-            <h2>{{ team.team_name }}</h2>
-            {% for membership in team_memberships %}
-                <div class="tab-pane {% if forloop.first %}active{% endif %}" id="team-{{ team_id }}">
-                    <div class="card-members">
-                        <div class="info">
-                            <table>
-                                <tr>
-                                    <td>
-                                        <img src="{% static 'res/logoPlaceHolder.png' %}" alt="profile pic" class="avatar">
-                                    </td>
-                                    <td>
-                                        <h2>{{ membership.user.first_name|capfirst }} {{ membership.user.last_name|capfirst }}</h2>
-                                        <h2 class="title">{{ membership.role|capfirst }}</h2>
-                                    </td>
-                                </tr>
-                            </table>
+            {% for team, memberships in team_memberships %}
+                <h2>{{ team.name }}</h2> 
+        
+                {% if memberships %}
+                    {% for membership in memberships %}
+                        <div class="tab-pane {% if team.id == first_team_id %}active{% endif %}" id="team-{{ team.id }}">
+                            {% if membership.team_id == team.id %}
+                                <div class="card-members">
+                                    <table class="info">
+                                        <tr>
+                                            <td>
+                                                <img src="{% static 'res/logoPlaceHolder.png' %}" alt="profile pic" class="avatar">
+                                            </td>
+                                            <td>
+                                                <h2>{{ membership.user.first_name|capfirst }} {{ membership.user.last_name|capfirst }}</h2>
+                                                <h2 class="title">{{ membership.role|capfirst }}</h2>
+                                                
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="tab-pane" id="team-{{ team.id }}">
+                        <div class="card-members">
+                            <div class="info">
+                                <span>No members in this team.</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            {% empty %}
-                <div class="tab-pane" id="team-{{ team.id }}">
-                    <div class="card-members">
-                        <div class="info">
-                            <table>
-                                <tr>
-                                    <td colspan="2">No members in this team.</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+                {% endif %}
             {% endfor %}
         </div>
-        
-    
-   
-   
-    
-      <!-- add team -->
-        <div class="modal fade" id="addTeamModal" tabindex="-1" aria-labelledby="addTeamModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addTeamModalLabel">Add Team</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form method="post" action="{% url 'team_list' project.id %}">
-                            {% csrf_token %}
-                            {{ add_team_form|crispy }}
-                            <button type="submit" class="btn btn-primary mt-3">Add Team</button>
-                        </form>
-                        
-                    </div>
+    </div>
+
+    <!-- Add Team Modal -->
+    <div class="modal fade" id="addTeamModal" tabindex="-1" aria-labelledby="addTeamModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addTeamModalLabel">Add Team</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="{% url 'team_list' project.id %}">
+                        {% csrf_token %}
+                        {{ add_team_form|crispy }}
+                        <button type="submit" class="btn btn-primary mt-3">Add Team</button>
+                    </form>
                 </div>
             </div>
         </div>
-        
-
     </div>
+    <!-- Add Member Modal -->
+    <div class="modal fade" id="addMemberModal" tabindex="-1" aria-labelledby="addMemberModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addMemberModalLabel">Add Team</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="{% url 'team_list' project.id %}">
+                        {% csrf_token %}
+                        {{ add_member_form|crispy }}
+                        <button type="submit" class="btn btn-primary mt-3">Add Member</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 {% endblock %}
