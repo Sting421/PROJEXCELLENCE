@@ -10,6 +10,8 @@
         display: flex;
         flex-direction: column;
         min-height: 100vh;
+        margin-left: 4%;
+        margin-right: 4%;
     }
     .content-wrapper {
         flex: 1;
@@ -187,6 +189,10 @@
         font-size: 10px; /* Adjust size as needed */
      
     }
+    h1{
+        font-weight: 700;
+        color: #314863;
+    }
 
     </style>
 {% endblock extra_css %}
@@ -221,9 +227,9 @@
 
 
 <div class="page-container">
-    <div class="content-wrapper container mt-4">
+    <div class="content-wrapper">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="text-3xl font-bold">My Tasks</h1>
+            <h1>My Tasks</h1>
             <div class="add-task" data-bs-toggle="modal" data-bs-target="#addTaskModal">
                 <i class="fas fa-plus mr-2"></i> Add Task
             </div>
