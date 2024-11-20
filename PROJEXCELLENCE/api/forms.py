@@ -193,13 +193,13 @@ class TeamForm(forms.ModelForm):
 
 
 class AddMemberForm(forms.Form):
-    team = forms.ModelChoiceField(queryset=Team.objects.none(), label="Select Team")
-
-    def __init__(self, *args, **kwargs):
-        team = kwargs.pop('team', None)
-        super().__init__(*args, **kwargs)
-        if team:
-            self.fields['team'].queryset = Team.objects.filter(project=team.project)
-            self.fields['team'].initial = team
-
-
+    users = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        label="Select Members"
+    )
+    role = forms.ChoiceField(
+        choices=TeamMembership.STATUS_CHOICES,
+        widget=forms.Select(attrs={"class": "form-control"}),
+        label="Role"
+    )

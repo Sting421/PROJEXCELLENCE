@@ -264,3 +264,23 @@ class TimeTracker(models.Model):
 
     def __str__(self):
         return f'Time Tracker for {self.task} on {self.project}'
+
+
+class Resource(models.Model):
+    CATEGORY_CHOICES = [
+        ('knowledge', 'Knowledge Base'),
+        ('guides', 'Guides & eBooks'),
+        ('webinars', 'Webinars & Videos'),
+        ('templates', 'Templates & Tools'),
+        ('community', 'Community Forum'),
+    ]
+
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    file = models.FileField(upload_to='resources/')
+    uploaded_at = models.DateTimeField(default=timezone.now)
+    featured = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.title

@@ -217,19 +217,18 @@
         
         <div id="projects-list">
             {% for project in page_obj %}
-            <div class="project-item" >
-                <div class="project-actions" >
-                   
+            <div class="project-item" onclick="goToTeam(event, '{% url 'team_list' project.id %}')">
+                <div class="project-actions">
                     <div class="dropdown">
                         <!-- Dropdown toggle -->
-                        <button class="btn" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                          <i class="bi bi-three-dots" title="Settings"></i>
+                        <button class="btn" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" onclick="event.stopPropagation()">
+                            <i class="bi bi-three-dots" title="Settings"></i>
                         </button>
                         <!-- Dropdown menu -->
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                             {% if project.created_by.id == request.user.id %}
                             <li>
-                                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addMemberModalModal{{ project.id }}">
+                                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addMemberModal{{ project.id }}">
                                   Add Member
                                 </a>
                               </li>
@@ -401,4 +400,13 @@
         </nav>
     </div>
 </div>
+
+<script>
+function goToTeam(event, url) {
+    // Don't redirect if clicking on dropdown or its children
+    if (!event.target.closest('.dropdown')) {
+        window.location.href = url;
+    }
+}
+</script>
 {% endblock content %}

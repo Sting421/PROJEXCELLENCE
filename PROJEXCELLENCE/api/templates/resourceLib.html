@@ -100,6 +100,38 @@
         color: #1e3a5f;
         font-weight: 700;
     }
+
+    /* Add new styles for upload section */
+    .upload-section {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+    }
+
+    .upload-form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        max-width: 500px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .upload-btn {
+        background-color: #1e3a5f;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        align-self: flex-start;
+    }
 </style>
 {% endblock extra_css %}
 
@@ -132,6 +164,37 @@
         <div class="resource-tab">Webinars & Videos</div>
         <div class="resource-tab">Templates & Tools</div>
         <div class="resource-tab">Community Forum</div>
+    </div>
+
+    <!-- Add Upload Section -->
+    <div class="upload-section">
+        <h2>Upload Resource</h2>
+        <form class="upload-form" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="title">Resource Title</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="category">Category</label>
+                <select id="category" name="category" required>
+                    <option value="knowledge">Knowledge Base</option>
+                    <option value="guides">Guides & eBooks</option>
+                    <option value="webinars">Webinars & Videos</option>
+                    <option value="templates">Templates & Tools</option>
+                    <option value="community">Community Forum</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="file">File</label>
+                <input type="file" id="file" name="file" required>
+            </div>
+            <button type="submit" class="upload-btn">Upload Resource</button>
+        </form>
     </div>
 
     <!-- Resources -->

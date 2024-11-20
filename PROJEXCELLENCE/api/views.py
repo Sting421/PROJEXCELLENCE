@@ -13,7 +13,7 @@ from django.db import models
 from django.http import Http404
 
 
-from .models import Task ,Project, Team, TeamMembership
+from .models import Task ,Project, Team, TeamMembership, Resource
 from django.contrib import messages
 from .forms import (
     LoginForm,
@@ -336,14 +336,13 @@ def dashboard_view(request):
     return render(request, 'dashboard.html', context)
 
 #team
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from django.core.paginator import Paginator
-from .models import Project, Team, TeamMembership
-from .forms import TeamForm
-from .filters import TeamFilter
+
 
 def team_list(request, project_id):
+    # Initialize forms at the start
+    add_team_form = TeamForm()
+    add_member_form = AddMemberForm()
+    
     project = get_object_or_404(Project, id=project_id)
     teams = Team.objects.filter(project=project).order_by("-id").prefetch_related('teammembership_set')
     team_filter = TeamFilter(request.GET, queryset=teams)
@@ -352,54 +351,77 @@ def team_list(request, project_id):
     page_obj = paginator.get_page(page_number)
 
     if request.method == 'POST':
-        add_team_form = TeamForm(request.POST)
-        add_member_form = AddMemberForm(request.POST, team=team)
+        if 'delete_team' in request.POST:
+            team_id = request.POST.get('team_id')
+            try:
+                team = Team.objects.get(id=team_id, project_id=project_id)
+                # Optional: Add permission check
+                if request.user == team.project.created_by:
+                    team.delete()
+                    messages.success(request, 'Team deleted successfully.')
+                else:
+                    messages.error(request, 'You do not have permission to delete this team.')
+            except Team.DoesNotExist:
+                messages.error(request, 'Team not found.')
+            return redirect('team_list', project_id=project_id)
 
-        if add_team_form.is_valid():
-            team = add_team_form.save(commit=False)
-            team.project = project  
+        if 'edit_team' in request.POST:
+            team_id = request.POST.get('team_id')
+            team = get_object_or_404(Team, id=team_id)
+            new_name = request.POST.get('team_name')
+            team.team_name = new_name
             team.save()
-
-            # Handle adding users with a default role
-            users = add_team_form.cleaned_data.get('users', [])
-            role = add_team_form.cleaned_data.get('role', [])
-            default_role = role  # Define your default role here
-            for user in users:
-                if not TeamMembership.objects.filter(user=user, team=team).exists():
-                    TeamMembership.objects.create(user=user, team=team, project=project, role=default_role)
-
-            messages.success(request, "Team created successfully!")
-            return redirect('team_list', project_id=project.id)
+            return redirect('team_list', project_id=project_id)
+            
+        # Handle team creation
+        elif 'team_name' in request.POST:
+            add_team_form = TeamForm(request.POST)
+            if add_team_form.is_valid():
+                team = add_team_form.save(commit=False)
+                team.project = project
+                team.save()
+                
+                users = add_team_form.cleaned_data.get('users', [])
+                role = add_team_form.cleaned_data.get('role')
+                for user in users:
+                    if not TeamMembership.objects.filter(user=user, team=team).exists():
+                        TeamMembership.objects.create(
+                            user=user, 
+                            team=team, 
+                            project=project, 
+                            role=role
+                        )
+                messages.success(request, "Team created successfully!")
+                return redirect('team_list', project_id=project.id)
         
-        if 'add_member' in request.POST and add_member_form.is_valid():
-            team_id = request.POST.get('team_id')  # Capture the team ID from the form
+        # Handle member addition
+        elif 'add_member' in request.POST:
+            team_id = request.POST.get('team_id')
             team = get_object_or_404(Team, id=team_id, project=project)
-            user = add_member_form.cleaned_data.get('user')
-            role = add_member_form.cleaned_data.get('role', 'Member')  # Default role
-
-            # Check if the user is already a member of the team
-            if not TeamMembership.objects.filter(user=user, team=team).exists():
-                TeamMembership.objects.create(user=user, team=team, project=project, role=role)
-                messages.success(request, f"Member {user.username} added to the team!")
-            else:
-                messages.warning(request, f"{user.username} is already a member of this team.")
-
-            return redirect('team_list', project_id=project.id)
-    else:
-        add_team_form = TeamForm()
-
-    edit_team_forms = {team.id: TeamForm(instance=team) for team in page_obj}
-
-    team_memberships = [(team, team.teammembership_set.all()) for team in page_obj]
+            add_member_form = AddMemberForm(request.POST)
+            
+            if add_member_form.is_valid():
+                users = add_member_form.cleaned_data['users']
+                role = add_member_form.cleaned_data['role']
+                
+                for user in users:
+                    if not TeamMembership.objects.filter(user=user, team=team).exists():
+                        TeamMembership.objects.create(
+                            user=user,
+                            team=team,
+                            project=project,
+                            role=role
+                        )
+                messages.success(request, "Members added successfully!")
+                return redirect('team_list', project_id=project.id)
 
     context = {
         "page_obj": page_obj,
-        "edit_team_forms": edit_team_forms,
         "add_team_form": add_team_form,
+        "add_member_form": add_member_form,
         "filter": team_filter,
         "project": project,
-        "team_memberships": team_memberships,
-        "team_count": teams.count(),
+        "team_memberships": [(team, team.teammembership_set.all()) for team in page_obj],
     }
     return render(request, "myteam.html", context)
 
@@ -414,4 +436,43 @@ def edit_profile(request):
     else:
         form = UserProfileForm(instance=request.user)
     return render(request, 'profile.html', {'profile_form': form})
+
+def resource_library(request):
+    if request.method == 'POST':
+        print("Files:", request.FILES)  # Debug print
+        print("POST data:", request.POST)  # Debug print
+        
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        category = request.POST.get('category')
+        file = request.FILES.get('file')
+
+        print(f"Title: {title}")  # Debug print
+        print(f"File: {file}")    # Debug print
+
+        if title and description and category and file:
+            try:
+                resource = Resource.objects.create(
+                    title=title,
+                    description=description,
+                    category=category,
+                    file=file
+                )
+                print(f"Resource created: {resource}")  # Debug print
+                messages.success(request, 'Resource uploaded successfully!')
+                return redirect('resource_library')
+            except Exception as e:
+                print(f"Error creating resource: {e}")  # Debug print
+                messages.error(request, f'Upload failed: {str(e)}')
+        else:
+            messages.error(request, 'Please fill all required fields')
+
+    featured_resources = Resource.objects.filter(featured=True)[:4]
+    resources = Resource.objects.all().order_by('-uploaded_at')[:4]
+
+    context = {
+        'featured_resources': featured_resources,
+        'resources': resources,
+    }
+    return render(request, 'resourceLib.html', context)
 
