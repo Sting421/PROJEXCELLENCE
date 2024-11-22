@@ -79,8 +79,10 @@
                 {% for day in week %}
                     {% if day.0 == current_day and month == current_month %}
                         <div class="calendar-day current-day">
+                            <p>Today</p>
                     {% else %}
                         <div class="calendar-day">
+                         
                     {% endif %}
                         {% if day.1 == 'prev-month' %}
                             <span style="color: #ccc;">{{ day.0 }}</span>

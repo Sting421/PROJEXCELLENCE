@@ -45,6 +45,7 @@ def timeline(request):
     year = int(request.GET.get('year', current_date.year))
     month = int(request.GET.get('month', current_date.month))
     current_day = current_date.day
+    current_month = current_date.day
 
     # Create a Calendar instance with Monday as first day
     cal = Calendar(firstweekday=0)  # 0 = Monday, 6 = Sunday
@@ -71,7 +72,7 @@ def timeline(request):
         'month': month,
         'month_name': month_name[month],
         'current_day': current_day,
-        'current_month': month,
+        'current_month': current_month,
         'calendar_data': calendar_data,
     }
     
