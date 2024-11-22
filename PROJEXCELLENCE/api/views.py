@@ -258,7 +258,9 @@ def team_list(request, project_id):
     # Initialize forms at the start
     add_team_form = TeamForm()
     add_member_form = AddMemberForm()
+    user = request.user
     
+
     project = get_object_or_404(Project, id=project_id)
     # Initialize TaskForm with project
     assign_task = TaskForm(project=project)
@@ -268,6 +270,15 @@ def team_list(request, project_id):
     paginator = Paginator(team_filter.qs, 5)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
+
+    # Get user roles for all teams
+    user_roles = {
+        membership.team_id: membership.role 
+        for membership in TeamMembership.objects.filter(
+            user=request.user,
+            project=project
+        )
+    }
 
     if request.method == 'POST':
         if 'delete_team' in request.POST:
@@ -356,6 +367,7 @@ def team_list(request, project_id):
         "filter": team_filter,
         "project": project,
         "team_memberships": [(team, team.teammembership_set.all()) for team in page_obj],
+        "user_roles": user_roles,
     }
     return render(request, "myteam.html", context)
 

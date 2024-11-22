@@ -178,7 +178,7 @@
                                 <table class="info">
                                     <tr>
                                         <td>
-                                        {% if membership.user.profile_path.url != null  %}
+                                        {% if membership.user.profile_path and membership.user.profile_path.url %}
                                             <img class="avatar" src="{{ membership.user.profile_path.url }}" >
                                         {% else %}
                                             <img src="{% static '/res/logoPlaceHolder.png' %}" alt="avatar-profile" class="avatar">
@@ -188,6 +188,7 @@
                                             <h2>{{ membership.user.first_name|capfirst }} {{ membership.user.last_name|capfirst }}</h2>
                                             <h2 class="title">{{ membership.role|capfirst }}</h2>
                                         </td>
+                                        {% if user in team.users.all and user_roles|get_item:team.id == 'HEAD' and user != membership.user or user == project.created_by%}
                                         <td>
                                             <div class="dropdown">
                                                 <!-- Dropdown toggle -->
@@ -202,7 +203,7 @@
                                                         </a>
                                                       </li>
                                                  
-                                                 
+                                                     
                                                   <!-- Delete Project Modal Trigger -->
                                                   <div class="separator"></div>
                                                   <li>
@@ -216,7 +217,9 @@
                                                       Remove Member
                                                     </a>
                                                   </li>
+                                                  
                                         </td>
+                                        {%endif%}
                                     </tr>
                                 </table>
                             </div>
