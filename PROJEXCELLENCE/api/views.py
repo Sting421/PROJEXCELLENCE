@@ -40,12 +40,15 @@ def dashboard(request):
 
 @login_required
 def timeline(request):
-    # Get year and month from query parameters or use current date
+    # Get tasks
+    tasks = Task.objects.filter(assigned_to=request.user).order_by("due_date")
+    print(f"Number of tasks found: {tasks.count()}")  # Debug print
+
     current_date = datetime.now()
     year = int(request.GET.get('year', current_date.year))
     month = int(request.GET.get('month', current_date.month))
     current_day = current_date.day
-    current_month = current_date.day
+    current_month = current_date.month
 
     # Create a Calendar instance with Monday as first day
     cal = Calendar(firstweekday=0)  # 0 = Monday, 6 = Sunday
@@ -67,6 +70,20 @@ def timeline(request):
                 processed_week.append((day, 'current-month'))
         calendar_data.append(processed_week)
 
+    # Create a dictionary to store tasks by date
+    tasks_by_date = {}
+    for task in tasks:
+        # Format date_key as YYYY-MM-DD with leading zeros
+        date_key = task.due_date.strftime('%Y-%m-%d')
+        
+        if date_key not in tasks_by_date:
+            tasks_by_date[date_key] = []
+        tasks_by_date[date_key].append(task)
+
+    # Debug print the tasks_by_date dictionary
+    for date_key, task_list in tasks_by_date.items():
+        print(f"Date: {date_key}, Tasks: {[task.task_name for task in task_list]}")
+
     context = {
         'year': year,
         'month': month,
@@ -74,6 +91,7 @@ def timeline(request):
         'current_day': current_day,
         'current_month': current_month,
         'calendar_data': calendar_data,
+        'tasks_by_date': tasks_by_date,
     }
     
     return render(request, 'timeline.html', context)
