@@ -137,8 +137,6 @@
                             </td>
                         <td>
                             <h2 class="name"> {{ project.created_by.first_name|capfirst }} {{ project.created_by.last_name|capfirst }}</h2>
-
-                           
                         </td>
                         <td class="message">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-left-text-fill" viewBox="0 0 16 16">
@@ -188,7 +186,8 @@
                                             <h2>{{ membership.user.first_name|capfirst }} {{ membership.user.last_name|capfirst }}</h2>
                                             <h2 class="title">{{ membership.role|capfirst }}</h2>
                                         </td>
-                                        {% if user in team.users.all and user_roles|get_item:team.id == 'HEAD' and user != membership.user or user == project.created_by%}
+                                        {% if user in team.users.all and membership.role != 'HEAD' and user_roles|get_item:team.id == 'HEAD' and user != membership.user or user == project.created_by%}
+                                      
                                         <td>
                                             <div class="dropdown">
                                                 <!-- Dropdown toggle -->
@@ -219,6 +218,7 @@
                                                   </li>
                                                   
                                         </td>
+                                       
                                         {%endif%}
                                     </tr>
                                 </table>

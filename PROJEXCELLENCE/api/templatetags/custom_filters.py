@@ -20,3 +20,7 @@ def is_project_manager(user, project):
 def get_item(dictionary, key):
     """Get an item from a dictionary using bracket notation"""
     return dictionary.get(key)
+
+@register.filter
+def multiply(value, arg):
+    return value * arg

@@ -12,7 +12,8 @@ from django.urls import reverse
 from django.db import models
 from django.http import Http404
 from django.utils import timezone
-
+from datetime import datetime, timedelta
+from calendar import monthcalendar, month_name, Calendar
 
 from .models import Task ,Project, Team, TeamMembership, Resource
 from django.contrib import messages
@@ -39,7 +40,42 @@ def dashboard(request):
 
 @login_required
 def timeline(request):
-    return render(request, "timeline.html")
+    # Get year and month from query parameters or use current date
+    current_date = datetime.now()
+    year = int(request.GET.get('year', current_date.year))
+    month = int(request.GET.get('month', current_date.month))
+    current_day = current_date.day
+
+    # Create a Calendar instance with Monday as first day
+    cal = Calendar(firstweekday=0)  # 0 = Monday, 6 = Sunday
+    
+    # Get month calendar with correct week start (Monday=0)
+    calendar_data = []
+    month_days = cal.monthdays2calendar(year, month)
+    
+    for week in month_days:
+        processed_week = []
+        for day, weekday in week:
+            if day == 0:
+                # Handle days from previous/next month
+                if len(processed_week) == 0:  # First week
+                    processed_week.append((day, 'prev-month'))
+                else:  # Last week
+                    processed_week.append((day, 'next-month'))
+            else:
+                processed_week.append((day, 'current-month'))
+        calendar_data.append(processed_week)
+
+    context = {
+        'year': year,
+        'month': month,
+        'month_name': month_name[month],
+        'current_day': current_day,
+        'current_month': month,
+        'calendar_data': calendar_data,
+    }
+    
+    return render(request, 'timeline.html', context)
 
 #addtask
 @login_required
