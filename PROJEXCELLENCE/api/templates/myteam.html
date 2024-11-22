@@ -197,7 +197,7 @@
                                                 <!-- Dropdown menu -->
                                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                     <li>
-                                                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addTaskModal">
+                                                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addTaskModal" >
                                                           Add task
                                                         </a>
                                                       </li>
@@ -310,7 +310,6 @@
     {% endfor %}
 
 </div>
-
 <!-- Add Task Modal -->
 <div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -320,10 +319,11 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form method="post" action="{% url 'add_task' %}">
+                <form method="post" action="{% url 'team_list' project.id %}">
                     {% csrf_token %}
-                    {{ add_task_form|crispy }}  
-                    <button type="submit" class="btn btn-primary mt-3">Add Task</button>
+                    <input type="hidden" name="assign_task" value="1">
+                    {{ assign_task|crispy }}
+                    <button type="submit" class="btn btn-primary mt-3">Assign Task</button>
                 </form>
             </div>
         </div>

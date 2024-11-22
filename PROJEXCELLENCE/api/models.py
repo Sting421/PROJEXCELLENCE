@@ -234,6 +234,8 @@ class Task(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="Pending")
     due_date = models.DateTimeField(default=timezone.now)
     completed = models.BooleanField(default=False)
+    isAccepted = models.BooleanField(default=False)
+    date_started = models.DateTimeField(null=True, blank=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

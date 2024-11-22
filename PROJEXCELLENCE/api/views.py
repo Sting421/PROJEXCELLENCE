@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from django.db import models
 from django.http import Http404
+from django.utils import timezone
 
 
 from .models import Task ,Project, Team, TeamMembership, Resource
@@ -23,7 +24,7 @@ from .forms import (
     TeamForm,
     UserProfileForm,
     AddMemberForm,
-    EditPersonalInfoForm,
+    
 )
 
 def index(request):
@@ -39,25 +40,6 @@ def dashboard(request):
 @login_required
 def timeline(request):
     return render(request, "timeline.html")
-
-
-# #update profile
-# @login_required
-# def upload_profile(request):
-#     if request.method == "POST":
-#         form = UserProfileForm(request.POST, request.FILES, instance=request.user)
-#         if form.is_valid():
-#             user = form.save()
-#             update_session_auth_hash(request, user)
-#             messages.success(request, "Your profile was successfully updated.")
-#             return redirect("profile")
-#     else:
-#         form = UserProfileForm(instance=request.user)
-
-#     # storage = get_messages(request)
-#     # for _ in storage:
-#     #     pass
-#     return render(request, "profile.html", {"form": form})
 
 #addtask
 @login_required
@@ -81,10 +63,6 @@ def login_view(request):
            
     else:
         form = LoginForm()
-
-    # storage = get_messages(request)
-    # for _ in storage:
-    #     pass
     return render(request, "login.html", {"form": form})
 
 
@@ -100,67 +78,6 @@ def signup_view(request):
         form = SignupForm()
 
     return render(request, "signup.html", {"form": form})
-
-# ------------------------------------------- task -------------------------------------
-# @login_required
-# def task_list(request):
-#     tasks = Task.objects.filter(assigned_to=request.user).order_by("-due_date")
-#     task_filter = TaskFilter(request.GET, queryset=tasks)
-
-#     paginator = Paginator(task_filter.qs, 10)  
-#     page_number = request.GET.get("page")
-#     page_obj = paginator.get_page(page_number)
-
-
-#     edit_task_forms = {task.id: TaskForm(instance=task) for task in tasks}
-
-#     context = {
-#         "page_obj": page_obj,
-#         "edit_task_forms": edit_task_forms,
-#         "add_task_form": TaskForm(),  
-#         "filter": task_filter,
-#     }
-#     return render(request, "task.html", context)
-# @login_required
-# def add_task(request):
-#     if request.method == "POST":
-#         form = TaskForm(request.POST)
-#         if form.is_valid():
-#             task = form.save(commit=False) 
-#             task.save() 
-#             return redirect("task",)  
-#     else:
-#         form = TaskForm()
-    
-#     return render(request, "add_task.html", {"form": form})
-
-# @login_required
-# def delete_task(request, pk):
-#     task = get_object_or_404(Task, pk=pk, assigned_to=request.user)
-#     if request.method == 'POST':
-#         task.delete()
-#         # messages.success(request, 'Task deleted successfully.')
-#         return redirect('task')
-#     return render(request, 'delete_task.html', {'task': task})
-
-# @login_required
-# def edit_task(request, pk):
-    
-#     task = get_object_or_404(Task, pk=pk, assigned_to=request.user)
-    
-#     if request.method == 'POST':
-#         form = TaskForm(request.POST, instance=task) 
-#         if form.is_valid():
-#             form.save()
-#             # messages.success(request, 'Task updated successfully.')
-#             return redirect('task')  
-#     else:
-#         form = TaskForm(instance=task)  
-
-#     return render(request, 'task.html', {'form': form, 'task': task})
-
-
-# task filter team_list
 
 @login_required
 def task_list(request,status):
@@ -201,7 +118,6 @@ def delete_task(request, pk):
     task = get_object_or_404(Task, pk=pk, assigned_to=request.user)
     if request.method == 'POST':
         task.delete()
-        # messages.success(request, 'Task deleted successfully.')
         return redirect('task',status="On-going")
     return render(request, 'delete_task.html', {'task': task})
 
@@ -211,15 +127,16 @@ def edit_task(request, pk):
     task = get_object_or_404(Task, pk=pk, assigned_to=request.user)
     
     if request.method == 'POST':
-        form = TaskForm(request.POST, instance=task) 
-        if form.is_valid():
-            form.save()
-            # messages.success(request, 'Task updated successfully.')
+        edit_form = TaskForm(request.POST, instance=task) 
+        if edit_form.is_valid():
+            if task.isAccepted:
+                task.date_started = timezone.now() 
+            edit_form.save()
             return redirect('task',status=task.status)  
     else:
-        form = TaskForm(instance=task)  
+        edit_form = TaskForm(instance=task)  
 
-    return render(request, 'task.html', {'form': form, 'task': task})
+    return render(request, 'task.html', {'form': edit_form, 'task': task})
 
 
 # ------------------------------------------- End of task -------------------------------------
@@ -336,7 +253,6 @@ def dashboard_view(request):
     return render(request, 'dashboard.html', context)
 
 #team
-
 @login_required
 def team_list(request, project_id):
     # Initialize forms at the start
@@ -344,6 +260,9 @@ def team_list(request, project_id):
     add_member_form = AddMemberForm()
     
     project = get_object_or_404(Project, id=project_id)
+    # Initialize TaskForm with project
+    assign_task = TaskForm(project=project)
+    
     teams = Team.objects.filter(project=project).order_by("-id").prefetch_related('teammembership_set')
     team_filter = TeamFilter(request.GET, queryset=teams)
     paginator = Paginator(team_filter.qs, 5)
@@ -415,29 +334,30 @@ def team_list(request, project_id):
                 messages.success(request, "Members added successfully!")
                 return redirect('team_list', project_id=project.id)
 
+        elif 'assign_task' in request.POST:
+           
+            assign_task = TaskForm(request.POST, project=project)
+            if assign_task.is_valid():
+                task = assign_task.save(commit=False)
+                task.project_id = project
+                task.created_by = request.user
+              
+                task.save()
+                messages.success(request, "Task assigned successfully!")
+                return redirect('team_list', project_id=project.id)
+            else:
+                messages.error(request, "Error assigning task. Please check the form.")
+
     context = {
         "page_obj": page_obj,
         "add_team_form": add_team_form,
         "add_member_form": add_member_form,
+        "assign_task":assign_task,
         "filter": team_filter,
         "project": project,
         "team_memberships": [(team, team.teammembership_set.all()) for team in page_obj],
     }
     return render(request, "myteam.html", context)
-
-# @login_required
-# def edit_profile(request):
-#     if request.method == 'POST':
-#         form = UserProfileForm(request.PUT, instance=request.user)
-#         if form.is_valid():
-#             profile = form.save(commit=False)
-#             profile
-#             profile.save()
-#             return redirect('profile')  # Ensure 'profile' is defined in urls.py
-
-#     else:
-#         form = UserProfileForm(instance=request.user)
-#     return render(request, 'profile.html', {'profile_form': form})
 
 @login_required
 def edit_profile(request):

@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from .models import Task, Project, Team, TeamMembership
+from django.utils import timezone
 
 User = get_user_model()
 
@@ -76,6 +77,7 @@ class UserProfileForm(forms.ModelForm):
             "last_name",
             "email",
             "phone_number",
+            "date_of_hire",
             "profile_path",
             'new_password',
             'confirm_password',
@@ -115,23 +117,45 @@ class UserProfileForm(forms.ModelForm):
             user.save()
         return user
 
-class EditPersonalInfoForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ["first_name", "last_name", "email", "phone_number"]
+# class EditProfile(forms.ModelForm):
+#     class Meta:
+#         model = User
+#         fields = ["first_name", "last_name", "email", "phone_number", "status"]
        
 
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ["project_id","task_name", "description", "assigned_to", "due_date", "status"]
+        fields = ["task_name", "description", "assigned_to", "due_date", "status"]
         widgets = {
-            "due_date": forms.DateTimeInput(attrs={"type": "datetime-local"}),
+            "task_name": forms.TextInput(attrs={"class": "form-control"}),
+            "description": forms.Textarea(attrs={"class": "form-control"}),
+           
+            "due_date": forms.DateTimeInput(attrs={"type": "datetime-local", "class": "form-control"}),
+            "status": forms.Select(attrs={"class": "form-control"}),
+        }
+        labels = {
+            "task_name": "Task Name",
+            "description": "Task Description",
+            "assigned_to": "Assign To",
+            "due_date": "Due Date",
+            "status": "Task Status"
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, project=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['assigned_to'].queryset = User.objects.filter(is_active=True)
+        if project:
+            # Only show users who are members of the project's teams
+            self.fields['assigned_to'].queryset = User.objects.filter(
+                teammembership__project=project,
+                is_active=True
+            ).distinct()
+
+    def clean_due_date(self):
+        due_date = self.cleaned_data.get('due_date')
+        if due_date and due_date < timezone.now():
+            raise forms.ValidationError("Due date cannot be in the past")
+        return due_date
 
 class ProjectForm(forms.ModelForm):
     class Meta:
@@ -165,6 +189,11 @@ class ProjectForm(forms.ModelForm):
 #         self.fields['project'].queryset = Project.objects.filter(id)
 
 class TeamForm(forms.ModelForm):
+    class Meta:
+        model = Team
+        fields = ['team_name', 'users']
+  
+  
     team_name = forms.CharField(
         label="Team Name",
         max_length=50,
@@ -176,31 +205,25 @@ class TeamForm(forms.ModelForm):
         widget=forms.CheckboxSelectMultiple, 
         label="Select Team Members"
     )
-    
     role = forms.ChoiceField(
         choices=TeamMembership.STATUS_CHOICES,
         label="Select Role",
         widget=forms.Select(attrs={'class': 'form-control'})
     )
-    
-    class Meta:
-        model = Team
-        fields = ['team_name', 'users']
-    
     def __init__(self, *args, **kwargs):
-        current_user = kwargs.pop('current_user', None)
+        current_user = kwargs.pop('current_user', None)  # Extract the current user
         super().__init__(*args, **kwargs)
-
+        
         if current_user:
             self.fields['users'].queryset = User.objects.exclude(id=current_user.id)
         else:
+            # Fallback to include all users if current_user is not provided
             self.fields['users'].queryset = User.objects.all()
-
 
 
 class AddMemberForm(forms.Form):
     users = forms.ModelMultipleChoiceField(
-         queryset=User.objects.none(),
+        queryset=User.objects.all(),
         widget=forms.CheckboxSelectMultiple,
         label="Select Members"
     )
@@ -209,15 +232,10 @@ class AddMemberForm(forms.Form):
         widget=forms.Select(attrs={"class": "form-control"}),
         label="Role"
     )
-
-    class Meta:
-        model = Team
-        fields = ['team_name', 'users']
-    
     def __init__(self, *args, **kwargs):
-        current_user = kwargs.pop('current_user', None)
+        current_user = kwargs.pop('current_user', None)  # Extract the current user
         super().__init__(*args, **kwargs)
-
+        
         if current_user:
             self.fields['users'].queryset = User.objects.exclude(id=current_user.id)
         else:
