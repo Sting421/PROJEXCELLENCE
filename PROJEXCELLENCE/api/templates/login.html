@@ -1,0 +1,256 @@
+{% extends "hero_base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}PROJEXCELLENCE - Sign In{% endblock %}
+
+{% block extra_css %}
+    <style>
+
+        .background-container {
+            background-image: url("{% static 'res/background.png' %}");
+            background-repeat: no-repeat;
+            background-size: cover;
+            height: 100vh;
+            display: flex;
+            padding: 150px;
+            user-select: none;
+        }
+
+        .container-fluid {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            -webkit-box-shadow: 5px 5px 15px 5px #000000; 
+            box-shadow: 5px 5px 15px 0px #242424;
+            border-radius: 15px;
+        }
+
+        .row {
+            display: flex;
+            flex-grow: 1;
+        }
+
+        .col-lg-7 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: white;
+            border-radius: 10px 0 0 10px;
+            padding: 40px;
+            position: relative;
+        }
+
+        .col-lg-5 {
+            background: #46DFB1;
+            background: -moz-linear-gradient(top, #46DFB1 0%, #41D0A5 50%, #246F58 100%);
+            background: -webkit-linear-gradient(top, #46DFB1 0%, #41D0A5 50%, #246F58 100%);
+            background: linear-gradient(to bottom, #46DFB1 0%, #41D0A5 50%, #246F58 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            border-radius: 0 10px 10px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-family: 'Paytone One', sans-serif;
+            color: var(--primary-color);
+            width: 150px;
+            height: auto;
+        }
+
+        .signtext {
+            font-size: 40px;
+            text-align: center;
+            font-weight: 700;
+            color: #40E0D0;
+            margin-bottom: 40px;
+            user-select: none;
+        }
+
+        .signuptext {
+            font-size: 40px;
+            text-align: center;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 35px;
+        }
+        
+
+
+        .form-container {
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .btn-signin {
+            background-color: #343a40;
+            border: 1px solid #495057;
+            line-height: 20px;
+            width: 500px;
+            padding: 10px;
+            font-size: 15px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.35, -0.24, 0, 1.14);
+            border-radius: 5px;
+        }
+
+        .btn-signin:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-signup {
+            padding: 15px;
+            font-size: 18px;
+            cursor: pointer;
+            color: white;
+            border: 2px solid;
+            border-radius: 60px;
+            transition: all 0.3s;
+            position: relative; 
+            z-index: 10;
+            padding-left: 100px;
+            padding-right: 100px;
+            text-decoration: none; 
+        }
+
+        .btn-signup:hover{
+            background-color: white;
+            border-color: white;
+            color: #343a40;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .sign-up-container {
+            text-align: center;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            color: white;
+            background-color: red;
+            border-radius: 5px;
+        }
+
+        .alert .btn-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            float: right;
+            color: white;
+        }
+
+        .form-control {
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+            padding: 0.75rem 1rem;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+
+        .asteriskField {
+            display: none; 
+        }
+
+        .fade-out {
+            opacity: 0;
+            transform: scale(0.95); 
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+       
+        .fade-in {
+            opacity: 0;
+            transform: scale(1);
+            animation: fadeInAnimation 0.8s forwards ease;
+        }
+
+        @keyframes fadeInAnimation {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="background-container">
+    <div class="container-fluid">
+        <div class="row">
+
+            <!-- LogIn Form -->
+            <div class="col-lg-7">
+                <img src="{% static '/res/slogo.svg' %}" alt="logo" class="logo">
+                <div class="form-container">
+                    <h1 class="signtext">Sign in to Projexcellence</h1>
+                    <form method="POST" action="{% url 'login' %}">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <div>
+                            <button type="submit" class="btn-signin">Sign in</button>
+                        </div>
+                    </form>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" aria-label="Close">&times;</button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- SignUp Form -->
+            <div class="col-lg-5 left-panel">
+                <div class="sign-up-container">
+                    <h1 class="signuptext">Join Us Today!</h1>
+                    <p class="desSign">Start your journey toward seamless project<br>management. Create an account and take<br>control of your team's success.</p>
+                    <p style="font-weight: 600">Sign up to plan, collaborate, and achieve<br>more together!</p><br><br>
+                    <form method="GET">
+                        <a href="{% url 'signup' %}" class="btn-signup">SIGN UP</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const signupButton = document.querySelector(".btn-signup");
+
+        if (signupButton) {
+            signupButton.addEventListener("click", function (e) {
+                e.preventDefault();
+                document.querySelector(".container-fluid").classList.add("fade-out");
+
+                setTimeout(function () {
+                    window.location.href = signupButton.getAttribute("href");
+                }, 800); 
+            });
+        }
+
+        document.querySelector(".container-fluid").classList.add("fade-in");
+    });
+</script>
+{% endblock %}
