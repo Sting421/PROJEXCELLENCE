@@ -8,9 +8,9 @@ from django.utils import timezone
 from django.utils.timezone import now
 from PIL import Image
 from django.contrib.auth.models import User
+import pytz
 
-
-
+manila_timezone = pytz.timezone("Asia/Manila")
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:

@@ -14,7 +14,7 @@ from django.http import Http404
 from django.utils import timezone
 from datetime import datetime, timedelta
 from calendar import monthcalendar, month_name, Calendar
-
+import pytz
 from .models import Task ,Project, Team, TeamMembership, Resource
 from django.contrib import messages
 from .forms import (
@@ -28,6 +28,7 @@ from .forms import (
     
 )
 
+local_timezone = pytz.timezone('Asia/Manila') 
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
 def Error404(request):
@@ -44,11 +45,12 @@ def timeline(request):
     tasks = Task.objects.filter(assigned_to=request.user).order_by("due_date")
     print(f"Number of tasks found: {tasks.count()}")  # Debug print
 
-    current_date = datetime.now()
+    current_date = datetime.now(local_timezone)
     year = int(request.GET.get('year', current_date.year))
     month = int(request.GET.get('month', current_date.month))
     current_day = current_date.day
     current_month = current_date.month
+ 
 
     # Create a Calendar instance with Monday as first day
     cal = Calendar(firstweekday=0)  # 0 = Monday, 6 = Sunday
