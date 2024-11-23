@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
-from .models import Task, Project, Team, TeamMembership
+from .models import Task, Project, Team, TeamMembership, BlogPost
 from django.utils import timezone
 
 User = get_user_model()
@@ -156,7 +156,11 @@ class TaskForm(forms.ModelForm):
         if due_date and due_date < timezone.now():
             raise forms.ValidationError("Due date cannot be in the past")
         return due_date
-
+class EditTaskForm(forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ["status"]
+      
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
@@ -206,7 +210,7 @@ class TeamForm(forms.ModelForm):
         label="Select Team Members"
     )
     role = forms.ChoiceField(
-        choices=TeamMembership.STATUS_CHOICES,
+        choices=TeamMembership.ROLE_CHOICES,
         label="Select Role",
         widget=forms.Select(attrs={'class': 'form-control'})
     )
@@ -228,7 +232,7 @@ class AddMemberForm(forms.Form):
         label="Select Members"
     )
     role = forms.ChoiceField(
-        choices=TeamMembership.STATUS_CHOICES,
+        choices=TeamMembership.ROLE_CHOICES,
         widget=forms.Select(attrs={"class": "form-control"}),
         label="Role"
     )
@@ -240,3 +244,8 @@ class AddMemberForm(forms.Form):
             self.fields['users'].queryset = User.objects.exclude(id=current_user.id)
         else:
             self.fields['users'].queryset = User.objects.all()
+
+class AddBlogForm(forms.ModelForm):
+    class Meta:
+        model = BlogPost  
+        fields = ['message']

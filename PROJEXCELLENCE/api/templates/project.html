@@ -12,6 +12,7 @@
         min-height: 100vh;
         margin-left: 4%;
         margin-right: 4%;
+        user-select: none;
     }
     .content-wrapper {
         flex: 1;
@@ -263,7 +264,11 @@
                 </div>   
                 <div class="lower-btn">
                     <i class="bi bi-list-task" title="To Do list"></i>
-                    <i class="bi bi-chat-square-text" style="margin-left: 10px; " title="Chat Box"></i>
+                    
+                    <button class="btn" type="button" id="dropdownMenuButton" aria-expanded="false" >
+                        <a class="view-txt" href="{% url 'blog_post' project.id %}"><i class="bi bi-chat-square-text"title="Chat Box"></i></a>
+                    </button>
+
                     <i class="bi bi-collection " style="margin-left: 10px;"  title="Resources"></i>
                 </div>
             </div>

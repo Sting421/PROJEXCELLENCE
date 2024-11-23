@@ -159,7 +159,7 @@ class Team(models.Model):
         return self.team_name
 
 class TeamMembership(models.Model):
-    STATUS_CHOICES = [
+    ROLE_CHOICES = [
         ("Manager", "Manager"),
         ("HEAD", "Head"),
         ("MEMBER", "Member"),
@@ -167,7 +167,7 @@ class TeamMembership(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     project = models.ForeignKey('Project', on_delete=models.CASCADE)
-    role = models.CharField(max_length=50,  choices=STATUS_CHOICES, default="Member")
+    role = models.CharField(max_length=50,  choices=ROLE_CHOICES, default="Member")
     joined_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -175,22 +175,23 @@ class TeamMembership(models.Model):
 
 
 
-class ProjectManager(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f'{self.user} - {self.project}'
-
-
 class BlogPost(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    posted_by = models.ForeignKey(User, on_delete=models.CASCADE)
     time_posted = models.DateTimeField(auto_now_add=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     message = models.TextField()
 
+ 
+    
+class Comments(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    blog = models.ForeignKey(BlogPost, on_delete=models.CASCADE)
+    time_posted = models.DateTimeField(auto_now_add=True)
+    project = models.ForeignKey('Project', on_delete=models.CASCADE)
+    text_comment = models.TextField()
+
     def __str__(self):
-        return f'{self.user} on {self.project}'
+        return self.filename
 
 
 class Resources(models.Model):
@@ -201,13 +202,6 @@ class Resources(models.Model):
     def __str__(self):
         return self.filename
 
-
-class Admin(models.Model):
-    username = models.CharField(max_length=50)
-    password = models.CharField(max_length=150)
-
-    def __str__(self):
-        return self.username
 
 
 class File(models.Model):
@@ -242,31 +236,6 @@ class Task(models.Model):
     def __str__(self):
         return self.task_name
 
-
-class Member(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    time_posted = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f'{self.user} joined on {self.time_posted}'
-
-
-class Role(models.Model):
-    role_name = models.CharField(max_length=50)
-    permission = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.role_name
-
-
-class TimeTracker(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    task = models.ForeignKey(Task, on_delete=models.CASCADE)
-    assigned_to = models.ForeignKey(User, on_delete=models.CASCADE)
-    date_started = models.DateTimeField()
-
-    def __str__(self):
-        return f'Time Tracker for {self.task} on {self.project}'
 
 
 class Resource(models.Model):

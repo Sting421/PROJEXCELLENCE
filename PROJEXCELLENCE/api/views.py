@@ -15,7 +15,7 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 from calendar import monthcalendar, month_name, Calendar
 import pytz
-from .models import Task ,Project, Team, TeamMembership, Resource
+from .models import Task ,Project, Team, TeamMembership, Resource, BlogPost
 from django.contrib import messages
 from .forms import (
     LoginForm,
@@ -25,6 +25,8 @@ from .forms import (
     TeamForm,
     UserProfileForm,
     AddMemberForm,
+    EditTaskForm,
+    AddBlogForm,
     
 )
 
@@ -50,12 +52,9 @@ def timeline(request):
     month = int(request.GET.get('month', current_date.month))
     current_day = current_date.day
     current_month = current_date.month
- 
+   
+    cal = Calendar(firstweekday=0)  
 
-    # Create a Calendar instance with Monday as first day
-    cal = Calendar(firstweekday=0)  # 0 = Monday, 6 = Sunday
-    
-    # Get month calendar with correct week start (Monday=0)
     calendar_data = []
     month_days = cal.monthdays2calendar(year, month)
     
@@ -63,26 +62,23 @@ def timeline(request):
         processed_week = []
         for day, weekday in week:
             if day == 0:
-                # Handle days from previous/next month
-                if len(processed_week) == 0:  # First week
+                if len(processed_week) == 0:  
                     processed_week.append((day, 'prev-month'))
-                else:  # Last week
+                else: 
                     processed_week.append((day, 'next-month'))
             else:
                 processed_week.append((day, 'current-month'))
         calendar_data.append(processed_week)
 
-    # Create a dictionary to store tasks by date
     tasks_by_date = {}
     for task in tasks:
-        # Format date_key as YYYY-MM-DD with leading zeros
-        date_key = task.due_date.strftime('%Y-%m-%d')
-        
-        if date_key not in tasks_by_date:
-            tasks_by_date[date_key] = []
-        tasks_by_date[date_key].append(task)
+        if task.status != 'Done':
+            date_key = task.due_date.strftime('%Y-%m-%d')
+            
+            if date_key not in tasks_by_date:
+                tasks_by_date[date_key] = []
+            tasks_by_date[date_key].append(task)
 
-    # Debug print the tasks_by_date dictionary
     for date_key, task_list in tasks_by_date.items():
         print(f"Date: {date_key}, Tasks: {[task.task_name for task in task_list]}")
 
@@ -146,7 +142,7 @@ def task_list(request,status):
     page_obj = paginator.get_page(page_number)
 
 
-    edit_task_forms = {task.id: TaskForm(instance=task) for task in tasks}
+    edit_task_forms = {task.id: EditTaskForm(instance=task) for task in tasks}
 
     context = {
         "page_obj": page_obj,
@@ -184,14 +180,14 @@ def edit_task(request, pk):
     task = get_object_or_404(Task, pk=pk, assigned_to=request.user)
     
     if request.method == 'POST':
-        edit_form = TaskForm(request.POST, instance=task) 
+        edit_form = EditTaskForm(request.POST, instance=task) 
         if edit_form.is_valid():
             if task.isAccepted:
                 task.date_started = timezone.now() 
             edit_form.save()
             return redirect('task',status=task.status)  
     else:
-        edit_form = TaskForm(instance=task)  
+        edit_form = EditTaskForm(instance=task)  
 
     return render(request, 'task.html', {'form': edit_form, 'task': task})
 
@@ -483,4 +479,38 @@ def resource_library(request):
         'resources': resources,
     }
     return render(request, 'resourceLib.html', context)
+
+
+@login_required
+def blog_list(request, project_id):
+    add_blog_form = AddBlogForm()
+    project = get_object_or_404(Project, id=project_id)
+    blogs = BlogPost.objects.filter(project = project).order_by("time_posted")
+
+
+    
+    if request.method == 'POST':
+        if 'add_Post' in request.POST:
+            add_blog_form = AddBlogForm(request.POST)
+            if add_blog_form.is_valid():
+                blog = add_blog_form.save(commit=False)
+                blog.project = project
+                blog.posted_by = request.user
+                blog.save()
+                print("New Blog posted")
+                messages.success(request, "Blog created successfully!")
+                return redirect('blog_post', project_id=project.id)
+
+
+
+    context = {
+        "add_blog_form": AddBlogForm(),
+        "project": project,  
+        "blogs":blogs,
+    }
+    return render(request, "BlogPost.html", context)
+
+
+
+
 

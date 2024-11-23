@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load custom_filters %}
+
+{% block title %}Task{% endblock %}
+
+{% block extra_css %}
+
+<style>
+    .page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin-left: 4%;
+    margin-right: 4%;
+    user-select: none;
+}
+
+    .task-content{
+        display:flex;
+        align-items: center;
+    }
+    #tasks-list {
+        flex: 1;
+        overflow-y: auto;
+        margin-bottom: 20px;
+    }
+    .task-content{
+        display:flex;
+        align-items: center;
+    }
+    .task-item {
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 20px;
+        padding-left: 50px;
+        padding-right: 50px;
+        margin-bottom: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        
+    }
+
+</style>
+
+{% endblock extra_css %}
+{% block content %}
+<div class="page-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Channel</h1>
+        <div class="add-task" data-bs-toggle="modal" data-bs-target="#addBlogModal">
+            <i class="fas fa-plus mr-2"></i> Post
+        </div>
+    </div>
+    <div id="tasks-list">
+        {% for blog in blogs %}
+        <div class="task-item ">
+            <div class="task-content">
+                <div>
+                    <div class="task-title" style="align-items: center;">
+                        <span style="font-weight: 600;"> <img class="avatar" src="{{blog.posted_by.profile_path.url }}" width="40px" height="40px" style="border-radius: 50%;" ></span>
+                        <span style="font-weight: 600;">{{ blog.posted_by.first_name|capfirst}} {{blog.posted_by.last_name|capfirst }} </span>
+                        <span style="font-weight: 300; color: rgb(117, 116, 116);">{{ blog.time_posted}}</span>
+                    </div>
+                    <div class="task-title" style="margin-left: 50px;">{{ blog.message}}</div>
+
+                    <hr style="border: 1px solid rgb(200, 200, 200); margin: 10px 0;">
+
+                    <div style="border: top 3px;">
+                       <span><img class="avatar" src="{{ request.user.profile_path.url }}" width="20px" height="20px" style="border-radius: 50%;" ></span>
+                       <span style="margin-left: 10px; padding-top: 20;">Reply</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+    <!-- Add Blog Modal -->
+    <div class="modal fade" id="addBlogModal" tabindex="-1" aria-labelledby="addBlogModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addBlogModalLabel">Post Blog</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="{% url 'blog_post' project.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="add_Post" value="1">
+                        {{ add_blog_form|crispy }}
+                        <input type="hidden" name="project_id" value="{{ project_id }}">
+                        <button type="submit" class="btn btn-primary mt-3">Post</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
