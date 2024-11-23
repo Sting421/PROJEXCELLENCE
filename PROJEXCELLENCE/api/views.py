@@ -15,7 +15,7 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 from calendar import monthcalendar, month_name, Calendar
 import pytz
-from .models import Task ,Project, Team, TeamMembership, Resource, BlogPost
+from .models import Task ,Project, Team, TeamMembership, Resource, BlogPost, Comments
 from django.contrib import messages
 from .forms import (
     LoginForm,
@@ -485,22 +485,44 @@ def resource_library(request):
 def blog_list(request, project_id):
     add_blog_form = AddBlogForm()
     project = get_object_or_404(Project, id=project_id)
-    blogs = BlogPost.objects.filter(project = project).order_by("time_posted")
+    blogs = BlogPost.objects.filter(project = project).order_by("-time_posted")
 
 
     
     if request.method == 'POST':
         if 'add_Post' in request.POST:
+            post_id = request.POST.get('team_id')
             add_blog_form = AddBlogForm(request.POST)
             if add_blog_form.is_valid():
                 blog = add_blog_form.save(commit=False)
                 blog.project = project
                 blog.posted_by = request.user
                 blog.save()
-                print("New Blog posted")
+                print("Terminal Confirmation: new Blog posted")
                 messages.success(request, "Blog created successfully!")
                 return redirect('blog_post', project_id=project.id)
 
+        if 'edit_Post' in request.POST:
+            post_id = request.POST.get('team_id')
+            blog = get_object_or_404(BlogPost, id=post_id)
+            new_message = request.POST.get('new_message')
+            blog.message = new_message
+            blog.save()
+            return redirect('blog_post', project_id=project_id)
+
+        if 'delete_Post' in request.POST:
+            post_id = request.POST.get('team_id')
+            blog = get_object_or_404(BlogPost, id=post_id)
+            blog.delete()
+            return redirect('blog_post', project_id=project_id)
+
+        if 'add_comment' in request.POST:
+            blog_id = request.POST.get('blog_id')
+            text_comment = request.POST.get('text_comment')
+            blog = get_object_or_404(BlogPost, id=blog_id)
+            Comments.objects.create(user=request.user, blog=blog, project=project, text_comment=text_comment)
+            messages.success(request, "Comment added successfully!")
+            return redirect('blog_post', project_id=project_id)
 
 
     context = {

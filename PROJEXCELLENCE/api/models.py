@@ -190,8 +190,7 @@ class Comments(models.Model):
     project = models.ForeignKey('Project', on_delete=models.CASCADE)
     text_comment = models.TextField()
 
-    def __str__(self):
-        return self.filename
+    
 
 
 class Resources(models.Model):
