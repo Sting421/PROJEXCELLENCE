@@ -126,30 +126,21 @@ class UserProfileForm(forms.ModelForm):
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ["task_name", "description", "assigned_to", "due_date", "status"]
+        fields = ["task_name", "description", "due_date"]
         widgets = {
             "task_name": forms.TextInput(attrs={"class": "form-control"}),
             "description": forms.Textarea(attrs={"class": "form-control"}),
-           
             "due_date": forms.DateTimeInput(attrs={"type": "datetime-local", "class": "form-control"}),
-            "status": forms.Select(attrs={"class": "form-control"}),
         }
         labels = {
             "task_name": "Task Name",
             "description": "Task Description",
-            "assigned_to": "Assign To",
             "due_date": "Due Date",
-            "status": "Task Status"
         }
 
     def __init__(self, *args, project=None, **kwargs):
         super().__init__(*args, **kwargs)
-        if project:
-            # Only show users who are members of the project's teams
-            self.fields['assigned_to'].queryset = User.objects.filter(
-                teammembership__project=project,
-                is_active=True
-            ).distinct()
+       
 
     def clean_due_date(self):
         due_date = self.cleaned_data.get('due_date')

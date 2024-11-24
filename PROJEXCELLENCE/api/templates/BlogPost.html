@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 {% load custom_filters %}
+{% load static %}
 
 {% block title %}Task{% endblock %}
 
@@ -14,22 +15,20 @@
     margin-left: 4%;
     margin-right: 4%;
     user-select: none;
-}
-
-    .task-content{
-        display:flex;
-        align-items: center;
     }
+    .avatar {
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        font-weight: 600;
+    }
+
     #tasks-list {
         flex: 1;
         overflow-y: auto;
         margin-bottom: 20px;
     }
-    .task-content{
-        display:flex;
-        align-items: center;
-        justify-content: space-between;
-    }
+  
     .task-item {
         background-color: #ffffff;
         border: 1px solid #e0e0e0;
@@ -42,6 +41,36 @@
         transition: all 0.3s ease;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         
+    }
+    .btn-icon {
+        position: absolute;
+        right: 10px;
+        bottom: 15px;
+        background-color: transparent;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .btn-primary {
+        --bs-btn-hover-bg:none;
+        --bs-btn-active-bg: none;
+    }
+
+    .btn-icon i.bi-backspace-reverse {
+        display: none;
+        background-color: transparent;
+        --bs-btn-active-bg: #0a58ca;
+    }
+
+    .btn-icon:hover i.bi-backspace-reverse-fill {
+        display: none;
+        background-color: transparent;
+    }
+
+    .btn-icon:hover i.bi-backspace-reverse {
+        display: inline;
+        background-color: transparent;
     }
 
 </style>
@@ -59,8 +88,7 @@
         {% for blog in blogs %}
         <div class="task-item " >
             <div class="task-content ">
-                <div class=>
-                    <div class="task-title" style="display: flex; flex-direction: row;  align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
                        <span>
                             <img class="avatar" src="{{ blog.posted_by.profile_path.url }}" width="40px" height="40px" style="border-radius: 50%; font-weight: 600;">
                             <span style="font-weight: 600;">{{ blog.posted_by.first_name|capfirst }} {{ blog.posted_by.last_name|capfirst }}</span>
@@ -80,37 +108,52 @@
                     <hr style="border: 1px solid rgb(200, 200, 200); margin: 10px 0;">
                      <!-- Comments Section -->
                         <p>Comments:</p>
-                        <div style="margin-left: 20px; display: flex; flex-direction: column; flex-wrap:wrap;">
+                        <div style="margin-left: 20px; display: flex; flex-direction: column; flex-wrap: wrap;">
                             {% for comment in blog.comments_set.all %}
-                                <span>
-                                    <img class="avatar" src="{{ comment.user.profile_path.url }}" width="25px" height="25px" style="border-radius: 50%; font-weight: 600;">
+                                <div>
+                                    {% if comment.user.profile_path and comment.user.profile_path.url %}
+                                        <img class="avatar" src="{{ comment.user.profile_path.url }}" >
+                                    {% else %}
+                                        <img class="avatar" src="{% static '/res/logoPlaceHolder.png' %}">
+                                    {% endif %} 
                                     <strong>{{ comment.user.first_name|capfirst }} {{ comment.user.last_name|capfirst }}:</strong> 
                                     <span style="font-size: small; color: grey;">
-                                    {{ comment.time_posted }}
+                                        {{ comment.time_posted }}
                                     </span>
-                                </span>
-                                  <span style="margin-left: 30px;">
+                                </div>
+                                <div style="margin-left: 30px; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">
                                     {{ comment.text_comment }}
-                                  </span>
-                               
+                                </div>
                             {% empty %}
                                 <p>No comments yet. Be the first to comment!</p>
                             {% endfor %}
                         </div>
+                        
                     <div style="border: top 3px;">
                        
                         <form method="post" action="{% url 'blog_post' project.id %}">
                             {% csrf_token %}
                             <input type="hidden" name="add_comment" value="1">
                             <input type="hidden" name="blog_id" value="{{ blog.id }}">
-                            <div class="form-group">
-                                <textarea name="text_comment" class="form-control" rows="2" placeholder="Write a comment..." required></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-sm btn-primary mt-2">Add Comment</button>
+                            <div class="form-group" style="position: relative; width: 100%;">
+                                <textarea 
+                                    name="text_comment" 
+                                    class="form-control" 
+                                    rows="2" 
+                                    placeholder="Write a comment..." 
+                                    required
+                                    style="padding-right: 50px;"
+                                ></textarea>
+                                <button 
+                                    type="submit" 
+                                    class="btn btn-sm btn-primary btn-icon">
+                                    <i class="bi bi-backspace-reverse-fill" style="color: rgb(0, 0, 0);"></i>
+                                    <i class="bi bi-backspace-reverse" style="color: rgb(0, 0, 0);"></i>
+                                </button>
+                            
+                          
                         </form>
-                        
                     </div>
-                </div>
             </div>
         </div>
     

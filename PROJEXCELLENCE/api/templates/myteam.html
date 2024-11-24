@@ -199,7 +199,7 @@
                                                 <!-- Dropdown menu -->
                                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                     <li>
-                                                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addTaskModal" >
+                                                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addTaskModal" data-user-id="{{ membership.user.id }}">
                                                           Add task
                                                         </a>
                                                       </li>
@@ -317,23 +317,50 @@
 </div>
 <!-- Add Task Modal -->
 <div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addTaskModalLabel">Add Task</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form method="post" action="{% url 'team_list' project.id %}">
-                    {% csrf_token %}
+    <div class="modal-dialog">
+        <form method="post" action="{% url 'team_list' project.id %}">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addTaskModalLabel">Add Task</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
                     <input type="hidden" name="assign_task" value="1">
+                    <input type="hidden" name="user_id" value="">
                     {{ assign_task|crispy }}
-                    <button type="submit" class="btn btn-primary mt-3">Assign Task</button>
-                </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Task</button>
+                </div>
             </div>
-        </div>
+        </form>
     </div>
 </div>
+
+  <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const modals = document.querySelectorAll('[data-bs-target="#addTaskModal"], [data-bs-target="#changeRoleModal"], [data-bs-target="#removeMemberModal"]');
+        
+        modals.forEach(modalTrigger => {
+            modalTrigger.addEventListener('click', function() {
+                const userId = this.getAttribute('data-user-id');
+                
+                // Example: Update a hidden input in the modal for backend processing
+                const targetModalId = this.getAttribute('data-bs-target');
+                const targetModal = document.querySelector(targetModalId);
+                if (targetModal) {
+                    const userIdInput = targetModal.querySelector('input[name="user_id"]');
+                    if (userIdInput) {
+                        userIdInput.value = userId;
+                    }
+                }
+            });
+        });
+    });
+  </script>
+
 
 
 

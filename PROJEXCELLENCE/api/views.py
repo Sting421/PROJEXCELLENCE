@@ -15,7 +15,7 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 from calendar import monthcalendar, month_name, Calendar
 import pytz
-from .models import Task ,Project, Team, TeamMembership, Resource, BlogPost, Comments
+from .models import Task ,Project, Team, TeamMembership, Resource, BlogPost, Comments, User
 from django.contrib import messages
 from .forms import (
     LoginForm,
@@ -399,14 +399,18 @@ def team_list(request, project_id):
                 return redirect('team_list', project_id=project.id)
 
         elif 'assign_task' in request.POST:
-           
+            user_id = request.POST.get('user_id')
+            user = get_object_or_404(User, id=user_id)
             assign_task = TaskForm(request.POST, project=project)
             if assign_task.is_valid():
                 task = assign_task.save(commit=False)
                 task.project_id = project
+                task.assigned_to = user
                 task.created_by = request.user
               
+              
                 task.save()
+              
                 messages.success(request, "Task assigned successfully!")
                 return redirect('team_list', project_id=project.id)
             else:
