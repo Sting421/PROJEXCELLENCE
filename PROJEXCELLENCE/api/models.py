@@ -80,32 +80,7 @@ class User(AbstractUser):
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
-    
-    # def save(self, *args, **kwargs):
-    #     # Check if the profile picture has changed
-    #     if self.pk:
-    #         old_profile = User.objects.get(pk=self.pk)
-    #         if old_profile.profile_path and old_profile.profile_path != self.profile_path:
-    #             # Delete the old photo if it exists
-    #             old_profile_path = os.path.join(settings.MEDIA_ROOT, old_profile.profile_path.name)
-    #             if os.path.exists(old_profile_path):
-    #                 os.remove(old_profile_path)
-    #             # Rename the uploaded image to the current date and time
-    #             if self.profile_path:
-    #                 ext = os.path.splitext(self.profile_path.name)[1]
-    #                 new_filename = timezone.now().strftime('%Y%m%d%H%M%S') + ext
-    #                 self.profile_path.name = os.path.join('profiles', new_filename)
-    #     super().save(*args, **kwargs)
-    #     # Resize the image if it exists
-    
-        # if self.profile_path and os.path.exists(self.profile_path.path):
-        #     try:
-        #         img = Image.open(self.profile_path.path)
-        #         output_size = (300, 300)
-        #         img.thumbnail(output_size)
-        #         img.save(self.profile_path.path)
-        #     except FileNotFoundError:
-        #         print(f"File not found: {self.profile_path.path}")
+
     def save(self, *args, **kwargs):
         # Check if the profile picture has changed
         if self.pk:
@@ -115,12 +90,11 @@ class User(AbstractUser):
                     # Delete the old photo if it exists
                     old_profile_path = os.path.join(settings.MEDIA_ROOT, old_profile.profile_path.name)
                     if os.path.exists(old_profile_path):
-                        os.remove(old_profile_path)
+                      old_profile.profile_path.delete(save=False)
             except User.DoesNotExist:
-                pass  # Old profile doesn't exist
+                pass  
 
-        # Rename the uploaded image to the current date and time
-        if self.profile_path:
+        if self.profile_path and self.profile_path != '':
             ext = os.path.splitext(self.profile_path.name)[1]
             new_filename = timezone.now().strftime('%Y%m%d%H%M%S') + ext
             self.profile_path.name = os.path.join('profiles', new_filename)

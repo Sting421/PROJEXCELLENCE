@@ -4,6 +4,12 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from .models import Task, Project, Team, TeamMembership, BlogPost
 from django.utils import timezone
+from datetime import datetime
+import pytz
+
+
+
+manila_timezone = pytz.timezone("Asia/Manila")
 
 User = get_user_model()
 
@@ -53,8 +59,8 @@ class SignupForm(forms.ModelForm):
 
         return cleaned_data
     
+
 class UserProfileForm(forms.ModelForm):
-  
     new_password = forms.CharField(
         widget=forms.PasswordInput(
             attrs={"class": "form-control", "id": "new_password"}
@@ -106,22 +112,24 @@ class UserProfileForm(forms.ModelForm):
         return cleaned_data
 
     def save(self, commit=True):
+      
         user = super().save(commit=False)
 
-        # Handle password change
         new_password = self.cleaned_data.get("new_password")
         if new_password:
             user.set_password(new_password)
 
+        if not self.cleaned_data.get("profile_path"):
+            user.profile_path = self.instance.profile_path
+
         if commit:
             user.save()
+
         return user
 
-# class EditProfile(forms.ModelForm):
-#     class Meta:
-#         model = User
-#         fields = ["first_name", "last_name", "email", "phone_number", "status"]
-       
+
+
+
 
 class TaskForm(forms.ModelForm):
     class Meta:
@@ -140,13 +148,13 @@ class TaskForm(forms.ModelForm):
 
     def __init__(self, *args, project=None, **kwargs):
         super().__init__(*args, **kwargs)
-       
 
     def clean_due_date(self):
-        due_date = self.cleaned_data.get('due_date')
+        due_date = self.cleaned_data.get("due_date")
         if due_date and due_date < timezone.now():
             raise forms.ValidationError("Due date cannot be in the past")
         return due_date
+    
 class EditTaskForm(forms.ModelForm):
     class Meta:
         model = Task

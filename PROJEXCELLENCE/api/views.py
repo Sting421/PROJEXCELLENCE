@@ -32,6 +32,8 @@ from .forms import (
 )
 
 local_timezone = pytz.timezone('Asia/Manila') 
+
+now_in_manila = datetime.now(local_timezone)
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
 def Error404(request):
@@ -74,7 +76,7 @@ def timeline(request):
     tasks_by_date = {}
     for task in tasks:
         if task.status != 'Done':
-            date_key = task.due_date.strftime('%Y-%m-%d')
+            date_key = (task.due_date + timedelta(days=1)).strftime('%Y-%m-%d') if task.due_date else 'No Due Date'
             
             if date_key not in tasks_by_date:
                 tasks_by_date[date_key] = []
@@ -316,11 +318,58 @@ def dashboard_view(request):
     paginator = Paginator(projects, 2)
     page_number = request.GET.get('page')
     page_obj_projects = paginator.get_page(page_number)
+
+
+    tasks = Task.objects.filter(assigned_to=request.user).order_by("due_date")
+    print(f"Number of tasks found: {tasks.count()}")  # Debug print
+
+    current_date = datetime.now(local_timezone)
+    year = int(request.GET.get('year', current_date.year))
+    month = int(request.GET.get('month', current_date.month))
+    current_day = current_date.day
+    current_month = current_date.month
+   
+    cal = Calendar(firstweekday=0)  
+
+    calendar_data = []
+    month_days = cal.monthdays2calendar(year, month)
+    
+    for week in month_days:
+        processed_week = []
+        for day, weekday in week:
+            if day == 0:
+                if len(processed_week) == 0:  
+                    processed_week.append((day, 'prev-month'))
+                else: 
+                    processed_week.append((day, 'next-month'))
+            else:
+                processed_week.append((day, 'current-month'))
+        calendar_data.append(processed_week)
+
+    tasks_by_date = {}
+    for task in tasks:
+        if task.status != 'Done':
+            date_key = (task.due_date + timedelta(days=1)).strftime('%Y-%m-%d') if task.due_date else 'No Due Date'
+            
+            if date_key not in tasks_by_date:
+                tasks_by_date[date_key] = []
+            tasks_by_date[date_key].append(task)
+
+    for date_key, task_list in tasks_by_date.items():
+        print(f"Date: {date_key}, Tasks: {[task.task_name for task in task_list]}")
     context = {
        
         "projects": page_obj_projects,
         "tasks":page_obj_task,
+        'year': year,
+        'month': month,
+        'month_name': month_name[month],
+        'current_day': current_day,
+        'current_month': current_month,
+        'calendar_data': calendar_data,
+        'tasks_by_date': tasks_by_date,
     }
+    
     
     return render(request, 'dashboard.html', context)
 
@@ -487,6 +536,7 @@ def team_list(request, project_id):
 def edit_profile(request):
     if request.method == "POST":
         form = UserProfileForm(request.POST, request.FILES, instance=request.user)
+        print(request.POST)
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)

@@ -201,6 +201,7 @@
       
         <div class="tab-content">
             {% for team, memberships in team_memberships %}
+             
                 <div class="tab-pane {% if forloop.first %}active{% endif %}" id="team-{{ team.id }}">
                     {% if memberships %}
                         {% for membership in memberships %}
@@ -224,30 +225,29 @@
                                             <h2>{{ membership.user.first_name|capfirst }} {{ membership.user.last_name|capfirst }}</h2>
                                             <h2 class="title">{{ membership.role|capfirst }}</h2>
                                         </td>
-                                        <!-- {% for membership in memberships %}
-                                        {% if membership.user == request.user %}
-                                            <p>Your Role in this Team: {{ membership.role}}</p>
-                                        {% endif %}
-                                        {% endfor %}     -->
                                         {% if user in team.users.all and membership.role != 'HEAD' and user_roles|get_item:team.id == 'HEAD' or user_roles|get_item:team.id == 'Manager' and user != membership.user or user == project.created_by%}
-                                        
+                                       
                                         <td>
-                                            {% if membership.role != 'HEAD'  or request.user == project.created_by%}
+                                            {%if user_roles|get_item:team.id  != 'MEMBER' and membership.role != 'HEAD'%}
                                             <div class="dropdown">
+                                               
                                                 <button class="btn" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" onclick="event.stopPropagation()">
                                                     <i class="bi bi-three-dots" title="Settings"></i>
-                                                </button>
+                                                </button>  
+                                                
                                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                  
+                                                   
                                                   <div class="separator"></div>
                                                   
+                                                    {%if user_roles|get_item:team.id  != 'MEMBER' and membership.role != 'HEAD' %}
+                                                        <li>
+                                                            <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addTaskModal" data-user-id="{{ membership.user.id }}">
+                                                                Add task
+                                                            </a>
+                                                        </li>
+                                                    {%endif%}
                                                   
-                                                    <li>
-                                                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addTaskModal" data-user-id="{{ membership.user.id }}">
-                                                            Add task
-                                                        </a>
-                                                    </li>
-                                                 
+                                                    {%if user_roles|get_item:team.id  == 'HEAD' or request.user == project.created_by%}
                                                     <li>
                                                         <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editMemberRoleModal" data-user-id="{{ membership.id }}">
                                                         Change Role
@@ -258,10 +258,10 @@
                                                         Remove Member
                                                         </a>
                                                     </li>
+                                                    {%endif%}
                                                 </ul>
                                             </div>
                                             {%endif%}
-                                                
                                         </td>
                                         {%endif%}
                                     </tr>
