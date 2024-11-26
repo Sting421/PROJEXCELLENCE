@@ -210,7 +210,7 @@
           data-bs-toggle="collapse"
           data-bs-target="#sidebarMenu"
           aria-controls="sidebarMenu"
-          aria-expanded="false"
+          aria-expanded="true"
           aria-label="Toggle navigation"
         >
           <span class="navbar-toggler-icon"></span>
@@ -251,11 +251,11 @@
                 <img src="{% static '/res/timelineIcon.svg' %}" alt="logo" width="20px">  TimeLine
               </a>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <a class="nav-link {% if request.resolver_match.url_name == 'resourceLib' %}active{% endif %}" href="{% url 'resourceLib' %}">
                 <img src="{% static '/res/resourceIcon.svg' %}" alt="logo" width="20px"> Resource Library
               </a>
-            </li>
+            </li> -->
           
           </ul>
         </nav>

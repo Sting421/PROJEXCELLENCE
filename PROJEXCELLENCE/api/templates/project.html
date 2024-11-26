@@ -159,6 +159,15 @@
     .separator{
         border-bottom: #2d3748;
     }
+    .view-txt {
+        color: inherit;
+        text-decoration: none;
+    }
+    .view-txt:hover {
+        color: blue;
+        text-decoration: none;
+     
+    }
   
     </style>
 {% endblock extra_css %}
@@ -251,30 +260,33 @@
                             {%endif%}
                           </li>
                          
+
                         </ul>
                       </div>
                     <br>
                 </div>
                 <div>
                   
+
                     <div class="project-title">  <img src="{% static 'res/logoPlaceHolder.png' %}" alt="profile pic" class="project-profile">{{ project.project_name }}</div>
                     <div class="project-description">{{ project.description|slice:":15" }}{% if project.description|length > 15 %}...{% endif %}</div>
                     <div class="project-created-date">Created on: {{ project.date_created|date:"F j, Y" }}</div>
                     <div class="project-created-by">Created by: {{ project.created_by.last_name}}</div>
                 </div>   
                 <div class="lower-btn">
-                    <i class="bi bi-list-task" title="To Do list"></i>
+                    <button class="btn" type="button" id="dropdownMenuButton" aria-expanded="false" >
+                        <a class="view-txt" href="{% url 'task_project' 'Pending' project.id %}"> <i class="bi bi-list-task" title="To Do list"></i></a>
+                    </button>
+
                     
                     <button class="btn" type="button" id="dropdownMenuButton" aria-expanded="false" >
                         <a class="view-txt" href="{% url 'blog_post' project.id %}"><i class="bi bi-chat-square-text"title="Chat Box"></i></a>
                     </button>
 
-                    <i class="bi bi-collection " style="margin-left: 10px;"  title="Resources"></i>
+            
                 </div>
             </div>
       
-         
-           
             <!-- Edit Project Modal -->
             <div class="modal fade" id="editProjectModal{{ project.id }}" tabindex="-1" aria-labelledby="editProjectModalLabel{{ project.id }}" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
@@ -356,6 +368,7 @@
                             {% csrf_token %}
                             {{ add_project_form|crispy }}
                             
+
                             <button type="submit" class="btn btn-primary mt-3">Create Project</button>
                         </form>
                     </div>
@@ -378,7 +391,7 @@
                     </a>
                 </li>
                 {% endif %}
-        
+
                 {% for num in page_obj.paginator.page_range %}
                     {% if page_obj.number == num %}
                         <li class="page-item active"><span class="page-link" style="background-color: #213A58; color: white;">{{ num }}</span></li>
@@ -386,7 +399,7 @@
                         <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
                     {% endif %}
                 {% endfor %}
-        
+
                 {% if page_obj.has_next %}
                 <li class="page-item">
                     <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">

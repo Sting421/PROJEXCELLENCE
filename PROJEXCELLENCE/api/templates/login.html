@@ -209,10 +209,10 @@
                         </div>
                     </form>
 
-                    {% if messages %}
+                    {% if messages.error %}
                         {% for message in messages %}
                             <div class="alert">
-                                {{ message }}
+                                {{ message.error }}
                                 <button type="button" class="btn-close" aria-label="Close">&times;</button>
                             </div>
                         {% endfor %}

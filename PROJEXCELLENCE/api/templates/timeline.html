@@ -67,18 +67,19 @@
         flex-direction: column;
         margin-bottom: 10px;
         margin-left: 10px;
-        width: 150px;;
+        width: 150px;
         height: 50px;
     }
     
     .task-item {
         display: flex;
-        background: #ff8888;
+        text-align: left;
+        background: #fcd6d6;
+        color: #f44336;
         flex-direction: column;
         padding: 3px;
-        border-radius: 5px;
-      
-       
+        border-radius: 2px;
+        
     }
 
     .task-completed {
@@ -122,7 +123,6 @@
         <div class="calendar-header">
             <button class="btn btn-primary" id="prevMonth">&lt; Previous</button>
             <h2>{{ month_name }} {{ year }} </h2>
-            
             <button class="btn btn-primary" id="nextMonth">Next &gt;</button>
         </div>
         <div class="calendar-grid">
@@ -133,7 +133,6 @@
             <div class="calendar-day-header">Friday</div>
             <div class="calendar-day-header">Saturday</div>
             <div class="calendar-day-header">Sunday</div>
-            
             {% for week in calendar_data %}
                 {% for day in week %}
                     {% if day.0 == current_day and month == current_month %}
@@ -144,41 +143,49 @@
                         <!-- Display the day number -->
                         {% if day.1 == 'prev-month' %}
                             <span style="color: #ccc;">{{ day.0 }}</span>
-                        {% elif day.1 == 'next-month' %}
+                        {% elif day.1 == 'next-month' %}{% with year_str=year|stringformat:"04d" month_str=month|stringformat:"02d" day_str=day.0|stringformat:"02d" %}
+                            {% with date_key=year_str|add:"-"|add:month_str|add:"-"|add:day_str %}
+                                {% if tasks_by_date|get_item:date_key %}
+                                    {% for task in tasks_by_date|get_item:date_key %}
+                                        <div class="task-container">
+                                            <div class="task-item" title="{{ task.description|default:'' }}">
+                                                <span class="task-name">Task Name: {{ task.task_name }}</span>
+                                                <span class="task-project">From Project: {{ task.project_id }}</span>
+                                                {% if task.priority %}
+                                                    <span class="task-priority priority-{{ task.priority|lower }}">
+                                                        {{ task.priority|title }}
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endwith %}
+                        {% endwith %}
                             <span style="color: #ccc;">{{ day.0 }}</span>
                         {% else %}
                             <span>{{ day.0 }}</span>
                         {% endif %}
                         <!-- Display tasks for this day -->
-                       
-                        {% with year|stringformat:"04d" as year_str %}
-                        {% with month|stringformat:"02d" as month_str %}
-                        {% with day.0|stringformat:"02d" as day_str %}
-                            {% with date_key=year_str|add:"-"|add:month_str|add:"-"|add:day_str %}
-                               
-                        {% if tasks_by_date|get_item:date_key  %}
-                      
-                        {% for task in tasks_by_date|get_item:date_key %}
-                            <div class="task-container">
-                                <div class="task-item" title="{{ task.description|default:'' }}">
-                                    <span class="task-name">Task Name: {{ task.task_name }}</span>
-                                    <span class="task-project">From Project: {{ task.project_id }}</span>
-                                    {% if task.priority %}
-                                        <span class="task-priority priority-{{ task.priority|lower }}">
-                                            {{ task.priority|title }}
-                                        </span>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            
-                            {% endfor %}
-                        {% endif %}
-                            {% endwith %}
+                        {% with year_str=year|stringformat:"04d" month_str=month|stringformat:"02d" day_str=day.0|stringformat:"02d" %}
+                        {% with date_key=year_str|add:"-"|add:month_str|add:"-"|add:day_str %}
+                            {% if tasks_by_date|get_item:date_key %}
+                                {% for task in tasks_by_date|get_item:date_key %}
+                                    <div class="task-container">
+                                        <div class="task-item" title="{{ task.description|default:'' }}">
+                                            <span class="task-name">{{ task.task_name }}</span>
+                                            <span class="task-project">{{ task.project_id }}</span>
+                                            {% if task.priority %}
+                                                <span class="task-priority priority-{{ task.priority|lower }}">
+                                                    {{ task.priority|title }}
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
                         {% endwith %}
-                        {% endwith %}
-                        {% endwith %}
-
-                     
+                    {% endwith %}
                     </div>
                 {% endfor %}
             {% endfor %}
@@ -217,4 +224,5 @@ document.getElementById('nextMonth').addEventListener('click', function() {
     window.location.href = `?year=${year}&month=${month}`;
 });
 </script>
+
 {% endblock %}

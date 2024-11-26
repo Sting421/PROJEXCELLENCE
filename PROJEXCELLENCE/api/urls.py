@@ -18,6 +18,7 @@ urlpatterns = [
     #----------------   task   ----------------
     #path("task/", views.task_list, name="task"),
     path("task/<str:status>/", views.task_list, name="task"),
+    path("task/<str:status>/<int:project_id>/", views.task_list_project, name="task_project"),
     path("tasks/add/", views.add_task, name="add_task"),
     path("task/<int:pk>/edit/", views.edit_task, name="edit_task"),
     path("task/<int:pk>/delete/", views.delete_task, name="delete_task"),

@@ -5,6 +5,14 @@
 {% block title %}My Team{% endblock title %}Dashboard
 {% block extra_css %}
 <style>
+      .page-container {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        margin-left: 4%;
+        margin-right: 4%;
+        user-select: none;
+    }
     .card {
         background-color: #E0E7EF;
         color: 213A58;
@@ -17,16 +25,29 @@
         margin-bottom: 16px;  
         user-select: none;
     }
-    .card-members{
-        background-color: #616569;
+    .teamCards{
         color: #FFFFFF;
         border-radius: 8px;
         padding: 16px;
         min-height: 100px;
         padding: 20;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        max-width: 30%;
+        width: 450px;
         margin-bottom: 16px;
+    }
+    
+    .card-members{
+        background-color: #616569;
+      
+    }
+    .card-head{
+        background-color: #213A58;
+       
+    }
+    .card-manager{
+        background-color: #6292d1;
+      
+        
     }
     .card-members .title{
         color: #D9D9D9;
@@ -108,10 +129,18 @@
         color: #e74c3c;
         border-color: #e74c3c;
     }
+    .tab-content>.active {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+
+  
 </style>
 {% endblock extra_css %}
 {% block content %}
-<div class="page">
+<div class="page-container">
     <div class="Team">
         <h1> <div class="project-name">{{ project.project_name|capfirst }} </div>Team</h1><br>
         
@@ -119,10 +148,11 @@
             <div type="button" class="add-team" data-bs-toggle="modal" data-bs-target="#addTeamModal">
                 <i class="fas fa-plus mr-2"></i> Add Team
             </div>
-            <div type="button" class="add-member" data-bs-toggle="modal" data-bs-target="#addMemberModal">
-                <i class="fas fa-plus mr-2"></i> Add Member
-            </div>
         {% endif %}
+      
+        <div type="button" class="add-member" data-bs-toggle="modal" data-bs-target="#addMemberModal">
+            <i class="fas fa-plus mr-2"></i> Add Member
+        </div>
 
         <h4>Project Manager</h4>
         <div class="card">
@@ -168,13 +198,19 @@
                 </li>
             {% endfor %}
         </ul>
-        
+      
         <div class="tab-content">
             {% for team, memberships in team_memberships %}
                 <div class="tab-pane {% if forloop.first %}active{% endif %}" id="team-{{ team.id }}">
                     {% if memberships %}
                         {% for membership in memberships %}
-                            <div class="card-members">
+                            {%if membership.role == 'HEAD'%}
+                            <div class="teamCards card-head">
+                            {%elif membership.role == 'Manager'%}
+                            <div class="teamCards card-manager">
+                            {%else %}
+                            <div class="teamCards card-members">
+                            {%endif%}
                                 <table class="info">
                                     <tr>
                                         <td>
@@ -188,39 +224,45 @@
                                             <h2>{{ membership.user.first_name|capfirst }} {{ membership.user.last_name|capfirst }}</h2>
                                             <h2 class="title">{{ membership.role|capfirst }}</h2>
                                         </td>
-                                        {% if user in team.users.all and membership.role != 'HEAD' and user_roles|get_item:team.id == 'HEAD' and user != membership.user or user == project.created_by%}
-                                      
+                                        <!-- {% for membership in memberships %}
+                                        {% if membership.user == request.user %}
+                                            <p>Your Role in this Team: {{ membership.role}}</p>
+                                        {% endif %}
+                                        {% endfor %}     -->
+                                        {% if user in team.users.all and membership.role != 'HEAD' and user_roles|get_item:team.id == 'HEAD' or user_roles|get_item:team.id == 'Manager' and user != membership.user or user == project.created_by%}
+                                        
                                         <td>
+                                            {% if membership.role != 'HEAD'  or request.user == project.created_by%}
                                             <div class="dropdown">
-                                                <!-- Dropdown toggle -->
                                                 <button class="btn" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" onclick="event.stopPropagation()">
                                                     <i class="bi bi-three-dots" title="Settings"></i>
                                                 </button>
-                                                <!-- Dropdown menu -->
                                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                  
+                                                  <div class="separator"></div>
+                                                  
+                                                  
                                                     <li>
                                                         <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addTaskModal" data-user-id="{{ membership.user.id }}">
-                                                          Add task
+                                                            Add task
                                                         </a>
-                                                      </li>
+                                                    </li>
                                                  
-                                                     
-                                                  <!-- Delete Project Modal Trigger -->
-                                                  <div class="separator"></div>
-                                                  <li>
-                                                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteProjectModal{{ project.id }}">
-                                                      Change Role
-                                                    </a>
-                                                  </li>
-                                                     <!-- Edit Project Modal Trigger -->
-                                                  <li>
-                                                    <a class="dropdown-item delete" data-bs-toggle="modal" data-bs-target="#editProjectModal{{ project.id }}">
-                                                      Remove Member
-                                                    </a>
-                                                  </li>
-                                                  
+                                                    <li>
+                                                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editMemberRoleModal" data-user-id="{{ membership.id }}">
+                                                        Change Role
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item delete" data-bs-toggle="modal" data-bs-target="#removeMemberModal"  data-user-id="{{ membership.id }}"  data-team-id="{{ membership.team.id }}">
+                                                        Remove Member
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            {%endif%}
+                                                
                                         </td>
-                                       
                                         {%endif%}
                                     </tr>
                                 </table>
@@ -237,6 +279,7 @@
             {% endfor %}
         </div>
     </div>
+
 
     <div class="modal fade" id="addTeamModal" tabindex="-1" aria-labelledby="addTeamModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -339,26 +382,88 @@
     </div>
 </div>
 
+<!-- Remove Member -->
+<div class="modal fade" id="removeMemberModal" tabindex="-1" aria-labelledby="removeMemberModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="post" action="{% url 'team_list' project.id %}">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="removeMemberModalLabel">Confirmation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="delete_memeber" value="1">
+                    <input type="hidden" name="user_id" value="">
+                    <input type="hidden" name="team_id" value="">
+                    <!-- <input type="password" name="password" placeholder="Enter your password"> -->
+                    <p>Are you sure to remove this user?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    
+                    <button type="submit" class="btn btn-primary">Remove</button>
+                   
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Edit Member Role -->
+<div class="modal fade" id="editMemberRoleModal" tabindex="-1" aria-labelledby="editMemberRoleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="post" action="{% url 'team_list' project.id %}">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editMemberRoleModalLabel">Edit role</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="edit_member_role" value="1">
+                    <input type="hidden" name="user_id" value="">
+                    {{ edit_role_form|crispy }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                   
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
   <script>
       document.addEventListener('DOMContentLoaded', () => {
-        const modals = document.querySelectorAll('[data-bs-target="#addTaskModal"], [data-bs-target="#changeRoleModal"], [data-bs-target="#removeMemberModal"]');
+        const modals = document.querySelectorAll
+        ('[data-bs-target="#addTaskModal"], [data-bs-target="#changeRoleModal"], [data-bs-target="#removeMemberModal"],[data-bs-target="#editMemberRoleModal"]');
         
         modals.forEach(modalTrigger => {
             modalTrigger.addEventListener('click', function() {
                 const userId = this.getAttribute('data-user-id');
-                
+                const teamId = this.getAttribute('data-team-id');
                 // Example: Update a hidden input in the modal for backend processing
                 const targetModalId = this.getAttribute('data-bs-target');
                 const targetModal = document.querySelector(targetModalId);
                 if (targetModal) {
                     const userIdInput = targetModal.querySelector('input[name="user_id"]');
+                    const teamIdInput = targetModal.querySelector('input[name="team_id"]');
                     if (userIdInput) {
                         userIdInput.value = userId;
+                    }
+                    if (teamIdInput) {
+                        teamIdInput.value = teamId;
                     }
                 }
             });
         });
     });
+
+  
+
+
   </script>
 
 

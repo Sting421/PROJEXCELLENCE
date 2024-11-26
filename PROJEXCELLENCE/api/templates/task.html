@@ -243,11 +243,7 @@
     <div class="content-wrapper">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1>My Tasks</h1>
-            <div class="add-task" data-bs-toggle="modal" data-bs-target="#addTaskModal">
-                <i class="fas fa-plus mr-2"></i> Add Task
-            </div>
         </div>
-        
         <div id="tasks-list">
             {% for task in page_obj %}
             <div class="task-item {% if task.completed %}completed{% endif %}">
@@ -291,7 +287,6 @@
                     </div>
                 </div>
             </div>
-        
             <!-- Delete Task Modal -->
             <div class="modal fade" id="deleteTaskModal{{ task.id }}" tabindex="-1" aria-labelledby="deleteTaskModalLabel{{ task.id }}" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
@@ -313,35 +308,12 @@
                     </div>
                 </div>
             </div>
-            
             {% empty %}
                 <div class="task-item" style="display: flex; justify-content: center;">
                     <h4 class="text-center" >You have no tasks to accomplish.<br/><small>Set up tasks to have a productive day ahead.</small></h4>
                 </div>
-               
             {% endfor %}
-            
         </div>
-        
-        <!-- Add Task Modal -->
-        <div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addTaskModalLabel">Add Task</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form method="post" action="{% url 'add_task' %}">
-                            {% csrf_token %}
-                            {{ add_task_form|crispy }}  
-                            <button type="submit" class="btn btn-primary mt-3">Add Task</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
         <!-- Pagination -->
         <nav aria-label="Page navigation" class="mt-auto">
             <ul class="pagination justify-content-center">
@@ -357,7 +329,6 @@
                     </a>
                 </li>
                 {% endif %}
-        
                 {% for num in page_obj.paginator.page_range %}
                     {% if page_obj.number == num %}
                         <li class="page-item active"><span class="page-link">{{ num }}</span></li>
@@ -365,7 +336,6 @@
                         <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
                     {% endif %}
                 {% endfor %}
-        
                 {% if page_obj.has_next %}
                 <li class="page-item">
                     <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">

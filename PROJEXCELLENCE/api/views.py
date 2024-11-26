@@ -27,6 +27,7 @@ from .forms import (
     AddMemberForm,
     EditTaskForm,
     AddBlogForm,
+    EditRoleForm,
     
 )
 
@@ -135,6 +136,24 @@ def signup_view(request):
 @login_required
 def task_list(request,status):
     tasks = Task.objects.filter(assigned_to=request.user, status=status).order_by("due_date")
+    task_filter = TaskFilter(request.GET, queryset=tasks)
+
+    paginator = Paginator(task_filter.qs, 10)  
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+
+    edit_task_forms = {task.id: EditTaskForm(instance=task) for task in tasks}
+
+    context = {
+        "page_obj": page_obj,
+        "edit_task_forms": edit_task_forms,
+        "add_task_form": TaskForm(),  
+        "filter": task_filter,
+    }
+    return render(request, "task.html", context)
+def task_list_project(request,status,project_id):
+    tasks = Task.objects.filter(assigned_to=request.user, status=status, project_id=project_id).order_by("due_date")
     task_filter = TaskFilter(request.GET, queryset=tasks)
 
     paginator = Paginator(task_filter.qs, 10)  
@@ -311,9 +330,10 @@ def team_list(request, project_id):
     # Initialize forms at the start
     add_team_form = TeamForm()
     add_member_form = AddMemberForm()
+    edit_role_form = EditRoleForm()
     user = request.user
     
-
+ 
     project = get_object_or_404(Project, id=project_id)
     # Initialize TaskForm with project
     assign_task = TaskForm(project=project)
@@ -332,6 +352,14 @@ def team_list(request, project_id):
             project=project
         )
     }
+    team_memberships_sorted = [
+    (team, sorted(
+        team.teammembership_set.all(),
+        key=lambda m: (m.role != 'HEAD', m.role != 'Manager')
+    ))
+    for team in page_obj
+]
+
 
     if request.method == 'POST':
         if 'delete_team' in request.POST:
@@ -347,6 +375,24 @@ def team_list(request, project_id):
             except Team.DoesNotExist:
                 messages.error(request, 'Team not found.')
             return redirect('team_list', project_id=project_id)
+        
+        if 'delete_memeber' in request.POST:
+            member_id = request.POST.get('user_id')
+            team_id = request.POST.get('team_id')
+            print("Member ID: ",member_id)
+            try:
+                memeber = TeamMembership.objects.get(id=member_id)
+                memeber.delete()
+                messages.success(request, 'Member remove successfully.')
+                member_count = TeamMembership.objects.filter(team_id=team_id).count()
+                # if member_count == 0:
+                #     team = Team.objects.get(id=team_id, project_id=project_id)
+                #     team.delete()
+                #     messages.success(request, 'Team deleted as it has no members.')
+                    
+            except Team.DoesNotExist:
+                messages.error(request, 'Team not found.')
+            return redirect('team_list', project_id=project_id)
 
         if 'edit_team' in request.POST:
             team_id = request.POST.get('team_id')
@@ -354,6 +400,16 @@ def team_list(request, project_id):
             new_name = request.POST.get('team_name')
             team.team_name = new_name
             team.save()
+            return redirect('team_list', project_id=project_id)
+        
+        if 'edit_member_role' in request.POST:
+            print(request.POST)
+            member_id = request.POST.get('user_id')
+            membership = get_object_or_404(TeamMembership, id=member_id)
+            edit_form = EditRoleForm(request.POST, instance=membership)
+            if edit_form.is_valid():
+                edit_form.save()
+                messages.success(request, "Member role updated successfully!")
             return redirect('team_list', project_id=project_id)
             
         # Handle team creation
@@ -407,8 +463,6 @@ def team_list(request, project_id):
                 task.project_id = project
                 task.assigned_to = user
                 task.created_by = request.user
-              
-              
                 task.save()
               
                 messages.success(request, "Task assigned successfully!")
@@ -423,7 +477,8 @@ def team_list(request, project_id):
         "assign_task":assign_task,
         "filter": team_filter,
         "project": project,
-        "team_memberships": [(team, team.teammembership_set.all()) for team in page_obj],
+        "edit_role_form": edit_role_form,
+        "team_memberships": team_memberships_sorted,
         "user_roles": user_roles,
     }
     return render(request, "myteam.html", context)

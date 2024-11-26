@@ -235,6 +235,17 @@ class AddMemberForm(forms.Form):
             self.fields['users'].queryset = User.objects.exclude(id=current_user.id)
         else:
             self.fields['users'].queryset = User.objects.all()
+class EditRoleForm(forms.ModelForm):
+    class Meta:
+        model = TeamMembership  
+        fields = ['role'] 
+        widgets = {
+            'role': forms.Select(attrs={"class": "form-control"}), 
+        }
+        labels = {
+            'role': "Role", 
+        }
+
 
 class AddBlogForm(forms.ModelForm):
     class Meta:
