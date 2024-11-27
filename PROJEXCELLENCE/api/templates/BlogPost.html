@@ -9,39 +9,49 @@
 
 <style>
     .page-container {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    margin-left: 4%;
-    margin-right: 4%;
-    user-select: none;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        margin-left: 4%;
+        margin-right: 4%;
+        user-select: none;
     }
     .avatar {
-        width: 25px;
-        height: 25px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
-        font-weight: 600;
+        font-weight: bold;
+        margin-right: 10px;
     }
-
+    .add-task {
+        color: #4a5568;
+        cursor: pointer;
+        padding: 15px;
+        border: 2px dashed #e2e8f0;
+        border-radius: 8px;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+    .add-task:hover {
+        color: #2b6cb0;
+        background-color: #ebf8ff;
+        border-color: #63b3ed;
+    }
     #tasks-list {
         flex: 1;
         overflow-y: auto;
         margin-bottom: 20px;
     }
-  
     .task-content {
         background-color: #ffffff;
         border: 1px solid #e0e0e0;
         border-radius: 8px;
-        padding: 20px;
-        padding-left: 50px;
-        padding-right: 50px;
+        padding: 30px 50px;
         margin-bottom: 15px;
         cursor: pointer;
         transition: all 0.3s ease; 
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    
     .btn-icon {
         position: absolute;
         right: 10px;
@@ -53,32 +63,135 @@
         justify-content: center;
     }
     .btn-primary {
-        --bs-btn-hover-bg:none;
+        --bs-btn-hover-bg: none;
         --bs-btn-active-bg: none;
     }
-
-    .btn-icon i.bi-backspace-reverse {
-        display: none;
-        background-color: transparent;
-        --bs-btn-active-bg: #0a58ca;
+    .btn-icon i.bi-backspace-reverse-fill {
+        display: inline; 
+        color: rgb(0, 0, 0);
     }
 
     .btn-icon:hover i.bi-backspace-reverse-fill {
-        display: none;
-        background-color: transparent;
+        display: none; 
     }
 
     .btn-icon:hover i.bi-backspace-reverse {
-        display: inline;
-        background-color: transparent;
+        display: inline; 
+        color: rgb(0, 0, 0);
+    }
+   
+    h1 {
+        font-weight: 700;
+        color: #314863;
+    }
+    .task-content span {
+        font-weight: 600;
+    }
+    .task-content img.avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        font-weight: 600;
+        margin-right: 10px;
+    }
+    .task-title {
+        margin-left: 50px;
+    }
+    .task-item hr {
+        border: 1px solid rgb(200, 200, 200);
+        margin: 10px 0;
+    }
+    .task-content .form-group {
+        position: relative;
+        margin-left: 6%;
+        margin-right: 0.7%;
+    }
+    .task-content .form-group textarea {
+        padding: 10px;
+        border-radius: 10px;
+    }
+    .comment-avatar img {
+        max-width: 40px;
+        max-height: 40px;
+        border-radius: 50%;
+    }
+    .comments-section {
+        margin-left: 30px;
+        display: block;
+        flex-direction: column;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+    }
+    .comment-container {
+        display: flex;         
+        align-items: flex-start; 
+        margin-bottom: 10px;    
+    }
+    .comment-text {
+        flex: 1;              
     }
 
+    .comments-section .time-posted {
+        font-size: 0.9rem;      
+        font-weight: 300;
+        color: rgb(117, 116, 116); 
+        margin-left: 40px;          
+    }
+    .comments-section div {
+        margin-bottom: 5px;
+    }
+    .comments-section strong {
+        font-weight: bold;
+    }
+    .comments-section span {
+        font-size: small;
+        color: grey;
+    }
+    .comments-section .comment-text {
+        border-radius: 10px;
+        background-color: #D9D9D9;
+        padding: 10px;
+        white-space: normal;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        margin-bottom: 0;
+    }
+    .modal .form-group textarea {
+        margin-top: 10px;
+    }
+    .title{
+        display: flex;
+        justify-content: space-between;
+        align-items: center; 
+        margin-bottom: 20px;
+    }
+
+    .creator-container {
+        display: flex;         
+        justify-content: space-between; 
+        align-items: center;    
+    }
+    .creator-info {
+        display: flex;          
+        align-items: center;    
+    }
+    .creator-actions {
+        display: flex;          
+        gap: 10px;             
+    }
+    .creator .time-posted {
+        font-size: 0.9rem;      
+        font-weight: 300;
+        color: rgb(117, 116, 116); 
+        margin-left: 50px;          
+    }
 </style>
 
 {% endblock extra_css %}
+
 {% block content %}
 <div class="page-container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="title">
         <h1>{{project.project_name}} <span style="font-weight: 200;">General Channel</span></h1>
         <div class="add-task" data-bs-toggle="modal" data-bs-target="#addBlogModal">
             <i class="fas fa-plus mr-2"></i> Create Post
@@ -88,79 +201,78 @@
         <div class="task-item">
             {% for blog in blogs %}
             <div class="task-content">
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                   <span>
-                        {% if blog.posted_by.profile_path %}
-                            <img class="avatar" src="{{ blog.posted_by.profile_path.url }}" width="40px" height="40px" style="border-radius: 50%; font-weight: 600;">
-                        {% else %}
-                            <img class="avatar" src="{% static '/res/logoPlaceHolder.png' %}" width="40px" height="40px" style="border-radius: 50%; font-weight: 600;">
-                        {% endif %}
-                        <span style="font-weight: 600;">{{ blog.posted_by.first_name|capfirst }} {{ blog.posted_by.last_name|capfirst }}</span>
-                        <span style="font-weight: 300; color: rgb(117, 116, 116);">{{ blog.time_posted }}</span>
-                   </span>
-                  
-                    <span>
-                        {% if blog.posted_by == request.user %}
-                            <i class="fas fa-edit" class="btn btn-sm btn-link text-primary" data-bs-toggle="modal" data-bs-target="#editBlogModal-{{ blog.id }}" style="padding: 10px;"></i>
-                            <i class="fas fa-trash"  data-bs-toggle="modal" data-bs-target="#deleteBlogModal-{{ blog.id }}"></i>
-                        {% endif %}
-                    </span>
-                 
+                <div class="creator">
+                    <div class="creator-container">
+                        <span class="creator-info">
+                            {% if blog.posted_by.profile_path %}
+                                <img class="avatar comment-avatar" src="{{ blog.posted_by.profile_path.url }}">
+                            {% else %}
+                                <img class="avatar comment-avatar" src="{% static '/res/logoPlaceHolder.png' %}">
+                            {% endif %}
+                            <span style="font-weight: 700;">{{ blog.posted_by.first_name|capfirst }} {{ blog.posted_by.last_name|capfirst }}</span>
+                        </span>
+                        <span class="creator-actions">
+                            {% if blog.posted_by == request.user %}
+                                <i class="fas fa-edit" style="padding: 10px;" class="btn btn-sm btn-link text-primary" data-bs-toggle="modal" data-bs-target="#editBlogModal-{{ blog.id }}"></i>
+                                <i class="fas fa-trash" style="padding: 10px;" data-bs-toggle="modal" data-bs-target="#deleteBlogModal-{{ blog.id }}"></i>
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="task-title">{{ blog.message }}</div>
+                    <div>
+                        <span class="time-posted">{{ blog.time_posted }}</span>
+                    </div>
                 </div>
-                <div class="task-title" style="margin-left: 50px;">{{ blog.message }}</div>
+                <hr>
 
-                <hr style="border: 1px solid rgb(200, 200, 200); margin: 10px 0;">
-                 <!-- Comments Section -->
-                    <p>Comments:</p>
-                    <div style="margin-left: 20px; display: flex; flex-direction: column; flex-wrap: wrap;">
-                        {% for comment in blog.comments_set.all %}
-                            <div>
+                <p>Comments:</p>
+                <div class="comments-section">
+                    {% for comment in blog.comments_set.all %}
+                        <div class="comment-container">
+                            <span>
                                 {% if comment.user.profile_path %}
-                                    <img class="avatar" src="{{ comment.user.profile_path.url }}">
+                                    <img class="avatar comment-avatar" src="{{ comment.user.profile_path.url }}">
                                 {% else %}
-                                    <img class="avatar" src="{% static '/res/logoPlaceHolder.png' %}">
+                                    <img class="avatar comment-avatar" src="{% static '/res/logoPlaceHolder.png' %}">
                                 {% endif %}
-                                <strong>{{ comment.user.first_name|capfirst }} {{ comment.user.last_name|capfirst }}:</strong> 
-                                <span style="font-size: small; color: grey;">
-                                    {{ comment.time_posted }}
-                                </span>
-                            </div>
-                            <div style="margin-left: 30px; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">
+                            </span>
+                
+                            <div class="comment-text">
+                                <strong>{{ comment.user.first_name|capfirst }} {{ comment.user.last_name|capfirst }}:</strong><br>
                                 {{ comment.text_comment }}
                             </div>
-                        {% empty %}
-                            <p>No comments yet. Be the first to comment!</p>
-                        {% endfor %}
-                    </div>
-                    
-                <div style="border: top 3px;">
-                   
+                        </div>
+                        <ul><span class="time-posted">{{ comment.time_posted }}</span></ul>
+                    {% empty %}
+                        <p>No comments yet. Be the first to comment!</p>
+                    {% endfor %}
+                </div>
+                <div>
                     <form method="post" action="{% url 'blog_post' project.id %}">
                         {% csrf_token %}
                         <input type="hidden" name="add_comment" value="1">
                         <input type="hidden" name="blog_id" value="{{ blog.id }}">
-                        <div class="form-group" style="position: relative; width: 100%;">
+                        <div class="form-group">
                             <textarea 
                                 name="text_comment" 
                                 class="form-control" 
                                 rows="2" 
                                 placeholder="Write a comment..." 
-                                required
-                                style="padding-right: 50px;"
-                            ></textarea>
+                                required>
+                            </textarea>
                             <button 
                                 type="submit" 
                                 class="btn btn-sm btn-primary btn-icon">
-                                <i class="bi bi-backspace-reverse-fill" style="color: rgb(0, 0, 0);"></i>
-                                <i class="bi bi-backspace-reverse" style="color: rgb(0, 0, 0);"></i>
+                                <i class="bi bi-backspace-reverse-fill"></i>
+                                <i class="bi bi-backspace-reverse"></i>
                             </button>
-                        </form>
-                    </div>
+                        </div>
+                    </form>
                 </div>
             </div>
             {% endfor %}
         </div>
-       
+    </div>    
         <!-- Edit Blog Modal -->
         <div class="modal fade" id="editBlogModal-{{ blog.id }}" tabindex="-1" aria-labelledby="editBlogModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
@@ -184,6 +296,7 @@
                 </div>
             </div>
         </div>
+        
          <!-- Delete Blog Modal -->
         <div class="modal fade" id="deleteBlogModal-{{ blog.id }}" tabindex="-1" aria-labelledby="deleteBlogModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
@@ -229,6 +342,7 @@
             </div>
         </div>
     </div>
-
+    </div>
 </div>
+</body>
 {% endblock %}
