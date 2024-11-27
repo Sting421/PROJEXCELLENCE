@@ -166,11 +166,25 @@
             border-radius: 50%;
             margin-right: 16px;
         }
-        
+      }
+      .footer {
+        margin-top: 80px;
+        font-size: 0.9rem;
+        color: #6c757d;
+        background-color: #ffffff;
+        padding: 15px 0;
+        position: relative;
+        margin-left: calc(260px); 
+        width: calc(100% - 260px); 
+      }
+
+      .footer .content-container {
+        margin: 0 auto;
+        max-width: 800px; 
       }
     </style>
-    {% block extra_css %}
-    {% endblock extra_css %}
+{% block extra_css %}
+{% endblock extra_css %}
   </head>
   <body>
     <header>
@@ -298,4 +312,14 @@
     {% block extra_js %}
     {% endblock extra_js %}
   </body>
+  <footer class="footer">
+    <div class="container text-center content-container">
+      <img src="{% static '/res/slogo.svg' %}" alt="logo" width="200px">
+      <p class="mb-1 fw-bold">Projexcellence: A Project Management System</p>
+      <p class="text-muted">
+        Developed for Information Management 2 using Python, Django, and SQLite.<br>
+        Created by Ramos, Sumalpong, and Vitorillo &copy; {% now "Y" %}.
+      </p>
+    </div>
+  </footer>
 </html>

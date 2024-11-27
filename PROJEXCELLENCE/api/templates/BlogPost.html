@@ -85,75 +85,78 @@
         </div>
     </div>
     <div id="tasks-list">
-        <div class="task-item " >
+        <div class="task-item">
             {% for blog in blogs %}
-            <div class="task-content ">
-                    <div style="display: flex; align-items: center; justify-content: space-between;">
-                       <span>
+            <div class="task-content">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                   <span>
+                        {% if blog.posted_by.profile_path %}
                             <img class="avatar" src="{{ blog.posted_by.profile_path.url }}" width="40px" height="40px" style="border-radius: 50%; font-weight: 600;">
-                            <span style="font-weight: 600;">{{ blog.posted_by.first_name|capfirst }} {{ blog.posted_by.last_name|capfirst }}</span>
-                            <span style="font-weight: 300; color: rgb(117, 116, 116);">{{ blog.time_posted }}</span>
-                       </span>
-                      
-                        <span>
-                            {% if blog.posted_by == request.user %}
-                                <i class="fas fa-edit" class="btn btn-sm btn-link text-primary" data-bs-toggle="modal" data-bs-target="#editBlogModal-{{ blog.id }}" style="padding: 10px;"></i>
-                                <i class="fas fa-trash"  data-bs-toggle="modal" data-bs-target="#deleteBlogModal-{{ blog.id }}"></i>
-                            {% endif %}
-                        </span>
-                     
+                        {% else %}
+                            <img class="avatar" src="{% static '/res/logoPlaceHolder.png' %}" width="40px" height="40px" style="border-radius: 50%; font-weight: 600;">
+                        {% endif %}
+                        <span style="font-weight: 600;">{{ blog.posted_by.first_name|capfirst }} {{ blog.posted_by.last_name|capfirst }}</span>
+                        <span style="font-weight: 300; color: rgb(117, 116, 116);">{{ blog.time_posted }}</span>
+                   </span>
+                  
+                    <span>
+                        {% if blog.posted_by == request.user %}
+                            <i class="fas fa-edit" class="btn btn-sm btn-link text-primary" data-bs-toggle="modal" data-bs-target="#editBlogModal-{{ blog.id }}" style="padding: 10px;"></i>
+                            <i class="fas fa-trash"  data-bs-toggle="modal" data-bs-target="#deleteBlogModal-{{ blog.id }}"></i>
+                        {% endif %}
+                    </span>
+                 
+                </div>
+                <div class="task-title" style="margin-left: 50px;">{{ blog.message }}</div>
+
+                <hr style="border: 1px solid rgb(200, 200, 200); margin: 10px 0;">
+                 <!-- Comments Section -->
+                    <p>Comments:</p>
+                    <div style="margin-left: 20px; display: flex; flex-direction: column; flex-wrap: wrap;">
+                        {% for comment in blog.comments_set.all %}
+                            <div>
+                                {% if comment.user.profile_path %}
+                                    <img class="avatar" src="{{ comment.user.profile_path.url }}">
+                                {% else %}
+                                    <img class="avatar" src="{% static '/res/logoPlaceHolder.png' %}">
+                                {% endif %}
+                                <strong>{{ comment.user.first_name|capfirst }} {{ comment.user.last_name|capfirst }}:</strong> 
+                                <span style="font-size: small; color: grey;">
+                                    {{ comment.time_posted }}
+                                </span>
+                            </div>
+                            <div style="margin-left: 30px; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">
+                                {{ comment.text_comment }}
+                            </div>
+                        {% empty %}
+                            <p>No comments yet. Be the first to comment!</p>
+                        {% endfor %}
                     </div>
-                    <div class="task-title" style="margin-left: 50px;">{{ blog.message }}</div>
-    
-                    <hr style="border: 1px solid rgb(200, 200, 200); margin: 10px 0;">
-                     <!-- Comments Section -->
-                        <p>Comments:</p>
-                        <div style="margin-left: 20px; display: flex; flex-direction: column; flex-wrap: wrap;">
-                            {% for comment in blog.comments_set.all %}
-                                <div>
-                                    {% if comment.user.profile_path and comment.user.profile_path.url %}
-                                        <img class="avatar" src="{{ comment.user.profile_path.url }}" >
-                                    {% else %}
-                                        <img class="avatar" src="{% static '/res/logoPlaceHolder.png' %}">
-                                    {% endif %} 
-                                    <strong>{{ comment.user.first_name|capfirst }} {{ comment.user.last_name|capfirst }}:</strong> 
-                                    <span style="font-size: small; color: grey;">
-                                        {{ comment.time_posted }}
-                                    </span>
-                                </div>
-                                <div style="margin-left: 30px; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">
-                                    {{ comment.text_comment }}
-                                </div>
-                            {% empty %}
-                                <p>No comments yet. Be the first to comment!</p>
-                            {% endfor %}
-                        </div>
-                        
-                    <div style="border: top 3px;">
-                       
-                        <form method="post" action="{% url 'blog_post' project.id %}">
-                            {% csrf_token %}
-                            <input type="hidden" name="add_comment" value="1">
-                            <input type="hidden" name="blog_id" value="{{ blog.id }}">
-                            <div class="form-group" style="position: relative; width: 100%;">
-                                <textarea 
-                                    name="text_comment" 
-                                    class="form-control" 
-                                    rows="2" 
-                                    placeholder="Write a comment..." 
-                                    required
-                                    style="padding-right: 50px;"
-                                ></textarea>
-                                <button 
-                                    type="submit" 
-                                    class="btn btn-sm btn-primary btn-icon">
-                                    <i class="bi bi-backspace-reverse-fill" style="color: rgb(0, 0, 0);"></i>
-                                    <i class="bi bi-backspace-reverse" style="color: rgb(0, 0, 0);"></i>
-                                </button>
-                            
-                          
+                    
+                <div style="border: top 3px;">
+                   
+                    <form method="post" action="{% url 'blog_post' project.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="add_comment" value="1">
+                        <input type="hidden" name="blog_id" value="{{ blog.id }}">
+                        <div class="form-group" style="position: relative; width: 100%;">
+                            <textarea 
+                                name="text_comment" 
+                                class="form-control" 
+                                rows="2" 
+                                placeholder="Write a comment..." 
+                                required
+                                style="padding-right: 50px;"
+                            ></textarea>
+                            <button 
+                                type="submit" 
+                                class="btn btn-sm btn-primary btn-icon">
+                                <i class="bi bi-backspace-reverse-fill" style="color: rgb(0, 0, 0);"></i>
+                                <i class="bi bi-backspace-reverse" style="color: rgb(0, 0, 0);"></i>
+                            </button>
                         </form>
                     </div>
+                </div>
             </div>
             {% endfor %}
         </div>
@@ -205,26 +208,27 @@
        
     </div>
     
-        <!-- Add Blog Modal -->
-        <div class="modal fade" id="addBlogModal" tabindex="-1" aria-labelledby="addBlogModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addBlogModalLabel">Post Blog</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form method="post" action="{% url 'blog_post' project.id %}">
-                            {% csrf_token %}
-                            <input type="hidden" name="add_Post" value="1">
-                            {{ add_blog_form|crispy }}
-                            <input type="hidden" name="project_id" value="{{ project_id }}">
-                            <button type="submit" class="btn btn-primary mt-3">Post</button>
-                        </form>
-                    </div>
+    <!-- Add Blog Modal -->
+    <div class="modal fade" id="addBlogModal" tabindex="-1" aria-labelledby="addBlogModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addBlogModalLabel">Add New Blog Post</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="{% url 'blog_post' project.id %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="new_message">Message</label>
+                            <textarea name="new_message" id="new_message" class="form-control" rows="4" placeholder="Write your message..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-3">Post</button>
+                    </form>
                 </div>
             </div>
         </div>
-    
-    
+    </div>
+
+</div>
 {% endblock %}
