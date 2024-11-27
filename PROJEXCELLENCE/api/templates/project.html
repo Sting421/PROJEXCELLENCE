@@ -39,11 +39,10 @@
         padding: 20px;
         cursor: pointer;
         transition: all 0.3s ease;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        max-width: calc(20% - 15px); /* Allow exactly 5 items in a row */
-        min-width: 250px; /* Optional: set a minimum width */
-        flex-grow: 1; /* Ensures that items can grow */
-        max-height: 200px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        max-width: calc(25% - 15px); /* Allow exactly 4 items in a row */
+        min-width: 300px; /* Optional: set a minimum width */
+        max-height: 250px;
         margin-left: 25px;
     }
 
@@ -368,7 +367,6 @@
                             {% csrf_token %}
                             {{ add_project_form|crispy }}
                             
-
                             <button type="submit" class="btn btn-primary mt-3">Create Project</button>
                         </form>
                     </div>

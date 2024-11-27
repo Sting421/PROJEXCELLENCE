@@ -134,9 +134,9 @@ class Team(models.Model):
 
 class TeamMembership(models.Model):
     ROLE_CHOICES = [
-        ("Manager", "Manager"),
-        ("HEAD", "Head"),
         ("MEMBER", "Member"),
+        ("MANAGER", "Manager"),
+        ("HEAD", "Head"),   
     ]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)

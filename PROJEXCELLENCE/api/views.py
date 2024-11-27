@@ -421,7 +421,7 @@ def team_list(request, project_id):
     team_memberships_sorted = [
     (team, sorted(
         team.teammembership_set.all(),
-        key=lambda m: (m.role != 'HEAD', m.role != 'Manager')
+        key=lambda m: (m.role != 'HEAD', m.role != 'MANAGER')
     ))
     for team in page_obj
 ]
