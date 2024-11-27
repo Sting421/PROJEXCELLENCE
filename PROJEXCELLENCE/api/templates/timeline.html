@@ -171,8 +171,8 @@
                         {% with date_key=year_str|add:"-"|add:month_str|add:"-"|add:day_str %}
                             {% if tasks_by_date|get_item:date_key %}
                                 {% for task in tasks_by_date|get_item:date_key %}
-                                    <div class="task-container">
-                                        <div class="task-item" title="{{ task.description|default:'' }}">
+                                    <div class="task-container" >
+                                        <div class="task-item" onclick="goToTaskDetails(event, '{% url 'task_details' task.id %}')" title="{{ task.description|default:'' }}">
                                             <span class="task-name">{{ task.task_name }}</span>
                                             <span class="task-project">{{ task.project_id }}</span>
                                             {% if task.priority %}
@@ -223,6 +223,13 @@ document.getElementById('nextMonth').addEventListener('click', function() {
     
     window.location.href = `?year=${year}&month=${month}`;
 });
+
+function goToTaskDetails(event, url) {
+    // Don't redirect if clicking on dropdown or its children
+    if (!event.target.closest('.dropdown')) {
+        window.location.href = url;
+    }
+}
 </script>
 
 {% endblock %}

@@ -135,6 +135,23 @@ def signup_view(request):
 
     return render(request, "signup.html", {"form": form})
 
+
+
+@login_required
+def task_details(request, pk):
+    try:
+        task = Task.objects.get(id=pk)
+    except Task.DoesNotExist:
+        raise Http404("Task not found") 
+    
+    if task.assigned_to != request.user:
+        raise Http404("You are not authorized to view this task")
+    context = {
+        "task": task  
+    }
+    return render(request, "taskDetails.html", context)
+
+
 @login_required
 def task_list(request,status):
     tasks = Task.objects.filter(assigned_to=request.user, status=status).order_by("due_date")

@@ -241,6 +241,7 @@ class AddMemberForm(forms.Form):
         
         if current_user:
             self.fields['users'].queryset = User.objects.exclude(id=current_user.id)
+            print("test",self.fields['users'].queryset)
         else:
             self.fields['users'].queryset = User.objects.all()
 class EditRoleForm(forms.ModelForm):

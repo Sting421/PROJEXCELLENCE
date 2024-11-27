@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load custom_filters %}
+{% block title %}Task{% endblock %}
+{% block extra_css %}
+    <style>
+    .page-container {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        margin-left: 4%;
+        margin-right: 4%;
+        user-select: none;
+    }
+    .head-label{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    .task-info{
+        display: flex;
+        flex-direction: column;
+    }
+    .task-info .name{
+        font-size: 50px;
+        font-weight:bold;
+    }
+    .task-info .due-date{
+        font-size: 15px;
+        color: #5c5a5a;
+        
+    }
+    .task-info .description{
+        margin-top: 4%;
+        font-size: 20px;
+        
+    }
+    .submit-btn {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    
+   
+    
+    
+    </style>
+{% endblock extra_css %}
+
+{% block content %}
+   <div class="page-container ">
+        <div class="head-label">
+           
+            <span class="project-name">{{task.project_id.project_name}}</span>
+            {%if task.status != 'Done'%}
+            <span >
+                <button class="submit-btn">Mark as Done</button>
+                   
+              
+            </span>
+            {%else%}
+            <span ><button >Undo</button></span>
+            {%endif%}
+
+        </div>
+       
+        <div class="task-info"> 
+            <span class="name">{{task.task_name}}</span>
+            <span class="due-date">{{task.due_date}}</span>
+            <div class="task-info description">
+                <h3>Description</h3>
+                <p style="margin-left: 2%;">{{task.description|capfirst}}</p>
+            </div>
+            <p>Assigned by: {{task.created_by}}</p>
+        </div>
+    
+   </div>
+{% endblock content %}
