@@ -10,6 +10,7 @@
     .dashboard{
         margin-left: 4%;  
         user-select: none;
+        width: 190%;
     }
     .Welcome-card {
         background-color: rgba(70, 223, 177, 0.5);
@@ -19,8 +20,8 @@
         min-height: 100px;
         padding: 20;
         box-shadow: 0 10px 14px rgba(0, 0, 0, 0.1);
-        max-width: 70%;
-        height: 120%;
+        max-width: 96%;
+        height: 12%;
         margin-bottom: 16px; 
     }
 
@@ -34,14 +35,14 @@
 
     /* Task area */
     .task-lists{
-        max-width: 70%;
+        max-width: 96%;
     }
 
     #tasks-list {
         flex: 1;
         overflow-y: auto;
         margin-bottom: 20px;
-        margin-top: 10px;
+        margin-top: 10px; 
     }
 
     .task-item {
@@ -54,6 +55,7 @@
         cursor: pointer;
         transition: all 0.3s ease;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+       
        
     }
     .task-item:hover {
@@ -99,7 +101,7 @@
 
     /* Project Area */
     .project-lists{
-        max-width: 70%;
+        max-width: 96%;
     }
     #projects-list {
         margin-top: 10px;
@@ -218,7 +220,7 @@
         border-radius: 10px;
         box-shadow: 0 0 10px rgba(0,0,0,0.1);
         padding: 20px;
-        width: 350px;
+        width: 390px;
      
     }
 
@@ -227,13 +229,12 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 20px;
+        
     }
 
     .calendar-grid {
         display: grid;
         grid-template-columns: repeat(7, 0.2fr);
-       
-       
         
     }
 
@@ -242,7 +243,7 @@
         font-weight: bold;
         padding: 10px;
         background: #f5f5f5;
-        width: 30px;
+        width: 50px;
        
     }
 
@@ -250,8 +251,8 @@
         text-align: center;
         padding: 10px;
         border: 1px solid #eee;
-        width: 60px;
-        height: 60px; /* Set a height for the scrollable container */
+        width: 50px;
+        height: 50px; /* Set a height for the scrollable container */
         overflow-y: auto; /* Enable vertical scrolling */
        
     }
@@ -265,18 +266,17 @@
         background: #c4faea;
         font-weight: bold;
     }
-        .have_Due {
-        background-color: red;
+    .have_Due {
+        background-color: rgb(255, 134, 134);
     }
-
-
+    .have_Due:hover{
+        background-color: rgb(221, 12, 12);
+    }
     .task-completed {
         background: #e8f5e9;
         text-decoration: line-through;
         color: #666;
     }
-
-
 
     .btn-primary{
         background-color: #46DFB1;
@@ -286,6 +286,10 @@
         background-color: #2a866b;
         border-color: #2a866b;
     }
+    .page_Container{
+        display: flex;
+        flex-direction: row;   
+    }
     
 
     </style>
@@ -293,111 +297,105 @@
 
 {% block content %}
         <!-- Main content -->
-    <div class="dashboard">
-        <div class="Welcome-card">
-            <p class="name">Welcome back,  {{ request.user.first_name|capfirst }} {{ request.user.last_name|capfirst }}</p>
-        </div>
-
-        <!-- Ongoing Tasks -->
-        <div class="task-lists">
-                <div class="rt-header">
-                    <h2>Recent Task</h2>
-                    <a class="view-txt" href="{% url 'task' 'Pending' %}">View All Tasks</a>
-                </div>
-            <div id="tasks-list">
-                {% for task in tasks %}
-                <div class="task-item {% if task.completed %}completed{% endif %}">
-                    <div class="d-flex align-items-center">
-                        <div>
-                            <div class="task-title">{{ task.task_name }}</div>
-                            <div class="task-description">{{ task.description }}</div>
-                            <div class="task-due-date">Due: {{ task.due_date|date:"F j, Y g:iA" }}</div>
+    <div class="page_Container">
+        <div class="dashboard">
+            <div class="Welcome-card">
+                <p class="name">Welcome back,  {{ request.user.first_name|capfirst }} {{ request.user.last_name|capfirst }}</p>
+            </div>
+    
+            <!-- Ongoing Tasks -->
+            <div class="task-lists">
+                    <div class="rt-header">
+                        <h2>Recent Task</h2>
+                        <a class="view-txt" href="{% url 'task' 'Pending' %}">View All Tasks</a>
+                    </div>
+                <div id="tasks-list">
+                    {% for task in tasks %}
+                    <div class="task-item {% if task.completed %}completed{% endif %}">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <div class="task-title">{{ task.task_name }}</div>
+                                <div class="task-description">{{ task.description }}</div>
+                                <div class="task-due-date">Due: {{ task.due_date|date:"F j, Y g:iA" }}</div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                {% empty %}
-                    <div class="task-item">
-                        <h4 class="text-center">You have no tasks to accomplish.<br/><small>Set up tasks to have a productive day ahead.</small></h4>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- Ongoing Projects -->
-        <div class="project-lists">
-            <div class="rt-header">
-                <th><h2>Ongoing Projects</h2></th>
-                <a class="view-txt  " href="{% url 'project' %}">View All Projects</a>
-            </div>
-            <div id="projects-list">
-                {% for project in projects %}
-                <div class="project-item">
-                    <div class="project-actions ml-10">
-                        <a href="{% url 'team_list' project.id %}" class="btn View-Members mt-3">View Team</a>
-                    </div>
-                    <div>
-                        <div class="project-title">{{ project.project_name }}</div>
-                        <div class="project-description">{{ project.description }}</div>
-                        <div class="project-due-date">Created on: {{ project.date_created|date:"F j, Y g:iA" }}</div>
-                        <div class="project-due-date">Created By: {{ project.created_by.first_name}} {{ project.created_by.last_name}}</div>
-                    </div>   
-                </div>
-                 {% empty %}
-                <div class="project-item">
-                    <h4 class="text-center">No projects found.<br/><small>Create a project to get started.</small></h4>
-                </div>
-                {% endfor %}
-            
-            </div>
-        </div>
-    </div>
-   
-        
-
-    <div class="side-calendar">
-        <div class="calendar">
-            <div class="calendar-header">
-                <button class="btn btn-primary" id="prevMonth">&lt;</button>
-                <h2 style="font-size: 20px;">{{ month_name }} {{ year }} </h2>
-                <button class="btn btn-primary" id="nextMonth"> &gt;</button>
-            </div>
-            <div class="calendar-grid">
-                <div class="calendar-day-header">M</div>
-                <div class="calendar-day-header">T</div>
-                <div class="calendar-day-header">W</div>
-                <div class="calendar-day-header">Th</div>
-                <div class="calendar-day-header">F</div>
-                <div class="calendar-day-header">Sa</div>
-                <div class="calendar-day-header">Su</div>
-                {% for week in calendar_data %}
-                    {% for day in week %}
-                        {% if day.0 == current_day and month == current_month %}
-                            <div class="calendar-day current-day {% if tasks_by_date|get_item:date_key %}have_Due{% endif %}">
-                        {% else %}
-                            <div class="calendar-day {% if tasks_by_date|get_item:date_key %}have_Due{% endif %}">
-                        {% endif %}
-                            <!-- Display the day number -->
-                            {% if day.1 == 'prev-month' %}
-                                <span style="color: #ccc;">{{ day.0 }}</span>
-                            {% else %}
-                                <span>{{ day.0 }}</span>
-                            {% endif %}
-                            <!-- Display tasks for this day -->
-                            {% with year_str=year|stringformat:"04d" month_str=month|stringformat:"02d" day_str=day.0|stringformat:"02d" %}
-                            {% with date_key=year_str|add:"-"|add:month_str|add:"-"|add:day_str %}
-                                {% if tasks_by_date|get_item:date_key %}
-                                    {% for task in tasks_by_date|get_item:date_key %}
-                                        <div class="calendar-day have_Due">
-                                        </div>
-                                    {% endfor %}
-                                {% endif %}
-                            {% endwith %}
-                        {% endwith %}
+                    {% empty %}
+                        <div class="task-item">
+                            <h4 class="text-center">You have no tasks to accomplish.<br/><small>Set up tasks to have a productive day ahead.</small></h4>
                         </div>
                     {% endfor %}
-                {% endfor %}
+                </div>
+            </div>
+    
+            <!-- Ongoing Projects -->
+            <div class="project-lists">
+                <div class="rt-header">
+                    <th><h2>Ongoing Projects</h2></th>
+                    <a class="view-txt  " href="{% url 'project' %}">View All Projects</a>
+                </div>
+                <div id="projects-list">
+                    {% for project in projects %}
+                    <div class="project-item">
+                        <div class="project-actions ml-10">
+                            <a href="{% url 'team_list' project.id %}" class="btn View-Members mt-3">View Team</a>
+                        </div>
+                        <div>
+                            <div class="project-title">{{ project.project_name }}</div>
+                            <div class="project-description">{{ project.description }}</div>
+                            <div class="project-due-date">Created on: {{ project.date_created|date:"F j, Y g:iA" }}</div>
+                            <div class="project-due-date">Created By: {{ project.created_by.first_name}} {{ project.created_by.last_name}}</div>
+                        </div>   
+                    </div>
+                     {% empty %}
+                    <div class="project-item">
+                        <h4 class="text-center">No projects found.<br/><small>Create a project to get started.</small></h4>
+                    </div>
+                    {% endfor %}
+                
+                </div>
             </div>
         </div>
+       
+            
+    
+        <div class="side-calendar">
+            <div class="calendar">
+                <div class="calendar-header">
+                    <button class="btn btn-primary" id="prevMonth">&lt;</button>
+                    <h2 style="font-size: 20px;">{{ month_name }} {{ year }} </h2>
+                    <button class="btn btn-primary" id="nextMonth"> &gt;</button>
+                </div>
+                <div class="calendar-grid">
+                    <div class="calendar-day-header">M</div>
+                    <div class="calendar-day-header">T</div>
+                    <div class="calendar-day-header">W</div>
+                    <div class="calendar-day-header">Th</div>
+                    <div class="calendar-day-header">F</div>
+                    <div class="calendar-day-header">Sa</div>
+                    <div class="calendar-day-header">Su</div>
+                    {% for week in calendar_data %}
+                        {% for day in week %}
+                            {% with year_str=year|stringformat:"04d" month_str=month|stringformat:"02d" day_str=day.0|stringformat:"02d" %}
+                                {% with date_key=year_str|add:"-"|add:month_str|add:"-"|add:day_str %}
+                                    <div class="calendar-day 
+                                        {% if tasks_by_date|get_item:date_key %}have_Due{% endif %}
+                                        {% if day.0 == current_day and month == current_month %}current-day{% endif %}
+                                        {% if day.1 == 'prev-month' %}prev-month{% endif %}
+                                    ">
+                                        <!-- Display the day number -->
+                                        {%if day.0 != 0%}
+                                            <div>{{ day.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                {% endwith %}
+                            {% endwith %}
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+                
+        </div>
+
     </div>
     
     <script>
