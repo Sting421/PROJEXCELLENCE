@@ -5,7 +5,7 @@
 {% block title %}My Team{% endblock title %}Dashboard
 {% block extra_css %}
 <style>
-      .page-container {
+    .page-container {
         display: flex;
         flex-direction: column;
         min-height: 100vh;
@@ -13,26 +13,32 @@
         margin-right: 4%;
         user-select: none;
     }
+    .member-top{
+        display: flex;
+        justify-content: space-between; 
+        align-items: center;
+        margin-bottom: 20px;
+    }
     .card {
         background-color: #E0E7EF;
-        color: 213A58;
+        color: #213A58;
+        border: #E0E7EF;
         border-radius: 8px;
         padding: 16px;
         min-height: 100px;
         padding: 20;
-        box-shadow: 0 10px 14px rgba(0, 0, 0, 0.1);
-        max-width: 30%;
-        margin-bottom: 16px;  
+        max-width: 49%;
+        margin-bottom: 20px;  
         user-select: none;
     }
     .teamCards{
         color: #FFFFFF;
         border-radius: 8px;
         padding: 16px;
-        min-height: 100px;
+        height: 300px;
         padding: 20;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        width: 450px;
+        width: 24%;
         margin-bottom: 16px;
     }
     
@@ -46,51 +52,60 @@
     }
     .card-manager{
         background-color: #6292d1;
-      
-        
     }
+
     .card-members .title{
         color: #D9D9D9;
     }
+
     .avatar {
-        width: 48px;
-        height: 48px;
+        width: 80px;
+        height: 80px;
         border-radius: 50%;
-        margin-right: 16px;
+        margin-right: 15px;
+    }
+    .avatar-member {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin-bottom: 15px;
     }
     .info {
         display: flex;
-        align-items: center;
+        align-items: right;
     }
     .name {
-        font-size: 18px;
+        font-size: 25px;
         font-weight: bold;
         margin: 0;
     }
     .title {
-        font-size: 14px;
+        font-size: 15px;
         margin: 4px 0 0;
     }
     .page{
         margin-left: 5%;
         user-select: none;
     }
-    .message{
-        float: right;
-        margin-left: 170px;
-    }
     .nav-tabs{
-        margin-top: 6%;
         margin-bottom: 2%;
         user-select: none;
     }
-
+    .nav-item{
+        font-size: 20px;
+    }
+    .nav-link{
+        padding-left: 30px;
+        padding-right: 30px;
+        color:#6292d1;
+    }
     .add-team {
         color: #4a5568;
         cursor: pointer;
         padding: 15px;
-        border: 2px dashed #e2e8f0;
+        border: 2px dashed #c4faea;
         border-radius: 8px;
+        background-color: #c4faea;
         display: inline-block;
         transition: all 0.3s ease;
     }
@@ -106,6 +121,7 @@
         padding: 15px;
         border: 2px dashed #e2e8f0;
         border-radius: 8px;
+        background-color: #E0E7EF;
         display: inline-block;
         transition: all 0.3s ease;
     }
@@ -116,6 +132,7 @@
     }
     .project-name{
         color: #213A58;
+        
     }
     .active{
         color: rgb(52, 0, 241);
@@ -132,54 +149,76 @@
     .tab-content>.active {
         display: flex;
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 18px;
+    }
+    .bi bi-three-dots{
+        height: 100px;
+    }
+    .btn{
+        margin-top: 65px;
+        background-color: #e2e8f0;
+        color: #213A58;
+    }
+    .modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%; /* Ensure vertical centering */
     }
 
-
-  
+    .modal-content {
+        margin: auto;
+        max-width: 500px; /* You can adjust width as necessary */
+        padding: 20px;
+    }
 </style>
 {% endblock extra_css %}
+
 {% block content %}
 <div class="page-container">
     <div class="Team">
-        <h1> <div class="project-name">{{ project.project_name|capfirst }} </div>Team</h1><br>
-        
-        {% if user == project.created_by or user|is_project_manager:project %}
-            <div type="button" class="add-team" data-bs-toggle="modal" data-bs-target="#addTeamModal">
-                <i class="fas fa-plus mr-2"></i> Add Team
-            </div>
-        {% endif %}
-      
-        <div type="button" class="add-member" data-bs-toggle="modal" data-bs-target="#addMemberModal">
-            <i class="fas fa-plus mr-2"></i> Add Member
+        <div class="member-top">
+            <h1 class="project-name">{{ project.project_name|capfirst }}</h1>
         </div>
-
-        <h4>Project Manager</h4>
+        
+        <!-- Project Manager  -->
+        <h3 style="margin-bottom: 20px">Project Manager</h3>
         <div class="card">
             <div class="info">
                 <table>
                     <tr>
                         <td>
                             {% if project.created_by.user.profile_path %}
-                             <img class="avatar" src="{{ project.created_by.user.profile_path.url }}" >
+                                <img class="avatar" src="{{ project.created_by.user.profile_path.url }}" >
                             {% else %}
-                                <img src="{% static 'res/logoPlaceHolder.png' %}" alt="avatar-profile" class="avatar">
+                                <img class="avatar" src="{% static 'res/logoPlaceHolder.png' %}" alt="avatar-profile">
                             {% endif %}
-                        
-                            </td>
-                        <td>
-                            <h2 class="name"> {{ project.created_by.first_name|capfirst }} {{ project.created_by.last_name|capfirst }}</h2>
                         </td>
-                        <td class="message">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-left-text-fill" viewBox="0 0 16 16">
-                                <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4.414a1 1 0 0 0-.707.293L.854 15.146A.5.5 0 0 1 0 14.793zm3.5 1a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1zm0 2.5a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1zm0 2.5a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1z"/>
-                            </svg> 
+                        <td>
+                            <hp class="name"> {{ project.created_by.first_name|capfirst }} {{ project.created_by.last_name|capfirst }}</p>
                         </td>
                     </tr>
                 </table>
             </div>
         </div>
     </div>
+        
+    <!-- Team -->
+    <div class="member-top">
+        <h3>Team</h3>
+        <div>
+            {% if user == project.created_by or user|is_project_manager:project %}
+            <div type="button" class="add-team" data-bs-toggle="modal" data-bs-target="#addTeamModal">
+                <i class="fas fa-plus mr-2"></i> Add Team
+            </div>
+            {% endif %}
+            <div type="button" class="add-member" data-bs-toggle="modal" data-bs-target="#addMemberModal">
+                <i class="fas fa-plus mr-2"></i> Add Member
+            </div>
+            </div>
+    </div>
+    
+    <!-- Members -->
     <div class="Members">
         <ul class="nav nav-tabs">
             {% for team in page_obj %}
@@ -190,7 +229,7 @@
                        href="#team-{{ team.id }}">
                        {{ team.team_name }}
                        {% if user == project.created_by or user|is_project_manager:project %}
-                       <i class="fas fa-edit" style="cursor: pointer; margin-left: 5px;" 
+                       <i class="fas fa-edit" style="cursor: pointer;" 
                           data-bs-toggle="modal" 
                           data-bs-target="#editTeamModal-{{ team.id }}"></i>
                        {% endif %}
@@ -215,22 +254,19 @@
                                 <table class="info">
                                     <tr>
                                         <td>
-                                        {% if membership.user.profile_path and membership.user.profile_path.url %}
-                                            <img class="avatar" src="{{ membership.user.profile_path.url }}" >
-                                        {% else %}
-                                            <img src="{% static '/res/logoPlaceHolder.png' %}" alt="avatar-profile" class="avatar">
-                                        {% endif %} 
-                                        </td>
-                                        <td>
-                                            <h2>{{ membership.user.first_name|capfirst }} {{ membership.user.last_name|capfirst }}</h2>
+                                            {% if membership.user.profile_path and membership.user.profile_path.url %}
+                                                <img class="avatar-member" src="{{ membership.user.profile_path.url }}" >
+                                            {% else %}
+                                                <img class="avatar-member" src="{% static '/res/logoPlaceHolder.png' %}" alt="avatar-profile" >
+                                            {% endif %} 
+                                            <p class="name">{{ membership.user.first_name|capfirst }} {{ membership.user.last_name|capfirst }}</p>
                                             <h2 class="title">{{ membership.role|capfirst }}</h2>
-                                        </td>
-                                        {% if user in team.users.all and membership.role != 'HEAD' and user_roles|get_item:team.id == 'HEAD' or user_roles|get_item:team.id == 'Manager' and user != membership.user or user == project.created_by%}
+                                        
+                                            {% if user in team.users.all and membership.role != 'HEAD' and user_roles|get_item:team.id == 'HEAD' or user_roles|get_item:team.id == 'Manager' and user != membership.user or user == project.created_by%}
                                        
-                                        <td>
                                             {%if user_roles|get_item:team.id  != 'MEMBER' and membership.role != 'HEAD'%}
+                                            
                                             <div class="dropdown">
-                                               
                                                 <button class="btn" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" onclick="event.stopPropagation()">
                                                     <i class="bi bi-three-dots" title="Settings"></i>
                                                 </button>  
@@ -299,7 +335,7 @@
         </div>
     </div>
     <div class="modal fade" id="addMemberModal">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="addMemberModalLabel">Add Member</h5>
@@ -360,7 +396,7 @@
 </div>
 <!-- Add Task Modal -->
 <div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <form method="post" action="{% url 'team_list' project.id %}">
             {% csrf_token %}
             <div class="modal-content">
@@ -384,7 +420,7 @@
 
 <!-- Remove Member -->
 <div class="modal fade" id="removeMemberModal" tabindex="-1" aria-labelledby="removeMemberModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <form method="post" action="{% url 'team_list' project.id %}">
             {% csrf_token %}
             <div class="modal-content">
@@ -411,7 +447,7 @@
 </div>
 <!-- Edit Member Role -->
 <div class="modal fade" id="editMemberRoleModal" tabindex="-1" aria-labelledby="editMemberRoleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <form method="post" action="{% url 'team_list' project.id %}">
             {% csrf_token %}
             <div class="modal-content">

@@ -9,7 +9,7 @@
         height: 100%;
         flex-wrap: wrap;
         flex-direction: column;
-        margin-left: -20px;
+        margin-left: 3.5%;
         user-select: none;
     }
     
@@ -18,7 +18,8 @@
         border-radius: 10px;
         box-shadow: 0 0 10px rgba(0,0,0,0.1);
         padding: 20px;
-        width: 1500px;
+        width: 108%;
+        margin-top: 60px;
     }
 
     .calendar-header {
@@ -31,8 +32,8 @@
     .calendar-grid {
         display: grid;
         grid-template-columns: repeat(7, 0.2fr);
-        gap: 3px;
-        
+        gap: 3px;  
+        width:
     }
 
     .calendar-day-header {
@@ -40,15 +41,14 @@
         font-weight: bold;
         padding: 10px;
         background: #f5f5f5;
-        width: 200px;
-       
+        width: 190px;
     }
 
     .calendar-day {
         text-align: center;
         padding: 10px;
         border: 1px solid #eee;
-        width: 200px;
+        width: 190px;
         height: 128px; /* Set a height for the scrollable container */
         overflow-y: auto; /* Enable vertical scrolling */
     }
@@ -66,9 +66,8 @@
         display: center;
         flex-direction: column;
         margin-bottom: 10px;
-        margin-left: 10px;
-        width: 150px;
-        height: 50px;
+        width: 100%;
+        max-height: 80%;
     }
     
     .task-item {
@@ -79,7 +78,6 @@
         flex-direction: column;
         padding: 3px;
         border-radius: 2px;
-        
     }
 
     .task-completed {
@@ -114,11 +112,16 @@
         background-color: #2a866b;
         border-color: #2a866b;
     }
+    h1{
+        font-weight: 700;
+        color: #314863;
+    }
 </style>
 {% endblock extra_css %}
 
 {% block content %}
 <div class="container">
+    <h1>Timeline</h1>
     <div class="calendar">
         <div class="calendar-header">
             <button class="btn btn-primary" id="prevMonth">&lt; Previous</button>
