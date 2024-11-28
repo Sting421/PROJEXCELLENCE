@@ -9,8 +9,7 @@
         display: flex;
         flex-direction: column;
         min-height: 100vh;
-        margin-left: 4%;
-        margin-right: 4%;
+        margin: 0 4%;
         user-select: none;
     }
     .member-top{
@@ -24,9 +23,8 @@
         color: #213A58;
         border: #E0E7EF;
         border-radius: 8px;
-        padding: 16px;
+        padding: 15px;
         min-height: 100px;
-        padding: 20;
         max-width: 49%;
         margin-bottom: 20px;  
         user-select: none;
@@ -34,12 +32,11 @@
     .teamCards{
         color: #FFFFFF;
         border-radius: 8px;
-        padding: 16px;
-        height: 300px;
-        padding: 20;
+        padding: 20px;
+        min-height: 270px;
+        max-height: fit-content;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         width: 24%;
-        margin-bottom: 16px;
     }
     
     .card-members{
@@ -58,17 +55,16 @@
         color: #D9D9D9;
     }
 
+    .title {
+        font-size: 15px;
+        color: #D9D9D9;
+    }
+
     .avatar {
         width: 80px;
         height: 80px;
         border-radius: 50%;
         margin-right: 15px;
-    }
-    .avatar-member {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        margin-bottom: 15px;
     }
     .info {
         display: flex;
@@ -79,14 +75,6 @@
         font-weight: bold;
         margin: 0;
     }
-    .title {
-        font-size: 15px;
-        margin: 4px 0 0;
-    }
-    .page{
-        margin-left: 5%;
-        user-select: none;
-    }
     .nav-tabs{
         margin-bottom: 2%;
         user-select: none;
@@ -95,9 +83,8 @@
         font-size: 20px;
     }
     .nav-link{
-        padding-left: 30px;
-        padding-right: 30px;
-        color:#6292d1;
+        padding: 10px 30px;
+        color: #6292d1;
     }
     .add-team {
         color: #4a5568;
@@ -109,22 +96,17 @@
         display: inline-block;
         transition: all 0.3s ease;
     }
-    .add-team:hover {
-        color: #2b6cb0;
-        background-color: #ebf8ff;
-        border-color: #63b3ed;
-    }
-
     .add-member {
         color: #4a5568;
         cursor: pointer;
         padding: 15px;
-        border: 2px dashed #e2e8f0;
+        border: 2px dashed #E0E7EF;
         border-radius: 8px;
         background-color: #E0E7EF;
         display: inline-block;
         transition: all 0.3s ease;
     }
+    .add-team:hover,
     .add-member:hover {
         color: #2b6cb0;
         background-color: #ebf8ff;
@@ -132,7 +114,8 @@
     }
     .project-name{
         color: #213A58;
-        
+        font-size: 40px;
+        font-weight: bold;
     }
     .active{
         color: rgb(52, 0, 241);
@@ -151,11 +134,8 @@
         flex-wrap: wrap;
         gap: 18px;
     }
-    .bi bi-three-dots{
-        height: 100px;
-    }
     .btn{
-        margin-top: 65px;
+        margin-top: 40px;
         background-color: #e2e8f0;
         color: #213A58;
     }
@@ -165,29 +145,23 @@
     justify-content: center;
     height: 100%; /* Ensure vertical centering */
     }
+    .bi bi-three-dots{
+        height: 100px;
+    }
     .add-member-byhead{
         margin-bottom: 1;
     }
 
-    .modal-content {
-        margin: auto;
-        max-width: 500px; /* You can adjust width as necessary */
-        padding: 20px;
-    }
-    .project-name {
-        color: #213A58;
-        
-    }
 </style>
 {% endblock extra_css %}
 
 {% block content %}
 <div class="page-container">
     <div class="Team">
-        <h1> <div class="project-name">{{ project.project_name|capfirst }} </div>Team</h1><br>
-        
+        <h1><div class="project-name">{{ project.project_name|capfirst }}</div></h1>
         <h5>Project Description:</h5>
-        <div class="project-description">{{ project.description}}{% if project.description %}{% endif %}</div>
+
+        <div class="project-description">{{ project.description}}{% if project.description %}{% endif %}</div><br>
         <h4>Project Manager</h4>
         <div class="card">
             <div class="info">
@@ -212,7 +186,7 @@
         
     <!-- Team -->
     <div class="member-top">
-        <h3>Team</h3>
+        <h4>Team</h4>
         <div>
             {% if user == project.created_by or user|is_project_manager:project %}
             <div type="button" class="add-team" data-bs-toggle="modal" data-bs-target="#addTeamModal">
@@ -222,11 +196,11 @@
                 <i class="fas fa-plus mr-2"></i> Add Member
             </div>
             {% endif %}
-            </div>
+        </div>
     </div>
     
     <!-- Members -->
-    <div class="Members">
+    <div>
         <ul class="nav nav-tabs">
             {% for team in page_obj %}
                 <li class="nav-item">
@@ -265,27 +239,24 @@
                                 {%else %}
                                 <div class="teamCards card-members">
                                 {%endif%}
-                                    <table class="info">
-                                        <tr>
-                                            <td>
+                                    <div>
                                             {% if membership.user.profile_path and membership.user.profile_path.url %}
                                                 <img class="avatar" src="{{ membership.user.profile_path.url }}" >
                                             {% else %}
-                                                <img src="{% static '/res/logoPlaceHolder.png' %}" alt="avatar-profile" class="avatar">
+                                                <img class="avatar" src="{% static '/res/logoPlaceHolder.png' %}" alt="avatar-profile" >
                                             {% endif %} 
-                                            </td>
-                                            <td>
-                                                <h2>{{ membership.user.first_name|capfirst }} {{ membership.user.last_name|capfirst }}</h2>
-                                                <h2 class="title">{{ membership.role|capfirst }}</h2>
-                                            </td>
+                                    
+                                                <h4 style="margin-top: 10px;">{{ membership.user.first_name|capfirst }} {{ membership.user.last_name|capfirst }}</h4>
+                                                <h4 class="title">{{ membership.role|capfirst }}</h4>
+                                        
                                             {% if user in team.users.all and membership.role != 'HEAD' and user_roles|get_item:team.id == 'HEAD' or user_roles|get_item:team.id == 'MANAGER' and user != membership.user or user == project.created_by%}
                                         
-                                            <td>
                                                 {%if user_roles|get_item:team.id  != 'MEMBER' and membership.role != 'HEAD' or request.user == project.created_by%}
-                                                <div class="dropdown">
+                            
                                                     <button class="btn" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" onclick="event.stopPropagation()">
                                                         <i class="bi bi-three-dots" title="Settings"></i>
                                                     </button>  
+
                                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                         {%if user_roles|get_item:team.id  != 'MEMBER' and membership.role != 'HEAD'  or request.user == project.created_by %}
                                                             <li>
@@ -301,12 +272,10 @@
                                                             </li>
                                                         {%endif%}
                                                     </ul>
-                                                </div>
+
                                                 {%endif%}
-                                            </td>
                                             {%endif%}
-                                        </tr>
-                                    </table>
+                                    </div>
                                 </div>
                             {% endfor %}
                         {% else %}
