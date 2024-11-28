@@ -55,12 +55,13 @@ def timeline(request):
     month = int(request.GET.get('month', current_date.month))
     current_day = current_date.day
     current_month = current_date.month
+    current_year = current_date.year
    
     cal = Calendar(firstweekday=0)  
 
     calendar_data = []
     month_days = cal.monthdays2calendar(year, month)
-    
+
     for week in month_days:
         processed_week = []
         for day, weekday in week:
@@ -76,7 +77,7 @@ def timeline(request):
     tasks_by_date = {}
     for task in tasks:
         if task.status != 'Done':
-            date_key = (task.due_date + timedelta(days=1)).strftime('%Y-%m-%d') if task.due_date else 'No Due Date'
+            date_key = (task.due_date ).strftime('%Y-%m-%d') if task.due_date else 'No Due Date'
             
             if date_key not in tasks_by_date:
                 tasks_by_date[date_key] = []
@@ -91,6 +92,7 @@ def timeline(request):
         'month_name': month_name[month],
         'current_day': current_day,
         'current_month': current_month,
+        'current_year': current_year,
         'calendar_data': calendar_data,
         'tasks_by_date': tasks_by_date,
     }
@@ -171,6 +173,7 @@ def task_list(request,status):
         "filter": task_filter,
     }
     return render(request, "task.html", context)
+@login_required
 def task_list_project(request,status,project_id):
     tasks = Task.objects.filter(assigned_to=request.user, status=status, project_id=project_id).order_by("due_date")
     task_filter = TaskFilter(request.GET, queryset=tasks)
@@ -209,14 +212,13 @@ def delete_task(request, pk):
     task = get_object_or_404(Task, pk=pk, assigned_to=request.user)
     if request.method == 'POST':
         task.delete()
-        return redirect('task',status="On-going")
+        return redirect('task',status="Pending")
     return render(request, 'delete_task.html', {'task': task})
 
 @login_required
 def edit_task(request, pk):
     
     task = get_object_or_404(Task, pk=pk, assigned_to=request.user)
-    
     if request.method == 'POST':
         edit_form = EditTaskForm(request.POST, instance=task) 
         if edit_form.is_valid():
@@ -321,7 +323,6 @@ def edit_project(request, pk):
         return redirect('Error404')
 #------------------------------------------- end projects -------------------------------------
 
-
 @login_required
 def dashboard_view(request):
     projects = Project.objects.filter(models.Q(created_by=request.user) | models.Q(teammembership__user=request.user)).distinct()
@@ -366,7 +367,7 @@ def dashboard_view(request):
     tasks_by_date = {}
     for task in tasks:
         if task.status != 'Done':
-            date_key = (task.due_date + timedelta(days=1)).strftime('%Y-%m-%d') if task.due_date else 'No Due Date'
+            date_key = (task.due_date).strftime('%Y-%m-%d') if task.due_date else 'No Due Date'
             
             if date_key not in tasks_by_date:
                 tasks_by_date[date_key] = []
@@ -390,6 +391,7 @@ def dashboard_view(request):
     
     return render(request, 'dashboard.html', context)
 
+
 #team
 @login_required
 def team_list(request, project_id):
@@ -398,6 +400,7 @@ def team_list(request, project_id):
     add_member_form = AddMemberForm()
     edit_role_form = EditRoleForm()
     user = request.user
+    current_datetime = timezone.now()
     
  
     project = get_object_or_404(Project, id=project_id)
@@ -522,12 +525,15 @@ def team_list(request, project_id):
 
         elif 'assign_task' in request.POST:
             user_id = request.POST.get('user_id')
+            due = request.POST.get('due-date')
+            print("The due Date is:",due)
             user = get_object_or_404(User, id=user_id)
             assign_task = TaskForm(request.POST, project=project)
             if assign_task.is_valid():
                 task = assign_task.save(commit=False)
                 task.project_id = project
                 task.assigned_to = user
+                task.due_date = due
                 task.created_by = request.user
                 task.save()
               
@@ -546,38 +552,42 @@ def team_list(request, project_id):
         "edit_role_form": edit_role_form,
         "team_memberships": team_memberships_sorted,
         "user_roles": user_roles,
+        "current_datetime":current_datetime,
+        
     }
     return render(request, "myteam.html", context)
 
 @login_required
 def edit_profile(request):
-    if request.method == "POST":
-        form = UserProfileForm(request.POST, request.FILES, instance=request.user)
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES, instance=request.user, request=request)
+
         if form.is_valid():
-            user = form.save()
-            update_session_auth_hash(request, user)
-            messages.success(request, "Your profile was successfully updated.")
-            return redirect("profile")
+            current_password = form.cleaned_data.get("current_password")
+            if current_password and not request.user.check_password(current_password):
+                form.add_error('current_password', 'The current password is incorrect.')
+            else:
+                form.save()
+                return redirect('profile')  
+
     else:
         form = UserProfileForm(instance=request.user)
-    storage = get_messages(request)
-    
-    for _ in storage:
-        pass
-    return render(request, "profile.html", {"form": form})
+
+    return render(request, 'profile.html', {'form': form})
+
 
 def resource_library(request):
     if request.method == 'POST':
-        print("Files:", request.FILES)  # Debug print
-        print("POST data:", request.POST)  # Debug print
+        print("Files:", request.FILES)  
+        print("POST data:", request.POST)  
         
         title = request.POST.get('title')
         description = request.POST.get('description')
         category = request.POST.get('category')
         file = request.FILES.get('file')
 
-        print(f"Title: {title}")  # Debug print
-        print(f"File: {file}")    # Debug print
+        print(f"Title: {title}")  
+        print(f"File: {file}")   
 
         if title and description and category and file:
             try:
@@ -671,6 +681,63 @@ def blog_list(request, project_id):
         "blogs":blogs,
     }
     return render(request, "BlogPost.html", context)
+
+@login_required
+def assign_task(request,status):
+    tasks = Task.objects.filter(created_by=request.user, status=status).order_by("due_date")
+    task_filter = TaskFilter(request.GET, queryset=tasks)
+
+    paginator = Paginator(task_filter.qs, 10)  
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+
+    edit_task_forms = {task.id: EditTaskForm(instance=task) for task in tasks}
+
+    context = {
+        "page_obj": page_obj,
+        "edit_task_forms": edit_task_forms,
+        "add_task_form": TaskForm(),  
+        "filter": task_filter,
+    }
+    return render(request, "assignTask.html", context)
+
+
+@login_required
+def due_day_task_List(request,year,month,day):
+    tasks = Task.objects.filter(assigned_to=request.user).order_by("due_date")
+    date = f"{year}-{month:02d}-{day:02d}"
+    current_date = datetime.now(local_timezone)
+    years = int(request.GET.get('year', current_date.year))
+    months = int(request.GET.get('month', current_date.month))
+    current_day = current_date.day
+    current_month = current_date.month
+    current_year = current_date.year
+
+    tasks_by_date = {}
+    for task in tasks:
+        if task.status != 'Done':
+            date_key = (task.due_date ).strftime('%Y-%m-%d') if task.due_date else 'No Due Date'
+            
+            if date_key not in tasks_by_date:
+                tasks_by_date[date_key] = []
+            tasks_by_date[date_key].append(task)
+
+    for date_key, task_list in tasks_by_date.items():
+        print(f"Date: {date_key}, Tasks: {[task.task_name for task in task_list]}")
+
+    context = {
+        'tasks_by_date': tasks_by_date,
+        'year': years,
+        'month': months,
+        'month_name': month_name[months],
+        'current_day': current_day,
+        'current_month': current_month,
+        'current_year': current_year,
+        'currdate':date,
+    }
+    return render(request, "due_day_task_List.html", context)
+
 
 
 

@@ -42,8 +42,7 @@
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         max-width: calc(25% - 15px); /* Allow exactly 4 items in a row */
         width: 320px; 
-        min-height: 250px;
-        max-height:fit-content;
+        height: 280px;
         margin-left: 25px;
         margin-bottom: 20px;
     }
@@ -266,12 +265,12 @@
                     <div class="project-created-date">Created on: {{ project.date_created|date:"F j, Y" }}</div>
                     <div class="project-created-by">Created by: {{ project.created_by.last_name}}</div>
                 </div>  
-                <div class="lower-btn">
+                <div class="lower-btn mt-3">
                     <button class="btn" id="dropdownMenuButton" aria-expanded="false" >
-                        <a class="view-txt" href="{% url 'task_project' 'Pending' project.id %}"> <i class="bi bi-list-task" title="To Do list"></i></a>
+                        <a class="view-txt" href="{% url 'task_project' 'Pending' project.id %}"> <i class="bi bi-list-task " title="To Do list" style="font-size: 25px;"></i></a>
                     </button>
                     <button class="btn" type="button" id="dropdownMenuButton" aria-expanded="false" >
-                        <a class="view-txt" href="{% url 'blog_post' project.id %}"><i class="bi bi-chat-square-text"title="Chat Box"></i></a>
+                        <a class="view-txt" href="{% url 'blog_post' project.id %}"><i class="bi bi-chat-square-text"title="Chat Box" style="font-size: 25px;"></i></a>
                     </button>
                 </div>
             </div>
