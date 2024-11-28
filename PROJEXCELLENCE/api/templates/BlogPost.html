@@ -1,0 +1,343 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load custom_filters %}
+{% load static %}
+
+{% block title %}Task{% endblock %}
+
+{% block extra_css %}
+
+<style>
+    .page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin-left: 4%;
+    margin-right: 4%;
+    }
+    .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        font-weight: 600;
+        font-weight: bold;
+        margin-right: 10px;
+    }
+
+    #blogs-list {
+        flex: 1;
+        overflow-y: auto;
+        margin-bottom: 20px;
+    }
+  
+    .blog-content {
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 20px;
+        padding-left: 50px;
+        padding-right: 50px;
+        margin-bottom: 15px;
+        transition: all 0.3s ease; 
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .btn-icon {
+        position: absolute;
+        right: 10px;
+        bottom: 15px;
+        background-color: transparent;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .btn-primary {
+        --bs-btn-hover-bg:none;
+        --bs-btn-active-bg: none;
+    }
+
+    .btn-icon i.bi-backspace-reverse {
+        display: none;
+        background-color: transparent;
+        --bs-btn-active-bg: #0a58ca;
+    }
+
+    .btn-icon:hover i.bi-backspace-reverse-fill {
+        display: none;
+        background-color: transparent;
+    }
+
+    .btn-icon:hover i.bi-backspace-reverse {
+        display: inline;
+        background-color: transparent;
+    }
+    .fas:hover{
+        cursor: pointer;
+       
+    }
+
+</style>
+
+{% endblock extra_css %}
+{% block content %}
+<div class="page-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{project.project_name}} <span style="font-weight: 200;">General Channel</span></h1>
+        <div class="add-task" data-bs-toggle="modal" data-bs-target="#addBlogModal">
+           <a> <i class="fas fa-plus mr-2"></i> Create Post</a>
+        </div>
+    </div>
+    <div id="blogs-list">
+        {% for blog in blogs %}
+        <div class="blog-item " >
+            <div class="blog-content">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                       <span>
+                            {%if blog.posted_by.profile_path.url != null %}
+                                <img class="avatar" src="{{ blog.posted_by.profile_path.url }}" alt="avatar" width="40px" height="40px" style="border-radius: 50%; font-weight: 600;">
+                            {%else%}
+                                <img class="avatar" src="{% static 'res/logoPlaceHolder.png' %}" alt="avatar-profile">
+                            {%endif%}
+                            <span style="font-weight: 600;">{{ blog.posted_by.first_name|capfirst }} {{ blog.posted_by.last_name|capfirst }}</span>
+                            <span style="font-weight: 300; color: rgb(117, 116, 116);">{{ blog.time_posted }}</span>
+                       </span>
+                      
+                        <div>
+                            {% if blog.posted_by == request.user %}
+                           
+                                <!-- Edit Button -->
+                                <a class="fas fa-edit text-black"
+                                   data-bs-toggle="modal" 
+                                   data-bs-target="#editBlogModal"
+                                   data-blog-id="{{ blog.id }}"
+                                   style="padding: 10px;"></a>
+
+                                <!-- Delete Button -->
+                                <a class="fas fa-trash text-black" 
+                                   data-bs-toggle="modal" 
+                                   data-bs-target="#deleteBlogModal"
+                                   data-blog-id="{{ blog.id }}">  
+                                </a>
+                               
+                            {% endif %}
+                        </div>
+                     
+                    </div>
+                    <div class="task-title" style="margin-left: 50px;">{{ blog.message }}</div>
+    
+                    <hr style="border: 1px solid rgb(200, 200, 200); margin: 10px 0;">
+                     <!-- Comments Section -->
+                        <p>Comments:</p>
+                        <div style="margin-left: 20px; display: flex; flex-direction: column; flex-wrap: wrap;">
+                            {% for comment in blog.comments_set.all %}
+                                <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                                   <div>
+                                        {% if comment.user.profile_path and comment.user.profile_path.url %}
+                                        <img class="avatar" src="{{ comment.user.profile_path.url }}" >
+                                        {% else %}
+                                            <img class="avatar" src="{% static '/res/logoPlaceHolder.png' %}">
+                                        {% endif %} 
+                                        <strong>{{ comment.user.first_name|capfirst }} {{ comment.user.last_name|capfirst }}:</strong> 
+                                        <span style="font-size: small; color: grey;">
+                                            {{ comment.time_posted }}
+                                        </span>
+                                   </div>
+                                    {% if comment.user == request.user %}
+                                    <div>
+                                        <!-- Edit Button -->
+                                        <a class="fas fa-edit text-black" 
+                                        
+                                           data-bs-toggle="modal" 
+                                           data-bs-target="#editCommentModal"
+                                           data-comment-id="{{ comment.id }}"
+                                           style="padding: 10px;"></a>
+        
+                                        <!-- Delete Button -->
+                                        <a class="fas fa-trash text-black" 
+                                           data-bs-toggle="modal" 
+                                           data-bs-target="#deleteCommentModal"
+                                           data-comment-id="{{ comment.id }}">
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div style="margin-left: 30px; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">
+                                    {{ comment.text_comment }}
+                                </div>
+                            {% empty %}
+                                <p>No comments yet. Be the first to comment!</p>
+                            {% endfor %}
+                        </div>
+                        
+                    <div style="border: top 3px;">
+                        <form method="post" action="{% url 'blog_post' project.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="add_comment" value="1">
+                            <input type="hidden" name="blog_id" value="{{ blog.id }}">
+                            <div class="form-group" style="position: relative; width: 100%;">
+                                <textarea 
+                                    name="text_comment" 
+                                    class="form-control" 
+                                    rows="2" 
+                                    placeholder="Write a comment..." 
+                                    required
+                                    style="padding-right: 50px;"
+                                ></textarea>
+                                <button 
+                                    type="submit" 
+                                    class="btn btn-sm btn-primary btn-icon">
+                                    <i class="bi bi-backspace-reverse-fill" style="color: rgb(0, 0, 0);"></i>
+                                    <i class="bi bi-backspace-reverse" style="color: rgb(0, 0, 0);"></i>
+                                </button>
+                        </form>
+                    </div>
+            </div>
+        </div>
+        {% endfor %}
+        </div>
+    </div>
+         <!-- Edit Blog Modal -->
+         <div class="modal fade" id="editBlogModal" tabindex="-1" aria-labelledby="editBlogModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editBlogModalLabel">Edit Blog Message</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" action="{% url 'blog_post' project.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="edit_Post" value="1">
+                            <input type="hidden" name="blog_id" value="">
+                            <div class="form-group">
+                                <label for="new_message-{{ blog.id }}">Edit Message</label>
+                                <textarea name="new_message" id="new_message-{{ blog.id }}" class="form-control" rows="4">{{ blog.message }}</textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+         <!-- Delete Blog Modal -->
+         <div class="modal fade" id="deleteBlogModal" tabindex="-1" aria-labelledby="deleteBlogModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteBlogModalLabel">Delete Blog Post</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete this blog post?</p>
+                        <form method="post" action="{% url 'blog_post' project.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="delete_Post" value="1">
+                            <input type="hidden" name="blog_id" value="">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                           
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Comment Modal -->
+        <div class="modal fade" id="editCommentModal" tabindex="-1" aria-labelledby="editCommentModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editCommentModalLabel">Edit Blog Message</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" action="{% url 'blog_post' project.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="edit_Comment" value="1">
+                            <input type="hidden" name="comment_id" value="">
+                            <div class="form-group">
+                                <label for="new_message-{{ comment.id }}">Edit Message</label>
+                                <textarea name="new_message" id="new_message-{{ comment.id }}" class="form-control" rows="4">{{ comment.message }}</textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+         <!-- Delete Comment Modal -->
+         <div class="modal fade" id="deleteCommentModal" tabindex="-1" aria-labelledby="deleteCommentModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteCommentModalLabel">Delete Blog Post</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete this blog post?</p>
+                        <form method="post" action="{% url 'blog_post' project.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="delete_Comment" value="1">
+                            <input type="hidden" name="comment_id" value="">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                           
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Blog Modal -->
+        <div class="modal fade" id="addBlogModal" tabindex="-1" aria-labelledby="addBlogModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addBlogModalLabel">Post Blog</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" action="{% url 'blog_post' project.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="add_Post" value="1">
+                            {{ add_blog_form|crispy }}
+                            <input type="hidden" name="project_id" value="{{ project_id }}">
+                            <button type="submit" class="btn btn-primary mt-3">Post</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const modals = document.querySelectorAll
+      ('[data-bs-target="#deleteBlogModal"],[data-bs-target="#editBlogModal"],[data-bs-target="#editCommentModal"],[data-bs-target="#deleteCommentModal"]');
+      
+      modals.forEach(modalTrigger => {
+          modalTrigger.addEventListener('click', function() {
+              const blogId = this.getAttribute('data-blog-id');
+              const commentId = this.getAttribute('data-comment-id');
+
+              const targetModalId = this.getAttribute('data-bs-target');
+              const targetModal = document.querySelector(targetModalId);
+              
+              if (targetModal) {
+                  const blogIdInput = targetModal.querySelector('input[name="blog_id"]');
+                  const commentIdInput = targetModal.querySelector('input[name="comment_id"]');
+                  if (blogIdInput) {
+                        blogIdInput.value = blogId;
+                        console.log(blogIdInput.value);
+                  }
+                  if (commentIdInput) {
+                        commentIdInput.value = commentId;
+                        console.log(commentIdInput.value);
+                  }
+              }
+          });
+      });
+  });
+</script>
+{% endblock %}
