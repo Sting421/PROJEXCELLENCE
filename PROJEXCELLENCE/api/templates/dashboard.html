@@ -387,10 +387,11 @@
                                         {% if tasks_by_date|get_item:date_key %}have_Due{% endif %}
                                         {% if day.0 == current_day and month == current_month %}current-day{% endif %}
                                         {% if day.1 == 'prev-month' %}prev-month{% endif %}
-                                    ">
+                                    " {% if tasks_by_date|get_item:date_key %} onclick="goToTeam(event, '{% url 'due_day_task_List' year month day.0 %}') {% endif %}">
                                         <!-- Display the day number -->
                                         {%if day.0 != 0%}
                                             <div>{{ day.0 }}</div>
+                                           
                                         {% endif %}
                                     </div>
                                 {% endwith %}
@@ -433,6 +434,14 @@
         
         window.location.href = `?year=${year}&month=${month}`;
     });
+
+        function goToTeam(event, url) {
+            // Don't redirect if clicking on dropdown or its children
+            if (!event.target.closest('.dropdown')) {
+                window.location.href = url;
+            }
+        }
+
     </script>
     
 

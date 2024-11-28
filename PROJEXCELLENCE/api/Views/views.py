@@ -323,7 +323,6 @@ def edit_project(request, pk):
         return redirect('Error404')
 #------------------------------------------- end projects -------------------------------------
 
-
 @login_required
 def dashboard_view(request):
     projects = Project.objects.filter(models.Q(created_by=request.user) | models.Q(teammembership__user=request.user)).distinct()
@@ -391,6 +390,7 @@ def dashboard_view(request):
     
     
     return render(request, 'dashboard.html', context)
+
 
 #team
 @login_required
@@ -702,6 +702,41 @@ def assign_task(request,status):
     }
     return render(request, "assignTask.html", context)
 
+
+@login_required
+def due_day_task_List(request,year,month,day):
+    tasks = Task.objects.filter(assigned_to=request.user).order_by("due_date")
+    date = f"{year}-{month:02d}-{day:02d}"
+    current_date = datetime.now(local_timezone)
+    years = int(request.GET.get('year', current_date.year))
+    months = int(request.GET.get('month', current_date.month))
+    current_day = current_date.day
+    current_month = current_date.month
+    current_year = current_date.year
+
+    tasks_by_date = {}
+    for task in tasks:
+        if task.status != 'Done':
+            date_key = (task.due_date ).strftime('%Y-%m-%d') if task.due_date else 'No Due Date'
+            
+            if date_key not in tasks_by_date:
+                tasks_by_date[date_key] = []
+            tasks_by_date[date_key].append(task)
+
+    for date_key, task_list in tasks_by_date.items():
+        print(f"Date: {date_key}, Tasks: {[task.task_name for task in task_list]}")
+
+    context = {
+        'tasks_by_date': tasks_by_date,
+        'year': years,
+        'month': months,
+        'month_name': month_name[months],
+        'current_day': current_day,
+        'current_month': current_month,
+        'current_year': current_year,
+        'currdate':date,
+    }
+    return render(request, "due_day_task_List.html", context)
 
 
 

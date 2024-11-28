@@ -20,6 +20,8 @@ urlpatterns = [
     path("task/<str:status>/", views.task_list, name="task"),
 
     path("assign_task/<str:status>/", views.assign_task, name="assign_task"),
+    path("due_day_task_List/<int:year>/<int:month>/<int:day>/", views.due_day_task_List, name="due_day_task_List"),
+
     path("task/<str:status>/<int:project_id>/", views.task_list_project, name="task_project"),
     path("tasks/add/", views.add_task, name="add_task"),
     path("task/<int:pk>/edit/", views.edit_task, name="edit_task"),

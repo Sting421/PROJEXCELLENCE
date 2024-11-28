@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load custom_filters %}
+{% block title %}Task{% endblock %}
+{% block extra_css %}
+    <style>
+    .page-container {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        margin-left: 4%;
+        margin-right: 4%;
+        user-select: none;
+    }
+    .head-label{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    .task-info{
+        display: flex;
+        flex-direction: column;
+    }
+    .task-info .name{
+        font-size: 50px;
+        font-weight:bold;
+    }
+    .task-info .due-date{
+        font-size: 15px;
+        color: #5c5a5a;
+        
+    }
+    .task-info .description{
+        margin-top: 4%;
+        font-size: 20px;
+        
+    }
+    .submit-btn {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .task-container{
+        display: center;
+        flex-direction: column;
+        margin-bottom: 10px;
+        width: 100%;
+        max-height: 80%;
+    }
+    .task-item {
+        display: flex;
+        text-align: left;
+        background: #fcd6d6;
+        color: #f44336;
+        flex-direction: column;
+        padding: 3px;
+        border-radius: 2px;
+    }
+    
+  
+    
+    </style>
+{% endblock extra_css %}
+
+{% block content %}
+<div class="page-container">
+    <div class="task-list">
+        {% for date, tasks in tasks_by_date.items %}
+            <div class="task-container">
+               {%if date == currdate %}
+                <h3>Date: {{ date }}</h3>
+               
+                    {% for task in tasks %}
+                        <div class="task-item mt-3">
+                           
+                                <span class="task-name">{{ task.task_name }}</span>
+                                {% if task.project_id %}
+                                    <span class="task-project">(Project: {{ task.project_id }})</span>
+                                {% endif %}
+                                {% if task.priority %}
+                                    <span class="task-priority priority-{{ task.priority|lower }}">
+                                        [Priority: {{ task.priority|title }}]
+                                    </span>
+                                {% endif %}
+                            
+                        </div>
+                    {% endfor %}
+            
+               {%endif%}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}
