@@ -15,6 +15,20 @@
     margin-left: 4%;
     margin-right: 4%;
     }
+    .add-task {
+        color: #4a5568;
+        cursor: pointer;
+        padding: 15px;
+        border: 2px dashed #e2e8f0;
+        border-radius: 8px;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+    .add-task:hover {
+        color: #2b6cb0;
+        background-color: #ebf8ff;
+        border-color: #63b3ed;
+    }
     .avatar {
         width: 40px;
         height: 40px;
@@ -72,9 +86,69 @@
         display: inline;
         background-color: transparent;
     }
+}
+    .comments-section {
+        margin-left: 30px;
+        display: block;
+        flex-direction: column;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+    }
+    .comment-container {
+        display: flex;         
+        align-items: flex-start; 
+        margin-bottom: 10px;    
+    }
+    .comment-text {
+        flex: 1;              
+    }
+    .comments-section{
+        margin-left: 30px;
+    }
+    .comments-section .time-posted {
+        font-size: 0.9rem;      
+        font-weight: 300;
+        color: rgb(117, 116, 116); 
+        margin-left: 40px;          
+    }
+    .comments-section div {
+        margin-bottom: 5px;
+    }
+    .comments-section strong {
+        font-weight: bold;
+    }
+    .comments-section span {
+        font-size: small;
+        color: grey;
+    }
+    .comments-section .comment-text {
+        border-radius: 10px;
+        background-color: #D9D9D9;
+        padding: 10px;
+        white-space: normal;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        margin-bottom: 0;
+    }
     .fas:hover{
         cursor: pointer;
        
+    }
+    .time-posted {
+        font-size: 0.9rem;      
+        font-weight: 300;
+        color: rgb(117, 116, 116); 
+        margin-left: 50px;          
+    }
+    .creator-container {
+        display: flex;         
+        align-items: center;    
+    }
+    .creator .time-posted {
+        font-size: 0.9rem;      
+        font-weight: 300;
+        color: rgb(117, 116, 116); 
+        margin-left: 50px;          
     }
 
 </style>
@@ -92,79 +166,89 @@
         {% for blog in blogs %}
         <div class="blog-item " >
             <div class="blog-content">
-                    <div style="display: flex; align-items: center; justify-content: space-between;">
-                       <span>
-                            {%if blog.posted_by.profile_path.url != null %}
-                                <img class="avatar" src="{{ blog.posted_by.profile_path.url }}" alt="avatar" width="40px" height="40px" style="border-radius: 50%; font-weight: 600;">
-                            {%else%}
-                                <img class="avatar" src="{% static 'res/logoPlaceHolder.png' %}" alt="avatar-profile">
-                            {%endif%}
-                            <span style="font-weight: 600;">{{ blog.posted_by.first_name|capfirst }} {{ blog.posted_by.last_name|capfirst }}</span>
-                            <span style="font-weight: 300; color: rgb(117, 116, 116);">{{ blog.time_posted }}</span>
-                       </span>
-                      
-                        <div>
-                            {% if blog.posted_by == request.user %}
-                           
-                                <!-- Edit Button -->
-                                <a class="fas fa-edit text-black"
-                                   data-bs-toggle="modal" 
-                                   data-bs-target="#editBlogModal"
-                                   data-blog-id="{{ blog.id }}"
-                                   style="padding: 10px;"></a>
-
-                                <!-- Delete Button -->
-                                <a class="fas fa-trash text-black" 
-                                   data-bs-toggle="modal" 
-                                   data-bs-target="#deleteBlogModal"
-                                   data-blog-id="{{ blog.id }}">  
-                                </a>
-                               
-                            {% endif %}
+                    <div class="creator">
+                        <div class="creator-container">
+                            <span class="creator-info">
+                                {%if blog.posted_by.profile_path.url != null %}
+                                    <img class="avatar" src="{{ blog.posted_by.profile_path.url }}" alt="avatar" width="40px" height="40px" style="border-radius: 50%; font-weight: 600;">
+                                {%else%}
+                                    <img class="avatar" src="{% static 'res/logoPlaceHolder.png' %}" alt="avatar-profile">
+                                {%endif%}
+                                
+                            </span>
+                            <div class="comment-text">
+                                <strong>{{ blog.posted_by.first_name|capfirst }} {{ blog.posted_by.last_name|capfirst }}</strong>
+                                {% if blog.posted_by == request.user %}
+                                    <span style="float: right; margin-right: 10px;">
+                                        <!-- Edit Button -->
+                                        <a class="fas fa-edit text-black"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#editBlogModal"
+                                        data-blog-id="{{ blog.id }}"
+                                        style="padding: 10px;"></a>
+        
+                                        <!-- Delete Button -->
+                                        <a class="fas fa-trash text-black" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#deleteBlogModal"
+                                        data-blog-id="{{ blog.id }}">  
+                                        </a>
+                                    </span>
+                                    {% endif %}
+                                <div>
+                                    {{ blog.message }}
+                                </div>
+                            </div>
                         </div>
-                     
+                        <ul>
+                            <span class="time-posted">{{ blog.time_posted }}</span>
+                        </ul>
                     </div>
-                    <div class="task-title" style="margin-left: 50px;">{{ blog.message }}</div>
     
                     <hr style="border: 1px solid rgb(200, 200, 200); margin: 10px 0;">
-                     <!-- Comments Section -->
+                    
+                    <!-- Comments Section -->
                         <p>Comments:</p>
-                        <div style="margin-left: 20px; display: flex; flex-direction: column; flex-wrap: wrap;">
+                        <div class="comments-section">
                             {% for comment in blog.comments_set.all %}
-                                <div style="display: flex; flex-direction: row; justify-content: space-between;">
-                                   <div>
+                                <div class="comment-container">
+                                    <span>
                                         {% if comment.user.profile_path and comment.user.profile_path.url %}
                                         <img class="avatar" src="{{ comment.user.profile_path.url }}" >
                                         {% else %}
                                             <img class="avatar" src="{% static '/res/logoPlaceHolder.png' %}">
                                         {% endif %} 
-                                        <strong>{{ comment.user.first_name|capfirst }} {{ comment.user.last_name|capfirst }}:</strong> 
-                                        <span style="font-size: small; color: grey;">
-                                            {{ comment.time_posted }}
-                                        </span>
-                                   </div>
-                                    {% if comment.user == request.user %}
-                                    <div>
-                                        <!-- Edit Button -->
-                                        <a class="fas fa-edit text-black" 
+                                    </span>
+                                    
+                                    <div class="comment-text">
+                                        <strong>{{ comment.user.first_name|capfirst }} {{ comment.user.last_name|capfirst }}:</strong>         
+                                        {% if comment.user == request.user %}
+                                            <span style="float: right; margin-right: 10px;">
+                                                <!-- Edit Button -->
+                                                <a class="fas fa-edit text-black" 
+                                                
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#editCommentModal"
+                                                data-comment-id="{{ comment.id }}"
+                                                style="padding: 10px;"></a>
+                
+                                                <!-- Delete Button -->
+                                                <a class="fas fa-trash text-black" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#deleteCommentModal"
+                                                data-comment-id="{{ comment.id }}">
+                                                </a>
+                                            </span>
+                                        {% endif %}
+                                        <div>
+                                            {{ comment.text_comment }}
+                                        </div>
                                         
-                                           data-bs-toggle="modal" 
-                                           data-bs-target="#editCommentModal"
-                                           data-comment-id="{{ comment.id }}"
-                                           style="padding: 10px;"></a>
-        
-                                        <!-- Delete Button -->
-                                        <a class="fas fa-trash text-black" 
-                                           data-bs-toggle="modal" 
-                                           data-bs-target="#deleteCommentModal"
-                                           data-comment-id="{{ comment.id }}">
-                                        </a>
                                     </div>
-                                    {% endif %}
                                 </div>
-                                <div style="margin-left: 30px; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">
-                                    {{ comment.text_comment }}
-                                </div>
+                                <ul>
+                                    <span class="time-posted">{{ comment.time_posted }}</span>
+                                </ul>
                             {% empty %}
                                 <p>No comments yet. Be the first to comment!</p>
                             {% endfor %}
