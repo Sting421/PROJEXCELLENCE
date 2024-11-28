@@ -3,7 +3,7 @@
 {% load custom_filters %}
 {% load static %}
 
-{% block title %}Task{% endblock %}
+{% block title %}BlogPost{% endblock %}
 
 {% block extra_css %}
 
@@ -86,7 +86,7 @@
         display: inline;
         background-color: transparent;
     }
-}
+
     .comments-section {
         margin-left: 30px;
         display: block;
@@ -150,6 +150,10 @@
         color: rgb(117, 116, 116); 
         margin-left: 50px;          
     }
+    h1{
+        font-weight: 700;
+        color: #314863;
+    }
 
 </style>
 
@@ -174,7 +178,6 @@
                                 {%else%}
                                     <img class="avatar" src="{% static 'res/logoPlaceHolder.png' %}" alt="avatar-profile">
                                 {%endif%}
-                                
                             </span>
                             <div class="comment-text">
                                 <strong>{{ blog.posted_by.first_name|capfirst }} {{ blog.posted_by.last_name|capfirst }}</strong>

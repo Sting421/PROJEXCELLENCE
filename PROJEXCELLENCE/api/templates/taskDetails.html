@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 {% load custom_filters %}
+{% load static %}
+
 {% block title %}Task{% endblock %}
+
 {% block extra_css %}
     <style>
     .page-container {
@@ -17,37 +20,57 @@
         flex-direction: row;
         justify-content: space-between;
     }
+    
+    .avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        font-weight: 600;
+        font-weight: bold;
+        margin-right: 5px;
+    }
+    .project-name{
+        font-weight: 700;
+        color: #314863;
+    }
     .task-info{
         display: flex;
         flex-direction: column;
     }
     .task-info .name{
-        font-size: 50px;
+        font-size: 40px;
         font-weight:bold;
+        margin-bottom: 20px;
     }
+    .task-info .container{
+        display: flex;
+    }
+    .task-info .assignee,
     .task-info .due-date{
-        font-size: 15px;
-        color: #5c5a5a;
-        
+        width: 100%;
     }
     .task-info .description{
-        margin-top: 4%;
         font-size: 20px;
-        
+        border: 2px solid rgb(240, 240, 240);
+        border-radius: 10px;
+        padding: 20px;
     }
     .submit-btn {
-        background-color: #4CAF50;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
+        color: #4a5568;
         cursor: pointer;
+        padding: 15px;
+        border: 2px dashed #e2e8f0;
+        border-radius: 8px;
+        display: inline-block;
+        transition: all 0.3s ease;  
+        background-color: white;
+    }
+    .submit-btn:hover {
+        color: #2b6cb0;
+        background-color: #ebf8ff;
+        border-color: #63b3ed;
     }
 
-    
-   
-    
-    
     </style>
 {% endblock extra_css %}
 
@@ -55,27 +78,63 @@
    <div class="page-container ">
         <div class="head-label">
            
-            <span class="project-name">{{task.project_id.project_name}}</span>
-            {%if task.status != 'Done'%}
+            <h1><span class="project-name">{{task.project_id.project_name}}</span></h1>
+                {%if task.status != 'Done'%}
             <span >
                 <button class="submit-btn">Mark as Done</button>
-                   
-              
             </span>
             {%else%}
             <span ><button >Undo</button></span>
             {%endif%}
-
+            
         </div>
+
+        <hr style="border: 1px solid rgb(200, 200, 200); margin: 20px 0 10px 0;">
        
         <div class="task-info"> 
             <span class="name">{{task.task_name}}</span>
-            <span class="due-date">{{task.due_date}}</span>
-            <div class="task-info description">
-                <h3>Description</h3>
+            <div class="container">
+                <span class="due-date">
+                    <div>
+                        <h6>Due Date:</h6>
+                        <span>{{task.due_date}}</span>
+                    </div>
+                </span>
+                <span class="assignee">
+                    <div>
+                        <h6>Assigned To:</h6>
+                        <span>
+                            {%if task.assigned_to.profile_path.url != null %}
+                                <img class="avatar" src="{{ blog.posted_by.profile_path.url }}" alt="avatar">
+                            {%else%}
+                                <img class="avatar" src="{% static 'res/logoPlaceHolder.png' %}" alt="avatar-profile">
+                            {%endif%}
+                        </span>
+                        <span>{{task.assigned_to}}</span>
+                    </div>
+                </span>
+                <span class="assignee">
+                    <div>
+                        <h6>Assigned By:</h6>
+                        <span>
+                            {%if task.created_by.profile_path.url != null %}
+                                <img class="avatar" src="{{ blog.posted_by.profile_path.url }}" alt="avatar">
+                            {%else%}
+                                <img class="avatar" src="{% static 'res/logoPlaceHolder.png' %}" alt="avatar-profile">
+                            {%endif%}
+                        </span>
+                        <span>{{task.created_by}}</span>
+                    </div>
+                </span>
+            </div>
+            
+            <hr style="border: 1px solid rgb(200, 200, 200); margin: 30px 0;">
+            
+            <div class="description">
+                <h5>Description</h5>
                 <p style="margin-left: 2%;">{{task.description|capfirst}}</p>
             </div>
-            <p>Assigned by: {{task.created_by}}</p>
+            
         </div>
     
    </div>

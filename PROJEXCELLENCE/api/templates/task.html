@@ -32,14 +32,11 @@
         background-color: #ffffff;
         border: 1px solid #e0e0e0;
         border-radius: 8px;
-        padding: 20px;
-        padding-left: 50px;
-        padding-right: 50px;
+        padding: 20px 50px 20px 40px;
         margin-bottom: 15px;
         cursor: pointer;
         transition: all 0.3s ease;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        
     }
     .task-item:hover {
         box-shadow: 0 4px 8px rgba(0,0,0,0.15);
@@ -49,29 +46,23 @@
         background-color: #f0fff4;
         border-color: #68d391;
     }
-    .task-checkbox {
-        margin-right: 15px;
-        width: 20px;
-        height: 20px;
-    }
-    .task-description {
-        font-size: 1.1rem;
-        color: #2d3748;
-        margin-bottom: 5px;
-    }
     .task-title {
         font-size: 1.6rem;
         color: #2d3748;
-        margin-bottom: 5px;
     }
-   
+    .task-description {
+        font-size: 1.2rem;
+        color: #2d3748;
+        margin-bottom: 10px;
+    }
     .task-item.completed .task-description {
         text-decoration: line-through;
         color: #718096;
     }
     .task-due-date {
-        font-size: 0.9rem;
+        font-size: 1rem;
         color: #718096;
+        margin-bottom: 15px;
     }
     .add-task {
         color: #4a5568;
@@ -248,7 +239,7 @@
             {% for task in page_obj %}
             <div class="task-item {% if task.completed %}completed{% endif %}" >
                 <div class="task-content">
-                    <input type="checkbox" class="task-checkbox" {% if task.completed %}checked{% endif %}>
+                    <input style="margin-right: 20px;" type="checkbox" class="task-checkbox" {% if task.completed %}checked{% endif %}>
                     <div onclick="goToTaskDetails(event, '{% url 'task_details' task.id %}')">
                         <div class="task-title">{{ task.task_name }}</div>
                         <div class="task-description">{{ task.description }}</div>

@@ -40,10 +40,11 @@ urlpatterns = [
     path("project/add/", views.add_project, name="add_project"),
     path("project/<int:pk>/edit/", views.edit_project, name="edit_project"),
     path("project/<int:pk>/delete/", views.delete_project, name="delete_project"),
-      #Blog Post
+    
+    #----------------   Blog Post   ----------------
     path("blogpost/<int:project_id>",views.blog_list,name="blog_post"),
 
-    #Teams
+    #----------------    Teams    ----------------
     path("myteam/<int:project_id>/", views.team_list, name="team_list"),
     
     #----------------   Profile   ----------------
