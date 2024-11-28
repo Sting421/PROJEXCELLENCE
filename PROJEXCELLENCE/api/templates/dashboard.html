@@ -317,8 +317,8 @@
                 <div id="tasks-list">
                     {% for task in tasks %}
                     <div class="task-item {% if task.completed %}completed{% endif %}">
-                        <div class="d-flex align-items-center">
-                            <div>
+                        <div class="d-flex align-items-center" onclick="goToTaskDetails(event, '{% url 'task_details' task.id %}')">
+                            <div >
                                 <div class="task-title">{{ task.task_name }}</div>
                                 <div class="task-description">{{ task.description }}</div>
                                 <div class="task-due-date">Due: {{ task.due_date|date:"F j, Y g:iA" }}</div>
@@ -436,6 +436,12 @@
     });
 
         function goToTeam(event, url) {
+            // Don't redirect if clicking on dropdown or its children
+            if (!event.target.closest('.dropdown')) {
+                window.location.href = url;
+            }
+        }
+        function goToTaskDetails(event, url) {
             // Don't redirect if clicking on dropdown or its children
             if (!event.target.closest('.dropdown')) {
                 window.location.href = url;

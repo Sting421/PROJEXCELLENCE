@@ -246,10 +246,10 @@
         </div>
         <div id="tasks-list">
             {% for task in page_obj %}
-            <div class="task-item {% if task.completed %}completed{% endif %}">
+            <div class="task-item {% if task.completed %}completed{% endif %}" >
                 <div class="task-content">
                     <input type="checkbox" class="task-checkbox" {% if task.completed %}checked{% endif %}>
-                    <div>
+                    <div onclick="goToTaskDetails(event, '{% url 'task_details' task.id %}')">
                         <div class="task-title">{{ task.task_name }}</div>
                         <div class="task-description">{{ task.description }}</div>
                         <div class="task-due-date">Due: {{ task.due_date|date:"F j, Y g:iA" }}</div>
@@ -352,4 +352,13 @@
         </nav>
     </div>
 </div>
+
+<script>
+    function goToTaskDetails(event, url) {
+    // Don't redirect if clicking on dropdown or its children
+    if (!event.target.closest('.dropdown')) {
+        window.location.href = url;
+    }
+}
+</script>
 {% endblock content %}

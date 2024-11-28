@@ -53,11 +53,21 @@
     .task-item {
         display: flex;
         text-align: left;
-        background: #fcd6d6;
+        background: #ececec41;
         color: #f44336;
         flex-direction: column;
         padding: 3px;
         border-radius: 2px;
+
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+    }
+    .task-item:hover{
+        cursor: pointer;
+    }
+    .task-name{
+        background-color: #f44336;
+        color:white;
     }
     
   
@@ -74,11 +84,11 @@
                 <h3>Date: {{ date }}</h3>
                
                     {% for task in tasks %}
-                        <div class="task-item mt-3">
-                           
+                        <div class="task-item mt-3" onclick="goToTaskDetails(event, '{% url 'task_details' task.id %}')">
                                 <span class="task-name">{{ task.task_name }}</span>
+                                <span class="task-project">Due: {{ task.due_date }}</span>
                                 {% if task.project_id %}
-                                    <span class="task-project">(Project: {{ task.project_id }})</span>
+                                    <span class="task-project">Project: {{ task.project_id }}</span>
                                 {% endif %}
                                 {% if task.priority %}
                                     <span class="task-priority priority-{{ task.priority|lower }}">
@@ -94,4 +104,14 @@
         {% endfor %}
     </div>
 </div>
+
+<script>
+    function goToTaskDetails(event, url) {
+    // Don't redirect if clicking on dropdown or its children
+    if (!event.target.closest('.dropdown')) {
+        window.location.href = url;
+    }
+}
+</script>
+
 {% endblock content %}
