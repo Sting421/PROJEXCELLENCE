@@ -5,6 +5,7 @@ from crispy_forms.layout import Submit
 from .models import Task, Project, Team, TeamMembership, BlogPost
 from django.utils.timezone import make_aware, is_naive, localtime
 from datetime import datetime
+from django.contrib.auth import authenticate
 import pytz
 
 
@@ -28,6 +29,8 @@ class SignupForm(forms.ModelForm):
         widget=forms.PasswordInput(attrs={"class": "form-control"}),
         label="Confirm Password",
     )
+    first_name = forms.CharField(max_length=100, required=True)
+    last_name = forms.CharField(max_length=100, required=True)
 
     class Meta:
         model = User
@@ -61,21 +64,21 @@ class SignupForm(forms.ModelForm):
     
 
 class UserProfileForm(forms.ModelForm):
-  
+    current_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={"class": "form-control", "id": "current_password"}),
+        label="Current Password",
+    )
     new_password = forms.CharField(
-        widget=forms.PasswordInput(
-            attrs={"class": "form-control", "id": "new_password"}
-        ),
+        widget=forms.PasswordInput(attrs={"class": "form-control", "id": "new_password"}),
         label="New Password",
         required=False,
     )
     confirm_password = forms.CharField(
-        widget=forms.PasswordInput(
-            attrs={"class": "form-control", "id": "confirm_password"}
-        ),
+        widget=forms.PasswordInput(attrs={"class": "form-control", "id": "confirm_password"}),
         label="Confirm New Password",
         required=False,
     )
+
     class Meta:
         model = User
         fields = [
@@ -84,29 +87,42 @@ class UserProfileForm(forms.ModelForm):
             "email",
             "phone_number",
             "profile_path",
-            'new_password',
-            'confirm_password',
+            "current_password",
+            "new_password",
+            "confirm_password",
         ]
         widgets = {
-            "date_of_hire": forms.DateInput(
-                attrs={"type": "date", "class": "form-control"}
-            ),
+            "date_of_hire": forms.DateInput(attrs={"type": "date", "class": "form-control"})
         }
+
     def __init__(self, *args, **kwargs):
-        super(UserProfileForm, self).__init__(*args, **kwargs)
+        # Pop request from kwargs and save it for later use
+        self.request = kwargs.pop('request', None)
+        super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = "post"
         self.helper.attrs = {"enctype": "multipart/form-data"}
         self.helper.add_input(Submit("submit", "Update Profile"))
+
     def clean(self):
         cleaned_data = super().clean()
         new_password = cleaned_data.get("new_password")
         confirm_password = cleaned_data.get("confirm_password")
+        current_password = cleaned_data.get("current_password")
+
+        # Check if current password is correct
+        if current_password:
+            if not self.request.user.check_password(current_password):
+                raise forms.ValidationError("The current password is incorrect.")
+
         if new_password and new_password != confirm_password:
             raise forms.ValidationError("The new passwords do not match.")
+
         return cleaned_data
+
     def save(self, commit=True):
         user = super().save(commit=False)
+
         # Handle password change
         new_password = self.cleaned_data.get("new_password")
         if new_password:
@@ -118,20 +134,18 @@ class UserProfileForm(forms.ModelForm):
 
 
 
-
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ["task_name", "description", "due_date"]
+        fields = ["task_name", "description"]
         widgets = {
             "task_name": forms.TextInput(attrs={"class": "form-control"}),
             "description": forms.Textarea(attrs={"class": "form-control"}),
-            "due_date": forms.DateTimeInput(attrs={"type": "datetime-local", "class": "form-control"}),
+           
         }
         labels = {
             "task_name": "Task Name",
             "description": "Task Description",
-            "due_date": "Due Date",
         }
 
     def __init__(self, *args, project=None, **kwargs):
@@ -148,7 +162,7 @@ class TaskForm(forms.ModelForm):
             # Convert naive to aware if needed
             if is_naive(due_date):
                 due_date = make_aware(due_date)
-            if due_date < timezone.now():
+            if due_date < localtime():
                 raise forms.ValidationError("Due date cannot be in the past")
         return due_date
 

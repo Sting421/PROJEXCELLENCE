@@ -55,6 +55,7 @@ class User(AbstractUser):
     phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="EMPLOYEE")
     date_of_hire = models.DateField(blank=True, null=True)
+   
     profile_path = models.ImageField(null=True, blank=True,upload_to='profile/' )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="PENDING")
     # Override the groups field
@@ -207,8 +208,6 @@ class Task(models.Model):
     def __str__(self):
         return self.task_name
 
-
-
 class Resource(models.Model):
     CATEGORY_CHOICES = [
         ('knowledge', 'Knowledge Base'),
@@ -227,3 +226,4 @@ class Resource(models.Model):
 
     def __str__(self):
         return self.title
+    

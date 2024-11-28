@@ -434,6 +434,13 @@
                     <input type="hidden" name="assign_task" value="1">
                     <input type="hidden" name="user_id" value="">
                     {{ assign_task |crispy }}
+                    <div>
+                        <label for="due-date" style="font-weight: bold; font-size: 1.1rem; color: #333;">Due Date and Time</label>
+                        <input type="datetime-local" id="due-date" name="due-date" required
+                            style="border: 2px solid #ccc; border-radius: 8px; padding: 10px; font-size: 1rem; outline: none; width: 100%; max-width: 300px; box-sizing: border-box;"
+                            value="{{ due_date|date:'Y-m-d\TH:i' }}"
+                            min="{{ current_datetime|date:'Y-m-d\TH:i' }}">
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

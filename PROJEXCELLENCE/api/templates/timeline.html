@@ -138,7 +138,7 @@
             <div class="calendar-day-header">Sunday</div>
             {% for week in calendar_data %}
                 {% for day in week %}
-                    {% if day.0 == current_day and month == current_month %}
+                    {% if day.0 == current_day and month == current_month and year == current_year %}
                         <div class="calendar-day current-day">
                     {% else %}
                         <div class="calendar-day">
