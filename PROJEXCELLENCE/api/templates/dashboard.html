@@ -10,7 +10,8 @@
     .dashboard{
         margin-left: 4%;  
         user-select: none;
-        width: 190%;
+        width: 100%;
+        max-width: 1200px;
     }
     .Welcome-card {
         background-color: rgba(70, 223, 177, 0.5);
@@ -36,6 +37,7 @@
     /* Task area */
     .task-lists{
         max-width: 96%;
+        margin-bottom: 30px;
     }
 
     #tasks-list {
@@ -55,12 +57,12 @@
         cursor: pointer;
         transition: all 0.3s ease;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-       
-       
     }
     .task-item:hover {
         box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         transform: translateY(-2px);
+        background-color: #f1f1f1;
+        border: 1px solid #f1f1f1;
     }
     .task-item.completed {
         background-color: #f0fff4;
@@ -102,6 +104,7 @@
     /* Project Area */
     .project-lists{
         max-width: 96%;
+        margin-bottom: 30px;
     }
 
     .text-center-project{
@@ -129,6 +132,7 @@
     .project-item:hover {
         box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         transform: translateY(-2px);
+        background-color: #2c527e;
     }
     
     .project-description {
@@ -258,7 +262,7 @@
         border-radius: 5px;
         margin: 2px;
         width: 40px;
-        height: 40px; /* Set a height for the scrollable container */
+        height: 40px; 
         overflow-y: auto; /* Enable vertical scrolling */
     }
 
@@ -295,7 +299,42 @@
         display: flex;
         flex-direction: row;   
     }
-    
+    /* Digital Clock Styles */
+    .digital-clock {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+        font-family: 'Arial', sans-serif;
+        color: #fff;
+        background-color: #213A58;
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    .clock-section {
+        text-align: center;
+    }
+
+    .clock-section span {
+        display: block;
+        font-size: 25px;
+        font-weight: bold;
+    }
+
+    .clock-section small {
+        font-size: 8px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: #c7c7c7;
+    }
+
+    .colon {
+        font-size: 25px;
+        font-weight: bold;
+        margin: 0 5px;
+        color: #888;
+    }
 
     </style>
 {% endblock extra_css %}
@@ -363,7 +402,7 @@
         </div>
        
             
-    
+        <!-- Calendar -->
         <div class="side-calendar">
             <div class="calendar">
                 <div class="calendar-header">
@@ -399,7 +438,28 @@
                         {% endfor %}
                     {% endfor %}
                 </div>
-                
+            <!-- Styled Digital Clock -->
+            <div class="digital-clock">
+                <div class="clock-section">
+                    <span id="day">--</span>
+                    <small>DAY</small>
+                </div>
+                <span class="colon">:</span>
+                <div class="clock-section">
+                    <span id="hours">--</span>
+                    <small>HOURS</small>
+                </div>
+                <span class="colon">:</span>
+                <div class="clock-section">
+                    <span id="minutes">--</span>
+                    <small>MINUTES</small>
+                </div>
+                <span class="colon">:</span>
+                <div class="clock-section">
+                    <span id="seconds">--</span>
+                    <small>SECONDS</small>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -447,7 +507,26 @@
                 window.location.href = url;
             }
         }
+        
+        function updateDigitalClock() {
+        const now = new Date();
+        const manilaTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+        
+        // Get time components
+        const day = manilaTime.toLocaleString('en-US', { weekday: 'short' }).toUpperCase();
+        const hours = manilaTime.getHours().toString().padStart(2, '0');
+        const minutes = manilaTime.getMinutes().toString().padStart(2, '0');
+        const seconds = manilaTime.getSeconds().toString().padStart(2, '0');
 
+        // Update the DOM
+        document.getElementById('day').textContent = day;
+        document.getElementById('hours').textContent = hours;
+        document.getElementById('minutes').textContent = minutes;
+        document.getElementById('seconds').textContent = seconds;
+    }
+
+    setInterval(updateDigitalClock, 1000);
+    document.addEventListener('DOMContentLoaded', updateDigitalClock);
     </script>
     
 
