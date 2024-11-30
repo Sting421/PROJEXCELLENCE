@@ -28,6 +28,7 @@ from ..forms import (
     EditTaskForm,
     AddBlogForm,
     EditRoleForm,
+    EditAssigedTaskForm
     
 )
 
@@ -146,7 +147,18 @@ def task_details(request, pk):
     except Task.DoesNotExist:
         raise Http404("Task not found") 
     
-    if task.assigned_to != request.user:
+    if 'mark_done' in request.POST:
+        task.status = 'Done'
+        task.save()
+        messages.success(request, "Task mark as done successfully!")
+        return redirect('task_details', pk=pk)
+    if 'undo_turn_in' in request.POST:
+        task.status = 'On-going'
+        task.save()
+        messages.success(request, "Task mark as done successfully!")
+        return redirect('task_details', pk=pk)
+    
+    if task.assigned_to != request.user and task.created_by != request.user:
         raise Http404("You are not authorized to view this task")
     context = {
         "task": task  
@@ -163,6 +175,14 @@ def task_list(request,status):
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
+    if 'start' in request.POST:
+        task_id = request.POST.get('start')
+        task = get_object_or_404(Task, id=task_id)
+        task.status = 'On-going'
+        task.date_started = timezone.now()
+        task.save()
+        messages.success(request, "Task Started successfully!")
+        return redirect('task', status=task.status)
 
     edit_task_forms = {task.id: EditTaskForm(instance=task) for task in tasks}
 
@@ -171,6 +191,7 @@ def task_list(request,status):
         "edit_task_forms": edit_task_forms,
         "add_task_form": TaskForm(),  
         "filter": task_filter,
+        'current_status': status
     }
     return render(request, "task.html", context)
 @login_required
@@ -213,11 +234,10 @@ def delete_task(request, pk):
     if request.method == 'POST':
         task.delete()
         return redirect('task',status="Pending")
-    return render(request, 'delete_task.html', {'task': task})
+    return render(request, 'task.html', {'task': task})
 
 @login_required
 def edit_task(request, pk):
-    
     task = get_object_or_404(Task, pk=pk, assigned_to=request.user)
     if request.method == 'POST':
         edit_form = EditTaskForm(request.POST, instance=task) 
@@ -230,6 +250,30 @@ def edit_task(request, pk):
         edit_form = EditTaskForm(instance=task)  
 
     return render(request, 'task.html', {'form': edit_form, 'task': task})
+
+@login_required
+def delete_task(request, pk):
+    task = get_object_or_404(Task, pk=pk)
+    if request.method == 'POST':
+        task.delete()
+        return redirect('assign_task',status="Pending")
+    return render(request, 'task.html', {'task': task})
+@login_required
+def edit_task_head(request, pk):
+    task = get_object_or_404(Task, pk=pk)
+    
+    if request.method == 'POST':
+        edit_form = EditAssigedTaskForm(request.POST, instance=task)
+        if edit_form.is_valid():
+            edit_form.save()
+            messages.success(request, "Task updated successfully!")
+            return redirect(reverse('assign_task', kwargs={'status': task.status}))
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        edit_form = EditAssigedTaskForm(instance=task)
+    
+    return render(request, 'assignTask.html', {'form': edit_form, 'task': task})
 
 
 # ------------------------------------------- End of task -------------------------------------
@@ -692,13 +736,14 @@ def assign_task(request,status):
     page_obj = paginator.get_page(page_number)
 
 
-    edit_task_forms = {task.id: EditTaskForm(instance=task) for task in tasks}
+    edit_task_forms = {task.id: EditAssigedTaskForm(instance=task) for task in tasks}
 
     context = {
         "page_obj": page_obj,
         "edit_task_forms": edit_task_forms,
         "add_task_form": TaskForm(),  
         "filter": task_filter,
+        "current_status":status,
     }
     return render(request, "assignTask.html", context)
 

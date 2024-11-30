@@ -177,8 +177,8 @@
                                 {% for task in tasks_by_date|get_item:date_key %}
                                     <div class="task-container" >
                                         <div class="task-item" onclick="goToTaskDetails(event, '{% url 'task_details' task.id %}')" title="{{ task.description|default:'' }}">
-                                            <span class="task-name">{{ task.task_name }}</span>
-                                            <span class="task-project">{{ task.project_id }}</span>
+                                            <span class="task-name">{{ task.task_name |capfirst}}</span>
+                                            <span class="task-project">{{ task.project_id |capfirst}}</span>
                                             {% if task.priority %}
                                                 <span class="task-priority priority-{{ task.priority|lower }}">
                                                     {{ task.priority|title }}

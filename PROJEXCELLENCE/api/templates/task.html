@@ -197,6 +197,32 @@
         font-weight: 700;
         color: #314863;
     }
+    .start-btn{
+        padding: 10px 20px;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .start-btn {
+        background-color: #4CAF50; /* Green background */
+        color: white;
+    }
+
+    .start-btn:hover {
+        background-color: #388E3C; /* Darker green */
+    }
+      .filter-bar {
+        cursor: pointer;
+        padding: 10px 20px;
+        display: inline-block;
+    }
+    .filter-bar.active {
+        background-color: #46DFB1;
+       
+        color: black;
+    }
 
     </style>
 {% endblock extra_css %}
@@ -207,19 +233,19 @@
             <!-- Upcoming -->
             <label for="On-going">
                 <input type="radio" name="status" id="On-going" onchange="redirectToDashboard('On-going')">
-                <span class="filter-bar">On-going</span>
+                <span class="filter-bar {% if current_status == 'On-going' %}active{% endif %}">On-going</span>
             </label>
 
             <!-- Past Due -->
             <label for="Pending">
                 <input type="radio" name="status" id="Pending" onchange="redirectToDashboard('Pending')">
-                <span class="filter-bar"></i>Pending</span>
+                <span class="filter-bar {% if current_status == 'Pending' %}active{% endif %}"></i>Pending</span>
             </label>
 
             <!-- Completed -->
             <label for="Done">
                 <input type="radio" name="status" id="Done" onchange="redirectToDashboard('Done')">
-                <span class="filter-bar">Done</span>
+                <span class="filter-bar {% if current_status == 'Done' %}active{% endif %}">Done</span>
             </label>
         </div>
     </div>
@@ -241,6 +267,7 @@
                 <div class="task-content">
                     <input style="margin-right: 20px;" type="checkbox" class="task-checkbox" {% if task.completed %}checked{% endif %}>
                     <div onclick="goToTaskDetails(event, '{% url 'task_details' task.id %}')">
+                        <div class="task-title">{{ task.project_id }}</div>
                         <div class="task-title">{{ task.task_name }}</div>
                         <div class="task-description">{{ task.description }}</div>
                         <div class="task-due-date">Due: {{ task.due_date|date:"F j, Y g:iA" }}</div>
@@ -254,8 +281,14 @@
                         {%endif%}
                     </div>
                     <div class="task-actions">
-                        <i class="fas fa-edit" data-bs-toggle="modal" data-bs-target="#editTaskModal{{ task.id }}"></i>
-                        <i class="fas fa-trash" data-bs-toggle="modal" data-bs-target="#deleteTaskModal{{ task.id }}"></i>
+                        <form method="POST" action="{% url 'task' 'Pending' %}">
+                            {% csrf_token %}
+                            {%if task.status == 'Pending'%}
+                                <button class="start-btn"  name="start"  value="{{task.id}}">Start</button>
+                            {%endif%}
+                        </form>
+                        <!-- <i class="fas fa-edit" data-bs-toggle="modal" data-bs-target="#editTaskModal{{ task.id }}"></i> -->
+                        <!-- <i class="fas fa-trash" data-bs-toggle="modal" data-bs-target="#deleteTaskModal{{ task.id }}"></i> -->
                     </div>
                 </div>
             </div>

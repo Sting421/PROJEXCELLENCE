@@ -206,63 +206,93 @@
         font-weight: 700;
         color: #314863;
     }
+    .filter-bar.active {
+        background-color: #46DFB1;
+       
+        color: black;
+    }
 
     </style>
 {% endblock extra_css %}
 
 {% block content %}
-    <div class="mydict">
-        <div>
-            <!-- Upcoming -->
-            <label for="On-going">
-                <input type="radio" name="status" id="On-going" onchange="redirectToDashboard('On-going')">
-                <span class="filter-bar">On-going</span>
-            </label>
+<div class="mydict">
+    <div>
+        <!-- Upcoming -->
+        <label for="On-going">
+            <input type="radio" name="status" id="On-going" onchange="redirectToDashboard('On-going')">
+            <span class="filter-bar {% if current_status == 'On-going' %}active{% endif %}">On-going</span>
+        </label>
 
-            <!-- Past Due -->
-            <label for="Pending">
-                <input type="radio" name="status" id="Pending" onchange="redirectToDashboard('Pending')">
-                <span class="filter-bar"></i>Pending</span>
-            </label>
+        <!-- Past Due -->
+        <label for="Pending">
+            <input type="radio" name="status" id="Pending" onchange="redirectToDashboard('Pending')">
+            <span class="filter-bar {% if current_status == 'Pending' %}active{% endif %}"></i>Pending</span>
+        </label>
 
-            <!-- Completed -->
-            <label for="Done">
-                <input type="radio" name="status" id="Done" onchange="redirectToDashboard('Done')">
-                <span class="filter-bar">Done</span>
-            </label>
-        </div>
+        <!-- Completed -->
+        <label for="Done">
+            <input type="radio" name="status" id="Done" onchange="redirectToDashboard('Done')">
+            <span class="filter-bar {% if current_status == 'Done' %}active{% endif %}">Done</span>
+        </label>
     </div>
-    <script>
-        function redirectToDashboard(status) {
-            window.location.href = `/task/${status}/`;
-        }
-    </script>
+</div>
+<script>
+    function redirectToDashboard(status) {
+        window.location.href = `/assign_task/${status}/`;
+    }
+</script>
 
 
 <div class="page-container">
     <div class="content-wrapper">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1>My Tasks</h1>
+            <h1>Assigned Tasks</h1>
         </div>
         <div id="tasks-list">
             {% for task in page_obj %}
             <div class="task-item {% if task.completed %}completed{% endif %}">
                 <div class="task-content">
-                    <input style="margin-right: 20px;" type="checkbox" class="task-checkbox" {% if task.completed %}checked{% endif %}>
-                    <div>
-                        <div class="task-title">{{ task.task_name }}</div>
-                        <div class="task-description">{{ task.description }}</div>
-                        <div class="task-assign">Assigned To: {{ task.assigned_to }}</div>
-                        <div class="task-due-date">Due: {{ task.due_date|date:"F j, Y g:i A" }}</div>
-                        <span class="badge {{ task.status|lower }}">
-                            <i class="bi bi-circle-fill icon-small" style="width: 0.1px;"></i> {{ task.status }}
-                        </span>
-                        {%if task.status == 'On-going'%}
-                        <span>
-                        <p>Date: Started:{{ task.date_started }}</p>
-                        </span>
-                        {%endif%}
-                    </div>
+                    
+                    <table class="table" onclick="goToTaskDetails(event, '{% url 'task_details' task.id %}')">
+                        <thead>
+                            <tr>
+                                <th>Project </th>
+                                <th>Task Name</th>
+                                <th>Description</th>
+                                <th>Assigned To</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                {% if task.status == 'On-going' %}
+                                <th>Date started</th>
+                                {% endif %}
+                               
+                               
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ task.project_id }}</td>
+                               
+                                <td>{{ task.task_name|slice:":10" }}{% if task.description|length > 10 %}...{% endif %}</td>
+                                <td>{{ task.description|slice:":30" }}{% if task.description|length > 30 %}...{% endif %}</td>
+                                <td>{{ task.assigned_to }}</td>
+                                <td>{{ task.due_date|date:"F j, Y g:i A" }}</td>
+                                <td>
+                                    <span class="badge {{ task.status|lower }}">
+                                        <i class="bi bi-circle-fill icon-small" style="width: 0.1px;"></i>
+                                        {{ task.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if task.status == 'On-going' %}
+                                        <p> {{ task.date_started }}</p>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
                     <div class="task-actions">
                         <i class="fas fa-edit" data-bs-toggle="modal" data-bs-target="#editTaskModal{{ task.id }}"></i>
                         <i class="fas fa-trash" data-bs-toggle="modal" data-bs-target="#deleteTaskModal{{ task.id }}"></i>
@@ -279,7 +309,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form method="post" action="{% url 'edit_task' task.id %}">
+                            <form method="post" action="{% url 'edit_task_byAssigned' task.id %}">
                                 {% csrf_token %}
                                 {{ edit_task_forms|dict_get:task.id|crispy }}
                                 <button type="submit" class="btn btn-primary mt-3">Save changes</button>
@@ -353,4 +383,13 @@
         </nav>
     </div>
 </div>
+
+<script>
+    function goToTaskDetails(event, url) {
+    // Don't redirect if clicking on dropdown or its children
+    if (!event.target.closest('.dropdown')) {
+        window.location.href = url;
+    }
+}
+</script>
 {% endblock content %}

@@ -263,7 +263,7 @@
                 </div>
                 <div>
                     <div class="project-title">  <img src="{% static 'res/logoPlaceHolder.png' %}" alt="profile pic" class="project-profile">{{ project.project_name }}</div>
-                    <div class="project-description">{{ project.description|slice:":80" }}{% if project.description|length > 80 %}...{% endif %}</div>
+                    <div class="project-description">{{ project.description|slice:":80"|capfirst }}{% if project.description|capfirst|length > 80 %}...{% endif %}</div>
                     <div class="project-created-date">Created on: {{ project.date_created|date:"F j, Y" }}</div>
                     <div class="project-created-by">Created by: {{ project.created_by.last_name}}</div>
                 </div>  

@@ -171,6 +171,10 @@ class EditTaskForm(forms.ModelForm):
     class Meta:
         model = Task
         fields = ["status"]
+class EditAssigedTaskForm(forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ['task_name','status','description']
       
 class ProjectForm(forms.ModelForm):
     class Meta:
