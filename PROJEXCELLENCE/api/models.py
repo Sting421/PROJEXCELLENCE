@@ -34,16 +34,7 @@ class UserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 class User(AbstractUser):
-    ROLE_CHOICES = [
-        ("ADMIN", "Admin"),
-        ("PM", "projectmanger"),
-        ("MEMBER", "member"),
-    ]
-    STATUS_CHOICES = [
-        ("APPROVED", "Approved"),
-        ("REJECTED", "Rejected"),
-        ("PENDING", "Pending"),
-    ]
+    
     # Use email instead of username
     username = None  # Remove the username field entirely
     email = models.EmailField(_("email address"), unique=True)
@@ -52,12 +43,10 @@ class User(AbstractUser):
         regex=r"^\+?1?\d{9,15}$",
         message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.",
     )
+    isLogout = models.BooleanField(default=True)
+    logoutTime = models.DateTimeField(default=timezone.now)
     phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True)
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="EMPLOYEE")
-    date_of_hire = models.DateField(blank=True, null=True)
-   
     profile_path = models.ImageField(null=True, blank=True,upload_to='profile/' )
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="PENDING")
     # Override the groups field
     groups = models.ManyToManyField(
         "auth.Group",

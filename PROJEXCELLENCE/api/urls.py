@@ -10,7 +10,7 @@ urlpatterns = [
     # Authentication URLs
     path("", views.login_view, name="login"),
     path("login/", views.login_view, name="login"),
-    path("logout/", LogoutView.as_view(next_page="login"), name="logout"),
+    path("logout/", LogoutView.as_view(template_name="logout.html"), name="logout"),
     path("signup/", views.signup_view, name="signup"),
     path("Error404/", views.Error404, name="Error404"),
     path("dashboard/", views.dashboard_view, name="dashboard"),

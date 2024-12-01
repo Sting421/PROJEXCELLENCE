@@ -17,6 +17,7 @@ from calendar import monthcalendar, month_name, Calendar
 import pytz
 from ..models import Task ,Project, Team, TeamMembership, Resource, BlogPost, Comments, User
 from django.contrib import messages
+from django.contrib.auth.views import LogoutView
 from ..forms import (
     LoginForm,
     SignupForm,
@@ -44,6 +45,12 @@ def myteam(request):
 @login_required
 def dashboard(request):
       return render(request, "dashboard.html")
+@login_required
+class CustomLogoutView(LogoutView):
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            print(f"User {request.user.email} logged out")
+        return super().dispatch(request, *args, **kwargs)
 
 @login_required
 def timeline(request):
@@ -118,6 +125,8 @@ def login_view(request):
             user = authenticate(email=email, password=password)
             if user is not None:
                 login(request, user)
+                user.isLogout = False
+                user.save()
                 return redirect("dashboard")
            
     else:
@@ -440,8 +449,8 @@ def dashboard_view(request):
 @login_required
 def team_list(request, project_id):
     # Initialize forms at the start
-    add_team_form = TeamForm()
-    add_member_form = AddMemberForm()
+    add_team_form = TeamForm(request.POST, current_user=request.user)
+    add_member_form = AddMemberForm(request.POST, current_user=request.user)
     edit_role_form = EditRoleForm()
     user = request.user
     current_datetime = timezone.now()
@@ -550,8 +559,8 @@ def team_list(request, project_id):
         elif 'add_member' in request.POST:
             team_id = request.POST.get('team_id')
             team = get_object_or_404(Team, id=team_id, project=project)
-            add_member_form = AddMemberForm(request.POST, current_user=request.user)
             
+            add_member_form = AddMemberForm(request.POST, current_user=request.user,team=team)
             if add_member_form.is_valid():
                 users = add_member_form.cleaned_data['users']
                 role = add_member_form.cleaned_data['role']
@@ -566,6 +575,23 @@ def team_list(request, project_id):
                         )
                 messages.success(request, "Members added successfully!")
                 return redirect('team_list', project_id=project.id)
+        elif 'add_member_by_email' in request.POST:
+            team_id = request.POST.get('team_id')
+            team = get_object_or_404(Team, id=team_id, project=project)
+            get_email = request.POST.get('get_email')
+            user = get_object_or_404(User, email = get_email)
+            if not TeamMembership.objects.filter(user=user, team=team).exists():
+                TeamMembership.objects.create(
+                    user=user,
+                    team=team,
+                    project=project,
+                    role=role
+                )
+                messages.success(request, "Members added successfully!")
+            else:
+                messages.error(request, "Members already on the team.")
+            
+            return redirect('team_list', project_id=project.id)
 
         elif 'assign_task' in request.POST:
             user_id = request.POST.get('user_id')

@@ -1,0 +1,100 @@
+{% extends "hero_base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}PROJEXCELLENCE - Sign In{% endblock %}
+
+{% block extra_css %}
+    <style>
+
+        .background-container {
+            background-image: url("{% static 'res/background.png' %}");
+            background-repeat: no-repeat;
+            background-size: cover;
+            height: 100vh;
+            display: flex;
+            padding: 150px;
+            user-select: none;
+        }
+
+       
+
+        .row {
+            display: flex;
+            justify-content: center;
+            flex-grow: 1;
+            
+        }
+
+        .col-lg-7 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: white;
+            border-radius: 10px 10px 10px 10px;
+            padding: 40px;
+            position: relative;
+        }
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-family: 'Paytone One', sans-serif;
+            color: var(--primary-color);
+            width: 150px;
+            height: auto;
+        }
+
+        .text {
+            font-size: 20px;
+            text-align: center;
+            font-weight: 700;
+            color: #182524;
+            margin-bottom: 40px;
+            user-select: none;
+            padding: 0%  20%  0%  20%;
+        }
+        .btn-signin {
+            background-color: #343a40;
+            border: 1px solid #495057;
+            line-height: 20px;
+            width: 500px;
+            padding: 10px;
+            font-size: 15px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.35, -0.24, 0, 1.14);
+            border-radius: 5px;
+        }
+
+        .btn-signin:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .form-container{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="background-container">
+        <div class="row">
+            <div class="col-lg-7">
+                <img src="{% static '/res/slogo.svg' %}" alt="logo" class="logo">
+                <div class="form-container">
+                    <span><p class="text">PROJEXCELLENCE looks forward to serving you once more. Enjoy your fantastic day.</p></span>
+                    <span><button type="button" class="btn-signin" onclick="window.location.href='{% url 'login' %}';">Sign in</button></span>
+                </div>
+            </div>
+        </div>
+   
+</div>
+
+
+{% endblock %}

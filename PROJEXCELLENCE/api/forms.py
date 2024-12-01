@@ -251,15 +251,21 @@ class AddMemberForm(forms.Form):
         widget=forms.Select(attrs={"class": "form-control"}),
         label="Role"
     )
+
     def __init__(self, *args, **kwargs):
-        current_user = kwargs.pop('current_user', None)  # Extract the current user
+        current_user = kwargs.pop('current_user', None) 
+        team = kwargs.pop('team', None)  
         super().__init__(*args, **kwargs)
-        
+
+       
         if current_user:
             self.fields['users'].queryset = User.objects.exclude(id=current_user.id)
-            print("test",self.fields['users'].queryset)
         else:
             self.fields['users'].queryset = User.objects.all()
+
+        if team:
+             existing_members = team.users.all()  
+             self.fields['users'].queryset = self.fields['users'].queryset.exclude(id__in=existing_members.values_list('id', flat=True))
 class EditRoleForm(forms.ModelForm):
     class Meta:
         model = TeamMembership  

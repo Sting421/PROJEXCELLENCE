@@ -74,7 +74,7 @@ LOGIN_EXEMPT_ROUTES = [
     "login",
     "signup",
 ]
-
+LOGOUT_REDIRECT_URL = "logout"
 
 ROOT_URLCONF = 'PROJEXCELLENCE.urls'
 
