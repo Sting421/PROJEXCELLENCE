@@ -145,7 +145,7 @@
                     {% endif %}
                         <!-- Display the day number -->
                         {% if day.1 == 'prev-month' %}
-                            <span style="color: #ccc;">{{ day.0 }}</span>
+                            
                         {% elif day.1 == 'next-month' %}
                         {% with year_str=year|stringformat:"04d" month_str=month|stringformat:"02d" day_str=day.0|stringformat:"02d" %}
                             {% with date_key=year_str|add:"-"|add:month_str|add:"-"|add:day_str %}
@@ -166,7 +166,7 @@
                                 {% endif %}
                             {% endwith %}
                         {% endwith %}
-                            <span style="color: #ccc;">{{ day.0 }}</span>
+                           
                         {% else %}
                             <span>{{ day.0 }}</span>
                         {% endif %}

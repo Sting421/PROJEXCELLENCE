@@ -33,6 +33,7 @@ from ..forms import (
     EditAssigedTaskForm
     
 )
+from django.db.models import Q, Count
 
 local_timezone = pytz.timezone('Asia/Manila') 
 
@@ -86,8 +87,12 @@ def timeline(request):
     tasks_by_date = {}
     for task in tasks:
         if task.status != 'Done':
-            date_key = (task.due_date ).strftime('%Y-%m-%d') if task.due_date else 'No Due Date'
-            
+            date_key = (
+            (task.due_date + timedelta(days=1)).strftime('%Y-%m-%d') 
+            if task.due_date 
+            else 'No Due Date'
+)
+                    
             if date_key not in tasks_by_date:
                 tasks_by_date[date_key] = []
             tasks_by_date[date_key].append(task)
@@ -163,6 +168,11 @@ def task_details(request, pk):
         messages.success(request, "Task mark as done successfully!")
         return redirect('task_details', pk=pk)
     if 'undo_turn_in' in request.POST:
+        task.status = 'On-going'
+        task.save()
+        messages.success(request, "Task mark as done successfully!")
+        return redirect('task_details', pk=pk)
+    if 'start_task' in request.POST:
         task.status = 'On-going'
         task.save()
         messages.success(request, "Task mark as done successfully!")
@@ -396,6 +406,7 @@ def dashboard_view(request):
     print(f"Number of tasks found: {tasks.count()}")  # Debug print
 
     current_date = datetime.now(local_timezone)
+   
     year = int(request.GET.get('year', current_date.year))
     month = int(request.GET.get('month', current_date.month))
     current_day = current_date.day
@@ -405,6 +416,8 @@ def dashboard_view(request):
 
     calendar_data = []
     month_days = cal.monthdays2calendar(year, month)
+    print(current_date)
+   
     
     for week in month_days:
         processed_week = []
@@ -421,7 +434,11 @@ def dashboard_view(request):
     tasks_by_date = {}
     for task in tasks:
         if task.status != 'Done':
-            date_key = (task.due_date).strftime('%Y-%m-%d') if task.due_date else 'No Due Date'
+            date_key = (
+                (task.due_date + timedelta(days=1)).strftime('%Y-%m-%d') 
+                if task.due_date 
+                else 'No Due Date'
+            )
             
             if date_key not in tasks_by_date:
                 tasks_by_date[date_key] = []
@@ -452,6 +469,7 @@ def team_list(request, project_id):
     # Initialize forms at the start
     add_team_form = TeamForm(request.POST, current_user=request.user)
     add_member_form = AddMemberForm(request.POST, current_user=request.user)
+
     edit_role_form = EditRoleForm()
     user = request.user
     current_datetime = timezone.now()
@@ -483,7 +501,7 @@ def team_list(request, project_id):
     for team in page_obj
 ]
 
-
+  
     if request.method == 'POST':
         if 'delete_team' in request.POST:
             team_id = request.POST.get('team_id')
@@ -529,7 +547,9 @@ def team_list(request, project_id):
             print(request.POST)
             member_id = request.POST.get('user_id')
             membership = get_object_or_404(TeamMembership, id=member_id)
+            
             edit_form = EditRoleForm(request.POST, instance=membership)
+            print('Your role is: ',user_roles.get(membership.team_id))
             if edit_form.is_valid():
                 edit_form.save()
                 messages.success(request, "Member role updated successfully!")
@@ -762,6 +782,14 @@ def blog_list(request, project_id):
 
 @login_required
 def assign_task(request,status):
+    projects = Project.objects.filter(
+    Q(created_by=request.user) | Q(teammembership__user=request.user), 
+    task__created_by=request.user  # Use `task__created_by` to check tasks assigned by the user
+    ).annotate(
+        task_count=Count('task')
+    ).filter(
+        task_count__gt=0
+    ).distinct()
     tasks = Task.objects.filter(created_by=request.user, status=status).order_by("due_date")
     task_filter = TaskFilter(request.GET, queryset=tasks)
 
@@ -778,6 +806,7 @@ def assign_task(request,status):
         "add_task_form": TaskForm(),  
         "filter": task_filter,
         "current_status":status,
+        'projects':projects,
     }
     return render(request, "assignTask.html", context)
 
@@ -785,7 +814,10 @@ def assign_task(request,status):
 @login_required
 def due_day_task_List(request,year,month,day):
     tasks = Task.objects.filter(assigned_to=request.user).order_by("due_date")
-    date = f"{year}-{month:02d}-{day:02d}"
+    adjust_date = int(day) - 1
+    date = f"{year}-{month:02d}-{adjust_date:02d}"
+    return_date = f"{year}-{month:02d}-{day:02d}"
+    
     current_date = datetime.now(local_timezone)
     years = int(request.GET.get('year', current_date.year))
     months = int(request.GET.get('month', current_date.month))
@@ -814,6 +846,7 @@ def due_day_task_List(request,year,month,day):
         'current_month': current_month,
         'current_year': current_year,
         'currdate':date,
+        'getdate':return_date,
     }
     return render(request, "due_day_task_List.html", context)
 

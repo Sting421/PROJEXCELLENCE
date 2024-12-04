@@ -99,10 +99,12 @@
                 {%if request.user != task.created_by%}
                 <form method="POST" action="{% url 'task_details' task.id %}">
                     {% csrf_token %}
-                    {%if task.status != 'Done'%}
+                    {%if task.status != 'Done' and task.status == 'On-going'%}
                     <button class="submit-btn"  name="mark_done">Mark as Done</button>
-                    {%else%}
+                    {%elif task.status == 'Done'%}
                     <button class="submit-btn"  name="undo_turn_in">Undo turn in</button>
+                    {%else%}
+                    <button class="submit-btn"  name="start_task">Start</button>
                     {%endif%}
                 </form>
                 {%endif%}
@@ -146,7 +148,7 @@
                         <h6>Assigned By:</h6>
                         <span>
                             {%if task.created_by.profile_path.url != null %}
-                                <img class="avatar" src="{{ blog.posted_by.profile_path.url }}" alt="avatar">
+                                <img class="avatar" src="{{ task.created_by.profile_path.url }}" alt="avatar">
                             {%else%}
                                 <img class="avatar" src="{% static 'res/logoPlaceHolder.png' %}" alt="avatar-profile">
                             {%endif%}

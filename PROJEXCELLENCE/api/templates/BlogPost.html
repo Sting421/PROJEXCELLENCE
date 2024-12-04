@@ -161,7 +161,7 @@
 {% block content %}
 <div class="page-container">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>{{project.project_name}} <span style="font-weight: 200;">General Channel</span></h1>
+        <h1>{{project.project_name|capfirst}} <span style="font-weight: 200;">General Channel</span></h1>
         <div class="add-task" data-bs-toggle="modal" data-bs-target="#addBlogModal">
            <a> <i class="fas fa-plus mr-2"></i> Create Post</a>
         </div>

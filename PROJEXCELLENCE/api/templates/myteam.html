@@ -264,9 +264,11 @@
                                                             </li>
                                                         {%endif%}
                                                         {%if user_roles|get_item:team.id  == 'HEAD' or request.user == project.created_by%}
+                                                           
                                                             <li>
                                                                 <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editMemberRoleModal" data-user-id="{{ membership.id }}">Change Role</a>
                                                             </li>
+                                                            
                                                             <li>
                                                                 <a class="dropdown-item delete" data-bs-toggle="modal" data-bs-target="#removeMemberModal"  data-user-id="{{ membership.id }}"  data-team-id="{{ membership.team.id }}"> Remove Member </a>
                                                             </li>

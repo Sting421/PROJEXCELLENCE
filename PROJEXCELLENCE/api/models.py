@@ -138,21 +138,6 @@ class TeamMembership(models.Model):
 
     def __str__(self):
         return f"{self.user.email} in {self.team.team_name} as {self.role}"
-
-
-
-class BlogPost(models.Model):
-    posted_by = models.ForeignKey(User, on_delete=models.CASCADE)
-    time_posted = models.DateTimeField(auto_now_add=True)
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    message = models.TextField()
-    
-class Comments(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    blog = models.ForeignKey(BlogPost, on_delete=models.CASCADE)
-    time_posted = models.DateTimeField(auto_now_add=True)
-    project = models.ForeignKey('Project', on_delete=models.CASCADE)
-    text_comment = models.TextField()
 class Task(models.Model):
     STATUS_CHOICES = [
         ("On-going", "On-going"),
@@ -174,5 +159,20 @@ class Task(models.Model):
 
     def __str__(self):
         return self.task_name
+
+
+
+class BlogPost(models.Model):
+    posted_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    time_posted = models.DateTimeField(auto_now_add=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    message = models.TextField()
+    
+class Comments(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    blog = models.ForeignKey(BlogPost, on_delete=models.CASCADE)
+    time_posted = models.DateTimeField(auto_now_add=True)
+    project = models.ForeignKey('Project', on_delete=models.CASCADE)
+    text_comment = models.TextField()
 
     

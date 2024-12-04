@@ -231,11 +231,7 @@
                         <!-- Dropdown menu -->
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                             {% if project.created_by.id == request.user.id %}
-                            <li>
-                                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addMemberModal{{ project.id }}">
-                                    Add Member
-                                </a>
-                            </li>
+                            
                           <!-- Edit Project Modal Trigger -->
                             <li>
                                 <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editProjectModal{{ project.id }}">
