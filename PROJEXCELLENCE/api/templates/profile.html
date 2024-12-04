@@ -198,7 +198,7 @@
     <div class="info-section">
         <div class="info-header">
             <h2>Personal Information</h2>
-            <button class="edit-button">✎ Edit</button>
+            <button class="edit-button"  data-bs-toggle="modal" data-bs-target="#editProfileModal">✎ Edit</button>
         </div>
         <div class="info-content">
             <div class="info-item">
@@ -217,24 +217,24 @@
     </div>
 
     <!-- Location -->
-    <div class="info-loc-section">
+    <!-- <div class="info-loc-section">
         <div class="info-header">
             <h2>Location</h2>
             <button class="edit-button">✎ Edit</button>
         </div>
         <input type="text" class="location-input" placeholder="⚲ Enter your location">
-    </div>
+    </div> -->
 
-    <!-- Bio -->
+    <!-- Bio
     <div class="info-section">
         <div class="info-header">
             <h2>Bio</h2>
             <button class="edit-button">✎ Edit</button>
         </div>
         <div class="info-content">
-            <!-- Bio content would go here -->
+            
         </div>
-    </div>
+    </div> -->
 </div>
 
     <!-- Modal for Upload Photo -->
@@ -246,9 +246,11 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                   
                     <form method="post" action="{% url 'edit_profile' %}" enctype="multipart/form-data">
                         {% csrf_token %}
-                        {{ form|crispy }}
+                        <input type="hidden" name="upload_profile" value="1">
+                        {{ upload_form|crispy }}
                        
                         <button type="submit" class="btn btn-primary mt-3">Upload</button>
                     </form>
@@ -256,6 +258,28 @@
             </div>
         </div>
     </div>
+     <!-- Modal for Edit Profile -->
+    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadProfileModalLabel">Edit Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    
+                    <form method="post" action="{% url 'edit_profile' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="edit_profile" value="1">
+                        {{ edit_form|crispy }}
+                       
+                        <button type="submit" class="btn btn-primary mt-3">Upload</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     
 
 

@@ -15,7 +15,7 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 from calendar import monthcalendar, month_name, Calendar
 import pytz
-from ..models import Task ,Project, Team, TeamMembership, Resource, BlogPost, Comments, User
+from ..models import Task ,Project, Team, TeamMembership, BlogPost, Comments, User
 from django.contrib import messages
 from django.contrib.auth.views import LogoutView
 from ..forms import (
@@ -29,6 +29,7 @@ from ..forms import (
     EditTaskForm,
     AddBlogForm,
     EditRoleForm,
+    UploadProfile,
     EditAssigedTaskForm
     
 )
@@ -629,21 +630,28 @@ def team_list(request, project_id):
 
 @login_required
 def edit_profile(request):
+    upload_form = UploadProfile(request.POST, request.FILES, instance=request.user, request=request)
+    edit_form = UserProfileForm(request.POST, request.FILES, instance=request.user, request=request)
     if request.method == 'POST':
-        form = UserProfileForm(request.POST, request.FILES, instance=request.user, request=request)
-
-        if form.is_valid():
-            current_password = form.cleaned_data.get("current_password")
-            if current_password and not request.user.check_password(current_password):
-                form.add_error('current_password', 'The current password is incorrect.')
-            else:
-                form.save()
-                return redirect('profile')  
+        if 'upload_profile' in request.POST:
+            print(1)
+            if upload_form.is_valid():
+                    upload_form.save()
+                    return redirect('profile')  
+        if 'edit_profile' in request.POST:       
+            if edit_form.is_valid():
+                current_password = edit_form.cleaned_data.get("current_password")
+                if current_password and not request.user.check_password(current_password):
+                    edit_form.add_error('current_password', 'The current password is incorrect.')
+                else:
+                    edit_form.save()
+                    return redirect('profile')  
 
     else:
-        form = UserProfileForm(instance=request.user)
+        form = UploadProfile(instance=request.user)
 
-    return render(request, 'profile.html', {'form': form})
+    return render(request, 'profile.html', {'edit_form': edit_form,
+                                            'upload_form':upload_form})
 
 
 def resource_library(request):

@@ -6,10 +6,8 @@ from .models import (
     TeamMembership,
     BlogPost,
     Comments,
-    Resources,
-    File,
     Task,
-    Resource,
+   
 )
 
 # Customize the User admin
@@ -55,19 +53,6 @@ class CommentsAdmin(admin.ModelAdmin):
     search_fields = ('text_comment',)
     list_filter = ('time_posted',)
 
-# Customize the Resources admin
-@admin.register(Resources)
-class ResourcesAdmin(admin.ModelAdmin):
-    list_display = ('user', 'filename', 'time_posted')
-    search_fields = ('filename',)
-    list_filter = ('time_posted',)
-
-# Customize the File admin
-@admin.register(File)
-class FileAdmin(admin.ModelAdmin):
-    list_display = ('filename', 'user', 'res', 'time_posted')
-    search_fields = ('filename',)
-    list_filter = ('time_posted',)
 
 # Customize the Task admin
 @admin.register(Task)
@@ -77,10 +62,3 @@ class TaskAdmin(admin.ModelAdmin):
     list_filter = ('status', 'due_date', 'completed')
     ordering = ('-due_date',)
 
-# Customize the Resource admin
-@admin.register(Resource)
-class ResourceAdmin(admin.ModelAdmin):
-    list_display = ('title', 'category', 'uploaded_at', 'featured')
-    search_fields = ('title', 'description')
-    list_filter = ('category', 'featured')
-    ordering = ('-uploaded_at',)

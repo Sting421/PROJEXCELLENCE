@@ -86,15 +86,10 @@ class UserProfileForm(forms.ModelForm):
             "last_name",
             "email",
             "phone_number",
-            "profile_path",
             "current_password",
             "new_password",
             "confirm_password",
         ]
-        widgets = {
-            "date_of_hire": forms.DateInput(attrs={"type": "date", "class": "form-control"})
-        }
-
     def __init__(self, *args, **kwargs):
         # Pop request from kwargs and save it for later use
         self.request = kwargs.pop('request', None)
@@ -131,8 +126,26 @@ class UserProfileForm(forms.ModelForm):
             user.save()
         return user
 
+class UploadProfile(forms.ModelForm):
+ 
 
+    class Meta:
+        model = User
+        fields = [
+            "profile_path",
+        ]
+    def __init__(self, *args, **kwargs):
+        # Pop request from kwargs and save it for later use
+        self.request = kwargs.pop('request', None)
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = "post"
+        self.helper.attrs = {"enctype": "multipart/form-data"}
+        self.helper.add_input(Submit("submit", "Update Profile"))
 
+    def clean(self):
+        cleaned_data = super().clean()
+        return cleaned_data
 
 class TaskForm(forms.ModelForm):
     class Meta:

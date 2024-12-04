@@ -72,29 +72,33 @@ class User(AbstractUser):
 
 
     def save(self, *args, **kwargs):
+         # Check if the user is a superuser
+        if self.is_superuser:
+            self.status = "APPROVED"
+            self.role = "ADMIN"
+
         # Check if the profile picture has changed
         if self.pk:
-            try:
-                old_profile = User.objects.get(pk=self.pk)
-                if old_profile.profile_path and old_profile.profile_path != self.profile_path:
-                    # Delete the old photo if it exists
-                    old_profile_path = os.path.join(settings.MEDIA_ROOT, old_profile.profile_path.name)
-                    if os.path.exists(old_profile_path):
-                        os.remove(old_profile_path)
-            except User.DoesNotExist:
-                pass  # Old profile doesn't exist
-        # Rename the uploaded image to the current date and time
-        if self.profile_path:
-            ext = os.path.splitext(self.profile_path.name)[1]
-            new_filename = timezone.now().strftime('%Y%m%d%H%M%S') + ext
-            self.profile_path.name = os.path.join('profiles', new_filename)
+            old_profile = User.objects.get(pk=self.pk)
+            if old_profile.profile_path and old_profile.profile_path != self.profile_path:
+                # Delete the old photo if it exists
+                old_profile_path = os.path.join(settings.MEDIA_ROOT, old_profile.profile_path.name)
+                if os.path.exists(old_profile_path):
+                    os.remove(old_profile_path)
+
+                # Rename the uploaded image to the current date and time
+                if self.profile_path:
+                    ext = os.path.splitext(self.profile_path.name)[1]
+                    new_filename = timezone.now().strftime('%Y%m%d%H%M%S') + ext
+                    self.profile_path.name = os.path.join('profiles', new_filename)
+
         super().save(*args, **kwargs)
-        # Resize the image if it exists
+      
         if self.profile_path and os.path.exists(self.profile_path.path):
             try:
                 img = Image.open(self.profile_path.path)
                 output_size = (300, 300)
-                img.thumbnail(output_size, Image.LANCZOS)  # High-quality downscaling
+                img.thumbnail(output_size, Image.LANCZOS) 
                 img.save(self.profile_path.path)
             except FileNotFoundError:
                 print(f"File not found: {self.profile_path.path}")
@@ -142,8 +146,6 @@ class BlogPost(models.Model):
     time_posted = models.DateTimeField(auto_now_add=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     message = models.TextField()
-
- 
     
 class Comments(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -151,30 +153,6 @@ class Comments(models.Model):
     time_posted = models.DateTimeField(auto_now_add=True)
     project = models.ForeignKey('Project', on_delete=models.CASCADE)
     text_comment = models.TextField()
-
-    
-
-
-class Resources(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    time_posted = models.DateTimeField(auto_now_add=True)
-    filename = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.filename
-
-
-
-class File(models.Model):
-    filename = models.CharField(max_length=50)
-    time_posted = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    res = models.ForeignKey(Resources, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.filename
-
-
 class Task(models.Model):
     STATUS_CHOICES = [
         ("On-going", "On-going"),
@@ -197,22 +175,4 @@ class Task(models.Model):
     def __str__(self):
         return self.task_name
 
-class Resource(models.Model):
-    CATEGORY_CHOICES = [
-        ('knowledge', 'Knowledge Base'),
-        ('guides', 'Guides & eBooks'),
-        ('webinars', 'Webinars & Videos'),
-        ('templates', 'Templates & Tools'),
-        ('community', 'Community Forum'),
-    ]
-
-    title = models.CharField(max_length=200)
-    description = models.TextField()
-    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
-    file = models.FileField(upload_to='resources/')
-    uploaded_at = models.DateTimeField(default=timezone.now)
-    featured = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.title
     

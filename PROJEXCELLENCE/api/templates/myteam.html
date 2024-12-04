@@ -168,8 +168,8 @@
                 <table>
                     <tr>
                         <td>
-                            {% if project.created_by.user.profile_path %}
-                                <img class="avatar" src="{{ project.created_by.user.profile_path.url }}" >
+                            {% if project.created_by.profile_path %}
+                                <img class="avatar" src="{{ project.created_by.profile_path.url }}" >
                             {% else %}
                                 <img class="avatar" src="{% static 'res/logoPlaceHolder.png' %}" alt="avatar-profile">
                             {% endif %}
