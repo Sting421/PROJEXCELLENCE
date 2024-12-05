@@ -259,11 +259,7 @@ class AddMemberForm(forms.Form):
         widget=forms.CheckboxSelectMultiple,
         label="Select Members"
     )
-    role = forms.ChoiceField(
-        choices=TeamMembership.ROLE_CHOICES,
-        widget=forms.Select(attrs={"class": "form-control"}),
-        label="Role"
-    )
+    
 
     def __init__(self, *args, **kwargs):
         current_user = kwargs.pop('current_user', None) 

@@ -133,7 +133,7 @@ class TeamMembership(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     project = models.ForeignKey('Project', on_delete=models.CASCADE)
-    role = models.CharField(max_length=50,  choices=ROLE_CHOICES, default="Member")
+    role = models.CharField(max_length=50,  choices=ROLE_CHOICES, default="MEMBER")
     joined_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

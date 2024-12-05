@@ -554,7 +554,16 @@ def team_list(request, project_id):
                 edit_form.save()
                 messages.success(request, "Member role updated successfully!")
             return redirect('team_list', project_id=project_id)
+        if 'promte_member' in request.POST:
+            print(request.POST)
+            member_id = request.POST.get('user_id')
+            membership = get_object_or_404(TeamMembership, id=member_id)
             
+            membership.role = 'MANAGER'
+            membership.save()
+              
+            messages.success(request, "Member role updated successfully!")
+            return redirect('team_list', project_id=project_id)
         # Handle team creation
         elif 'team_name' in request.POST:
             add_team_form = TeamForm(request.POST, current_user=request.user)
@@ -584,7 +593,7 @@ def team_list(request, project_id):
             add_member_form = AddMemberForm(request.POST, current_user=request.user,team=team)
             if add_member_form.is_valid():
                 users = add_member_form.cleaned_data['users']
-                role = add_member_form.cleaned_data['role']
+      
                 
                 for user in users:
                     if not TeamMembership.objects.filter(user=user, team=team).exists():
@@ -592,7 +601,7 @@ def team_list(request, project_id):
                             user=user,
                             team=team,
                             project=project,
-                            role=role
+                           
                         )
                 messages.success(request, "Members added successfully!")
                 return redirect('team_list', project_id=project.id)

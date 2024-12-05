@@ -263,16 +263,26 @@
                                                                 <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#addTaskModal" data-user-id="{{ membership.user.id }}">Add task</a>
                                                             </li>
                                                         {%endif%}
-                                                        {%if user_roles|get_item:team.id  == 'HEAD' or request.user == project.created_by%}
-                                                           
+                                                        {%if user_roles|get_item:team.id  == 'HEAD' and membership.role != 'MANAGER'%}
                                                             <li>
-                                                                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editMemberRoleModal" data-user-id="{{ membership.id }}">Change Role</a>
+                                                                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#promoteModal" data-user-id="{{ membership.id }}">Promote</a>
                                                             </li>
                                                             
                                                             <li>
                                                                 <a class="dropdown-item delete" data-bs-toggle="modal" data-bs-target="#removeMemberModal"  data-user-id="{{ membership.id }}"  data-team-id="{{ membership.team.id }}"> Remove Member </a>
                                                             </li>
                                                         {%endif%}
+                                                        {%if request.user == project.created_by%}
+                                                           
+                                                            <li>
+                                                                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editMemberRoleModal" data-user-id="{{ membership.id }}">Change Role</a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item delete" data-bs-toggle="modal" data-bs-target="#removeMemberModal"  data-user-id="{{ membership.id }}"  data-team-id="{{ membership.team.id }}"> Remove Member </a>
+                                                            </li>
+                                                        {%endif%}    
+                                                       
+                                                       
                                                     </ul>
 
                                                 {%endif%}
@@ -474,11 +484,32 @@
     </div>
 </div>
 
+<!-- Promote Modal -->
+<div class="modal fade" id="promoteModal" tabindex="-1" aria-labelledby="promoteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="promoteModalLabel">Promote</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'team_list' project.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="promte_member" value="1">
+                    <input type="hidden" name="user_id" value="">
+                    <p>Are you sure you want to promote this member?</p>
+                    <button type="submit" class="btn btn-primary mt-3">Promote</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
   <script>
       document.addEventListener('DOMContentLoaded', () => {
         const modals = document.querySelectorAll
-        ('[data-bs-target="#addTaskModal"], [data-bs-target="#changeRoleModal"], [data-bs-target="#removeMemberModal"],[data-bs-target="#editMemberRoleModal"],[data-bs-target="#addMemberByHeadModal"]');
+        ('[data-bs-target="#addTaskModal"], [data-bs-target="#changeRoleModal"], [data-bs-target="#removeMemberModal"],[data-bs-target="#editMemberRoleModal"],[data-bs-target="#addMemberByHeadModal"],[data-bs-target="#promoteModal"]');
         
         modals.forEach(modalTrigger => {
             modalTrigger.addEventListener('click', function() {
