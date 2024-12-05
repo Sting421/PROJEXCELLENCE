@@ -164,11 +164,13 @@ def task_details(request, pk):
     
     if 'mark_done' in request.POST:
         task.status = 'Done'
+        task.completed = True
         task.save()
         messages.success(request, "Task mark as done successfully!")
         return redirect('task_details', pk=pk)
     if 'undo_turn_in' in request.POST:
         task.status = 'On-going'
+        task.completed = False
         task.save()
         messages.success(request, "Task mark as done successfully!")
         return redirect('task_details', pk=pk)

@@ -251,11 +251,12 @@
                                         
                                             {% if user in team.users.all and membership.role != 'HEAD' and user_roles|get_item:team.id == 'HEAD' or user_roles|get_item:team.id == 'MANAGER' and user != membership.user or user == project.created_by%}
                                         
-                                                {%if user_roles|get_item:team.id  != 'MEMBER' and membership.role != 'HEAD' or request.user == project.created_by%}
-                            
-                                                    <button class="btn" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" onclick="event.stopPropagation()">
-                                                        <i class="bi bi-three-dots" title="Settings"></i>
-                                                    </button>  
+                                                {%if user_roles|get_item:team.id  != 'head' and membership.role != 'HEAD'  or request.user == project.created_by%}
+                                                  
+                                                        <button class="btn" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" onclick="event.stopPropagation()">
+                                                            <i class="bi bi-three-dots" title="Settings"></i>
+                                                        </button>  
+                                                  
 
                                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                         {%if user_roles|get_item:team.id  != 'MEMBER' and membership.role != 'HEAD'  or request.user == project.created_by %}
@@ -267,7 +268,7 @@
                                                             <li>
                                                                 <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#promoteModal" data-user-id="{{ membership.id }}">Promote</a>
                                                             </li>
-                                                            
+                                
                                                             <li>
                                                                 <a class="dropdown-item delete" data-bs-toggle="modal" data-bs-target="#removeMemberModal"  data-user-id="{{ membership.id }}"  data-team-id="{{ membership.team.id }}"> Remove Member </a>
                                                             </li>
