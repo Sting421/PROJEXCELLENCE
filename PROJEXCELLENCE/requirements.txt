@@ -4,3 +4,5 @@ Pillow
 django-filter
 ruff
 pytz
+jazzmin
+
