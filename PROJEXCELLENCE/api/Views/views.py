@@ -661,28 +661,36 @@ def team_list(request, project_id):
 
 @login_required
 def edit_profile(request):
-    upload_form = UploadProfile(request.POST, request.FILES, instance=request.user, request=request)
+    upload_form = UploadProfile(request.POST, request.FILES, instance=request.user)
     edit_form = UserProfileForm(request.POST, request.FILES, instance=request.user, request=request)
+
     if request.method == 'POST':
+       
         if 'upload_profile' in request.POST:
-            print(1)
             if upload_form.is_valid():
-                    upload_form.save()
-                    return redirect('profile')  
-        if 'edit_profile' in request.POST:       
+                upload_form.save()
+                return redirect('profile')  
+     
+        elif 'edit_profile' in request.POST:
             if edit_form.is_valid():
                 current_password = edit_form.cleaned_data.get("current_password")
                 if current_password and not request.user.check_password(current_password):
+                   
                     edit_form.add_error('current_password', 'The current password is incorrect.')
                 else:
+                 
                     edit_form.save()
-                    return redirect('profile')  
+                    return redirect('profile') 
 
+  
     else:
-        form = UploadProfile(instance=request.user)
+        upload_form = UploadProfile(instance=request.user)
+        edit_form = UserProfileForm(instance=request.user, request=request)
 
-    return render(request, 'profile.html', {'edit_form': edit_form,
-                                            'upload_form':upload_form})
+    return render(request, 'profile.html', {
+        'edit_form': edit_form,
+        'upload_form': upload_form,
+    })
 
 
 def resource_library(request):

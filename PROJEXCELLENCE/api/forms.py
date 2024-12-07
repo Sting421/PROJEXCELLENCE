@@ -78,6 +78,7 @@ class UserProfileForm(forms.ModelForm):
         label="Confirm New Password",
         required=False,
     )
+    
 
     class Meta:
         model = User
@@ -94,10 +95,20 @@ class UserProfileForm(forms.ModelForm):
         # Pop request from kwargs and save it for later use
         self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
+        
+        # Pre-fill user fields if request and user are available
+        if self.request and self.request.user.is_authenticated:
+            self.initial['first_name'] = self.request.user.first_name
+            self.initial['last_name'] = self.request.user.last_name
+            self.initial['email'] = self.request.user.email
+
         self.helper = FormHelper()
         self.helper.form_method = "post"
         self.helper.attrs = {"enctype": "multipart/form-data"}
         self.helper.add_input(Submit("submit", "Update Profile"))
+
+        
+
 
     def clean(self):
         cleaned_data = super().clean()
