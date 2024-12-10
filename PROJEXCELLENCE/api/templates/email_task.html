@@ -1,0 +1,147 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Task Assigned</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f6f9;
+            
+        }
+        .email-container {
+            background-image: url("{% static 'res/logoPlaceHolder.png' %}");
+            background-size: 200px;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-blend-mode: overlay; /* Optional: blends the logo with the background */
+            background-color: rgba(255, 255, 255, 0.7); /* Adds a white overlay to make the logo more subtle */
+            max-width: 610px;
+            margin: 40px auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .email-header {
+            background: linear-gradient(135deg, #46DFB1 0%, #2E9CDB 100%);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .email-header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .email-body {
+            padding: 30px;
+           
+        }
+        .task-details {
+            background-color: #f9fafb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .task-details p {
+            margin: 10px 0;
+            color: #333;
+        }
+        .task-details .label {
+            font-weight: 600;
+            color: #555;
+            margin-right: 10px;
+        }
+        .email-footer {
+            background-color: #f4f6f9;
+            text-align: center;
+            padding: 15px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .logo {
+            max-width: 150px;
+            margin: 0 auto 20px;
+            display: block;
+        }
+        .avatar{
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 10px
+        }
+        @media screen and (max-width: 600px) {
+            .email-container {
+                margin: 0;
+                width: 100%;
+                border-radius: 0;
+            }
+        }
+        .pic-below{
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 10px
+        }
+        .pic{
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 10px
+        }
+        .label{
+            display: flex;
+            flex-direction: row;
+            align-items: center
+        }
+        .label-header{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+        .head-logo{
+            width: 80px;
+            height: auto;
+            margin-left: 43%;
+        }
+       
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <h1 class="label-header"> <img class="pic" src="https://projexcellenceimg.netlify.app/Assets/clipboard.png" alt="">
+                 New Task Assigned</h1>
+        </div>
+        <div class="email-body">
+            <img class="head-logo" src="https://projexcellenceimg.netlify.app/Assets/logoNobg.png" alt="">
+            <div style="display: flex;flex-direction: row; align-items: center;">
+                <p style="display: flex;flex-direction: column;"><span class="label">Hello, &nbsp;</span><span> {{ task.assigned_to.first_name }} {{ task.assigned_to.last_name }}</span></p>
+            </div>
+            <div class="task-details">
+                <p>You have been assigned a new task:</p>
+                <span class="label"><img class="pic-below" src="https://projexcellenceimg.netlify.app/Assets/clipboardNoBG.png" alt=""> Task Name: {{ task.task_name }}</span> 
+                <span class="label"><img class="pic-below" src="https://projexcellenceimg.netlify.app/Assets/calendarNoBG.png" > Due Date: {{ get_due_date }}</span> 
+                <span class="label"><img class="pic-below" src="https://projexcellenceimg.netlify.app/Assets/folderNoBG.png" > Project: {{ task.project_id }}</span> 
+                <span class="label"><img class="pic-below" src="https://projexcellenceimg.netlify.app/Assets/personNoBG.png" > Assigned By:  {{ task.created_by.last_name }}</span>
+            </div>
+
+            <p style="text-align: center; color: #6b7280;">
+                Please log in to your PROJEXCELLENCE dashboard to view more details.
+            </p>
+        </div>
+        <div class="email-footer">
+            &copy; 2024 PROJEXCELLENCE. All rights reserved.
+        </div>
+    </div>
+</body>
+</html>

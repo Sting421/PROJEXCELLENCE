@@ -17,6 +17,11 @@ from calendar import monthcalendar, month_name, Calendar
 import pytz
 from ..models import Task ,Project, Team, TeamMembership, BlogPost, Comments, User
 from django.contrib import messages
+from django.core.mail import send_mail
+from django.conf import settings
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+
 from django.contrib.auth.views import LogoutView
 from ..forms import (
     LoginForm,
@@ -38,6 +43,19 @@ from django.db.models import Q, Count
 local_timezone = pytz.timezone('Asia/Manila') 
 
 now_in_manila = datetime.now(local_timezone)
+
+
+def landing(request):
+    """
+    Render the landing page for ProjExcellence
+    """
+    return render(request, 'landing.html')
+
+# Existing login view (if not already present)
+def login_view(request):
+    # Implement login logic here
+    return render(request, 'login.html')
+
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
 def Error404(request):
@@ -117,6 +135,8 @@ def timeline(request):
 @login_required
 def myteams(request):
       return render(request, "myteam.html")
+def test(request):
+      return render(request, "email_task.html")
 @login_required
 def resourceLib(request):
       return render(request, "resourceLib.html")
@@ -147,6 +167,33 @@ def signup_view(request):
             user = form.save(commit=False)
             user.set_password(form.cleaned_data["password"])
             user.save()
+            # send_mail(
+            #     "Account Created",
+            #     "Your account has been created successfully.",
+            #     settings.EMAIL_HOST_USER,
+            #     [user.email],
+            #     fail_silently=False,
+            # )
+            subject = "Account Created"
+            from_email = settings.EMAIL_HOST_USER
+            to_email = [user.email]
+
+            # Plain text version (fallback)
+            text_content = "Your account has been created successfully."
+
+            # HTML version with a card-like design
+            html_content = render_to_string('email_signup.html', {'user': user})
+
+            # Create the email
+            email = EmailMultiAlternatives(
+                subject="Account Created",
+                body="Your account has been created successfully.", 
+                from_email=settings.EMAIL_HOST_USER,
+                to=[user.email]
+            )
+            email.attach_alternative(html_content, "text/html")  
+            email.send()
+            login(request, user)
             return redirect("login")
     else:
         form = SignupForm()
@@ -244,6 +291,7 @@ def add_task(request):
             task = form.save(commit=False) 
             task.created_by = request.user
             task.save() 
+           
             return redirect("task",status=task.status)  
     else:
         form = TaskForm()
@@ -638,6 +686,42 @@ def team_list(request, project_id):
                 task.due_date = due
                 task.created_by = request.user
                 task.save()
+                due_date_obj = datetime.strptime(due, "%Y-%m-%dT%H:%M")
+                due_date_str = due_date_obj.strftime("%B %d, %Y at %I:%M %p")    
+                print('new task to: ',task.assigned_to.email)
+                subject = "Account Created "
+                from_email = settings.EMAIL_HOST_USER
+                to_email = [user.email]
+
+                # Plain text version (fallback)
+                text_content = "You have been assigned a new task."
+                getDueDate = due_date_obj.strftime("%B %d, %Y at %I:%M %p")
+                # HTML version with a card-like design
+                html_content = render_to_string('email_task.html', {'task': task,'get_due_date':getDueDate})
+
+                # Create the email
+                email = EmailMultiAlternatives(
+                    subject="[ New Task Assigned ]" + timezone.now().strftime("%B %d, %Y at %I:%M %p"),
+                    body="You have been assigned a new task:", 
+                    from_email=settings.EMAIL_HOST_USER,
+                    to=[task.assigned_to.email]
+                )
+                email.attach_alternative(html_content, "text/html")  
+                email.send()
+
+
+
+                # send_mail(
+                #     "You have a new task",
+                #     "Created by: " + request.user.first_name + " " + request.user.last_name + "\n" +
+                #     "Task Name: " + task.task_name + "\n" +
+                #     "Description: " + task.description + "\n" +
+                #     "Due Date: " +  due_date_str + "\n" +
+                #     "Project: " + project.project_name + "\n",
+                #     settings.EMAIL_HOST_USER,  # sender's email
+                #     [task.assigned_to.email],  # recipient list
+                #     fail_silently=False,
+                # )
               
                 messages.success(request, "Task assigned successfully!")
                 return redirect('team_list', project_id=project.id)

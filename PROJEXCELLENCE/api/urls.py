@@ -8,7 +8,8 @@ from django.contrib.auth.views import LogoutView
 urlpatterns = [
   # path("", views.index, name="index"),
     # Authentication URLs
-    path("", views.login_view, name="login"),
+    path("", views.landing, name='landing'),
+    path("test/", views.test, name='test'),
     path("login/", views.login_view, name="login"),
     path("logout/", LogoutView.as_view(template_name="logout.html"), name="logout"),
     path("signup/", views.signup_view, name="signup"),
