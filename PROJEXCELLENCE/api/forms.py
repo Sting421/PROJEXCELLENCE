@@ -286,6 +286,7 @@ class AddMemberForm(forms.Form):
         if team:
              existing_members = team.users.all()  
              self.fields['users'].queryset = self.fields['users'].queryset.exclude(id__in=existing_members.values_list('id', flat=True))
+        self.fields['users'].queryset = self.fields['users'].queryset.order_by('first_name')
 class EditRoleForm(forms.ModelForm):
     class Meta:
         model = TeamMembership  

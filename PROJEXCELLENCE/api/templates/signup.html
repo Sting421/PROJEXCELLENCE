@@ -94,6 +94,27 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
+        .btn-get {
+            background-color: #343a40;
+            border: 1px solid #495057;
+            line-height: 20px;
+            width: 100px;
+            padding: 10px;
+            font-size: 15px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.35, -0.24, 0, 1.14);
+            border-radius: 5px;
+            margin-top: 40px;
+        }
+
+        .btn-get:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
         .btn-signin {
             padding: 15px;
             font-size: 18px;
@@ -206,10 +227,8 @@
                     <form method="post">
                         {% csrf_token %}
                         {{ form|crispy }}
-                        
                         <button type="submit" class="btn-register">Register</button>
                     </form>
-                   
                 </div>
             </div>
         </div>

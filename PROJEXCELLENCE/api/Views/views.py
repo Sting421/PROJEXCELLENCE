@@ -136,7 +136,7 @@ def timeline(request):
 def myteams(request):
       return render(request, "myteam.html")
 def test(request):
-      return render(request, "email_task.html")
+      return render(request, "email_forgotPassword.html")
 @login_required
 def resourceLib(request):
       return render(request, "resourceLib.html")
@@ -167,13 +167,7 @@ def signup_view(request):
             user = form.save(commit=False)
             user.set_password(form.cleaned_data["password"])
             user.save()
-            # send_mail(
-            #     "Account Created",
-            #     "Your account has been created successfully.",
-            #     settings.EMAIL_HOST_USER,
-            #     [user.email],
-            #     fail_silently=False,
-            # )
+           
             subject = "Account Created"
             from_email = settings.EMAIL_HOST_USER
             to_email = [user.email]
