@@ -152,6 +152,7 @@
         margin-bottom: 1;
     }
 
+
 </style>
 {% endblock extra_css %}
 
@@ -240,6 +241,7 @@
                                 <div class="teamCards card-members">
                                 {%endif%}
                                     <div>
+                                       
                                             {% if membership.user.profile_path and membership.user.profile_path.url %}
                                                 <img class="avatar" src="{{ membership.user.profile_path.url }}" >
                                             {% else %}
@@ -292,8 +294,8 @@
                                 </div>
                             {% endfor %}
                         {% else %}
-                        <div >
-                            <div style="color:#314863; font-weight: 500;font-size: 40px; margin-left: 10px;">
+                        <div class="card-members">
+                            <div class="info">
                                 <span>No members in this team.</span>
                             </div>
                         </div>

@@ -191,7 +191,7 @@ def timelinePMview(request,project_id):
         'tasks_by_date': tasks_by_date,
     }
     
-    return render(request, 'timeline.html', context)
+    return render(request, 'projectTimeline.html', context)
 
 #addtask
 @login_required
@@ -230,9 +230,9 @@ def signup_view(request):
             user.set_password(form.cleaned_data["password"])
             user.save()
            
-            subject = "Account Created"
-            from_email = settings.EMAIL_HOST_USER
-            to_email = [user.email]
+            # subject = "Account Created"
+            # from_email = settings.EMAIL_HOST_USER
+            # to_email = [user.email]
 
             # Plain text version (fallback)
             text_content = "Your account has been created successfully."
@@ -495,8 +495,8 @@ def edit_project(request, pk):
 
 @login_required
 def dashboard_view(request):
-    projects = Project.objects.filter(models.Q(created_by=request.user) | models.Q(teammembership__user=request.user)).distinct()
-    tasks = Task.objects.filter(assigned_to=request.user)
+    projects = Project.objects.filter(models.Q(created_by=request.user) | models.Q(teammembership__user=request.user)).distinct().order_by("date_created")
+    tasks = Task.objects.filter(assigned_to=request.user).order_by("due_date")
     
    
     paginator = Paginator(tasks, 2)
@@ -574,7 +574,9 @@ def dashboard_view(request):
 def team_list(request, project_id):
     # Initialize forms at the start
     add_team_form = TeamForm(request.POST, current_user=request.user)
-    add_member_form = AddMemberForm(request.POST, current_user=request.user)
+    getCreator = get_object_or_404(Project, id=project_id)
+    add_member_form = AddMemberForm(request.POST, current_user=request.user,  create_by=getCreator.created_by)
+    print("the creator is: ",getCreator.created_by)
 
     edit_role_form = EditRoleForm()
     user = request.user
@@ -749,7 +751,7 @@ def team_list(request, project_id):
                 from_email = settings.EMAIL_HOST_USER
                 to_email = [user.email]
 
-                # Plain text version (fallback)
+                #Plain text version (fallback)
                 text_content = "You have been assigned a new task."
                 getDueDate = due_date_obj.strftime("%B %d, %Y at %I:%M %p")
                 # HTML version with a card-like design

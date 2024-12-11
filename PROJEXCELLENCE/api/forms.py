@@ -274,12 +274,15 @@ class AddMemberForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         current_user = kwargs.pop('current_user', None) 
+        create_by = kwargs.pop('create_by', None) 
         team = kwargs.pop('team', None)  
         super().__init__(*args, **kwargs)
 
        
         if current_user:
             self.fields['users'].queryset = User.objects.exclude(id=current_user.id)
+        if create_by:
+            self.fields['users'].queryset = User.objects.exclude(id=create_by.id)
         else:
             self.fields['users'].queryset = User.objects.all()
 
