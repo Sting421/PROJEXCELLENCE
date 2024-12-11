@@ -33,10 +33,10 @@
     }
 
     .project-item {
-        background-image: url("{% static 'res/logoPlaceHolder.png' %}");
+        /* background-image: url("{% static 'res/logoPlaceHolder.png' %}");
         background-size: cover;
         background-position: center;
-        background-blend-mode: overlay;
+        background-blend-mode: overlay; */
         background-color: rgba(255, 255, 255, 0.918);
         border: 1px solid #e0e0e0;
         border-radius: 8px;
@@ -275,6 +275,11 @@
                     <button class="btn" type="button" id="dropdownMenuButton" aria-expanded="false" >
                         <a class="view-txt" href="{% url 'blog_post' project.id %}"><i class="bi bi-chat-square-text"title="Chat Box" style="font-size: 25px;"></i></a>
                     </button>
+                    {%if project.created_by.id == request.user.id%}
+                        <button class="btn" type="button" id="dropdownMenuButton" aria-expanded="false" >
+                            <a class="view-txt" href="{% url 'timelinePM' project.id %}"><i class="bi bi-calendar-week" style="font-size: 25px;"></i></a>
+                        </button>
+                    {%endif%}
                 </div>
             </div>
       

@@ -131,6 +131,68 @@ def timeline(request):
     
     return render(request, 'timeline.html', context)
 
+@login_required
+def timelinePMview(request,project_id):
+    # Get tasks
+    if Project.objects.get(id=project_id).created_by != request.user:
+        raise Http404("You are not authorized to view this task")
+
+    tasks = Task.objects.filter(project_id=project_id).order_by("due_date")
+    print(f"Number of tasks found: {tasks.count()}")  # Debug print
+
+    current_date = datetime.now(local_timezone)
+    year = int(request.GET.get('year', current_date.year))
+    month = int(request.GET.get('month', current_date.month))
+    current_day = current_date.day
+    current_month = current_date.month
+    current_year = current_date.year
+   
+    cal = Calendar(firstweekday=0)  
+
+    calendar_data = []
+    month_days = cal.monthdays2calendar(year, month)
+
+    for week in month_days:
+        processed_week = []
+        for day, weekday in week:
+            if day == 0:
+                if len(processed_week) == 0:  
+                    processed_week.append((day, 'prev-month'))
+                else: 
+                    processed_week.append((day, 'next-month'))
+            else:
+                processed_week.append((day, 'current-month'))
+        calendar_data.append(processed_week)
+
+    tasks_by_date = {}
+    for task in tasks:
+        if task.status != 'Done':
+            date_key = (
+            (task.due_date + timedelta(days=1)).strftime('%Y-%m-%d') 
+            if task.due_date 
+            else 'No Due Date'
+)
+                    
+            if date_key not in tasks_by_date:
+                tasks_by_date[date_key] = []
+            tasks_by_date[date_key].append(task)
+
+    for date_key, task_list in tasks_by_date.items():
+        print(f"Date: {date_key}, Tasks: {[task.task_name for task in task_list]}")
+
+    context = {
+        'year': year,
+        'month': month,
+        'month_name': month_name[month],
+        'current_day': current_day,
+        'current_month': current_month,
+        'current_year': current_year,
+        'calendar_data': calendar_data,
+        'tasks_by_date': tasks_by_date,
+    }
+    
+    return render(request, 'timeline.html', context)
+
 #addtask
 @login_required
 def myteams(request):
@@ -221,7 +283,7 @@ def task_details(request, pk):
         messages.success(request, "Task mark as done successfully!")
         return redirect('task_details', pk=pk)
     
-    if task.assigned_to != request.user and task.created_by != request.user:
+    if task.assigned_to != request.user and task.project_id.created_by != request.user  and task.created_by != request.user:
         raise Http404("You are not authorized to view this task")
     context = {
         "task": task  
@@ -695,16 +757,13 @@ def team_list(request, project_id):
 
                 # Create the email
                 email = EmailMultiAlternatives(
-                    subject="[ New Task Assigned ]" + timezone.now().strftime("%B %d, %Y at %I:%M %p"),
+                    subject="[ New Task Assigned ]" + task.task_name,
                     body="You have been assigned a new task:", 
                     from_email=settings.EMAIL_HOST_USER,
                     to=[task.assigned_to.email]
                 )
                 email.attach_alternative(html_content, "text/html")  
                 email.send()
-
-
-
                 # send_mail(
                 #     "You have a new task",
                 #     "Created by: " + request.user.first_name + " " + request.user.last_name + "\n" +

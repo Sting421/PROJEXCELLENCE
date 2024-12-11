@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% load static %}
+{% load custom_filters %}
+{% block title %}Resource Library{% endblock title %}Dashboard
+{% block extra_css %}
+<style>
+    .container {
+        display: flex;
+        height: 100%;
+        flex-wrap: wrap;
+        flex-direction: column;
+        margin-left: 3.5%;
+        user-select: none;
+    }
+    
+    .calendar {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        padding: 20px;
+        width: 108%;
+        margin-top: 60px;
+    }
+
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 0.2fr);
+        gap: 3px;  
+        width:
+    }
+
+    .calendar-day-header {
+        text-align: center;
+        font-weight: bold;
+        padding: 10px;
+        background: #f5f5f5;
+        width: 190px;
+    }
+
+    .calendar-day {
+        text-align: center;
+        padding: 10px;
+        border: 1px solid #eee;
+        width: 190px;
+        height: 128px; /* Set a height for the scrollable container */
+        overflow-y: auto; /* Enable vertical scrolling */
+    }
+
+    .calendar-day:hover {
+        background: #f8f8f8;
+        cursor: pointer;
+    }
+
+    .current-day {
+        background: #c4faea;
+        font-weight: bold;
+    }
+    .task-container{
+        display: center;
+        flex-direction: column;
+        margin-bottom: 10px;
+        width: 100%;
+        max-height: 80%;
+    }
+    
+    .task-item {
+        display: flex;
+        text-align: left;
+        background: #fcd6d6;
+        color: #f44336;
+        flex-direction: column;
+        padding: 5px 5px 5px 10px;
+        border-radius: 10px;
+    }
+
+    .task-completed {
+        background: #e8f5e9;
+        text-decoration: line-through;
+        color: #666;
+    }
+
+    .task-priority {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-left: 5px;
+    }
+
+    .priority-high {
+        background: #f44336;
+    }
+
+    .priority-medium {
+        background: #ff9800;
+    }
+
+    .priority-low {
+        background: #4caf50;
+    }
+    .btn-primary{
+        background-color: #46DFB1;
+        border-color: #46DFB1;
+    }
+    .btn-primary:hover{
+        background-color: #2a866b;
+        border-color: #2a866b;
+    }
+    h1{
+        font-weight: 700;
+        color: #314863;
+    }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+<div class="container">
+    <h1>Timeline</h1>
+    <div class="calendar">
+        <div class="calendar-header">
+            <button class="btn btn-primary" id="prevMonth">&lt; Previous</button>
+            <h2>{{ month_name }} {{ year }} </h2>
+            <button class="btn btn-primary" id="nextMonth">Next &gt;</button>
+        </div>
+        <div class="calendar-grid">
+            <div class="calendar-day-header">Monday</div>
+            <div class="calendar-day-header">Tuesday</div>
+            <div class="calendar-day-header">Wednesday</div>
+            <div class="calendar-day-header">Thursday</div>
+            <div class="calendar-day-header">Friday</div>
+            <div class="calendar-day-header">Saturday</div>
+            <div class="calendar-day-header">Sunday</div>
+            {% for week in calendar_data %}
+                {% for day in week %}
+                    {% if day.0 == current_day and month == current_month and year == current_year %}
+                        <div class="calendar-day current-day">
+                    {% else %}
+                        <div class="calendar-day">
+                    {% endif %}
+                        <!-- Display the day number -->
+                        {% if day.1 == 'prev-month' %}
+                            
+                        {% elif day.1 == 'next-month' %}
+                        {% with year_str=year|stringformat:"04d" month_str=month|stringformat:"02d" day_str=day.0|stringformat:"02d" %}
+                            {% with date_key=year_str|add:"-"|add:month_str|add:"-"|add:day_str %}
+                                {% if tasks_by_date|get_item:date_key %}
+                                    {% for task in tasks_by_date|get_item:date_key %}
+                                        <div class="task-container">
+                                            <div class="task-item" title="{{ task.description|default:'' }}">
+                                                <span class="task-name">Task Name: {{ task.task_name }}</span>
+                                                <span class="task-project">From Project: {{ task.project_id }}</span>
+                                                {% if task.priority %}
+                                                    <span class="task-priority priority-{{ task.priority|lower }}">
+                                                        {{ task.priority|title }}
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endwith %}
+                        {% endwith %}
+                           
+                        {% else %}
+                            <span>{{ day.0 }}</span>
+                        {% endif %}
+                        <!-- Display tasks for this day -->
+                        {% with year_str=year|stringformat:"04d" month_str=month|stringformat:"02d" day_str=day.0|stringformat:"02d" %}
+                        {% with date_key=year_str|add:"-"|add:month_str|add:"-"|add:day_str %}
+                            {% if tasks_by_date|get_item:date_key %}
+                                {% for task in tasks_by_date|get_item:date_key %}
+                                    <div class="task-container" >
+                                        <div class="task-item" onclick="goToTaskDetails(event, '{% url 'task_details' task.id %}')" title="{{ task.description|default:'' }}">
+                                            <span class="task-name">{{ task.task_name |capfirst}}</span>
+                                            <span class="task-project">{{ task.project_id |capfirst}}</span>
+                                            {% if task.priority %}
+                                                <span class="task-priority priority-{{ task.priority|lower }}">
+                                                    {{ task.priority|title }}
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                    {% endwith %}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('prevMonth').addEventListener('click', function() {
+    const currentUrl = new URL(window.location.href);
+    const searchParams = currentUrl.searchParams;
+    let year = parseInt(searchParams.get('year')) || new Date().getFullYear();
+    let month = parseInt(searchParams.get('month')) || (new Date().getMonth() + 1);
+    
+    month--;
+    if (month < 1) {
+        month = 12;
+        year--;
+    }
+    
+    window.location.href = `?year=${year}&month=${month}`;
+});
+
+document.getElementById('nextMonth').addEventListener('click', function() {
+    const currentUrl = new URL(window.location.href);
+    const searchParams = currentUrl.searchParams;
+    let year = parseInt(searchParams.get('year')) || new Date().getFullYear();
+    let month = parseInt(searchParams.get('month')) || (new Date().getMonth() + 1);
+    
+    month++;
+    if (month > 12) {
+        month = 1;
+        year++;
+    }
+    
+    window.location.href = `?year=${year}&month=${month}`;
+});
+
+function goToTaskDetails(event, url) {
+    // Don't redirect if clicking on dropdown or its children
+    if (!event.target.closest('.dropdown')) {
+        window.location.href = url;
+    }
+}
+</script>
+
+{% endblock %}

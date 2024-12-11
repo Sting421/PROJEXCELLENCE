@@ -38,6 +38,8 @@ urlpatterns = [
     
     #----------------   Timeline   ----------------
     path("timeline/", views.timeline, name="timeline"),
+
+    path("timeline/<int:project_id>/", views.timelinePMview, name="timelinePM"),
     
     #----------------   Project   ----------------
     path("project/", views.project_list, name="project"),
